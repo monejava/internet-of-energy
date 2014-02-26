@@ -6,5 +6,5 @@ Il servizio cittadino è il cuore dell'architettura software e, al fine di suppo
 
 Al fine di rispettare i principi di alta coesione e basso accoppiamento ho deciso di implementare, per ogni classe presente nell'ontologia, una corrispettiva classe \code{Entity} Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella SIB.
 
-Lo scambio dei messaggi è implementato tramite il meccanismo delle   
+Lo scambio dei messaggi è implementato tramite il meccanismo delle \code{Subscription}. Questo comporta che i messaggi non sono inviati direttamente al destinatario, ma vengono scritti sul SIB cittadino il quale, notifica 
 

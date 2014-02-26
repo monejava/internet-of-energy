@@ -1,0 +1,110 @@
+\chapter{Appendici}
+
+\section{A - Installazione}
+
+Per far interagire tutti gli elementi necessari alla simulazione è necessario installare numerosi framework e librerie. In questa sezione verrà data una guida il più esaustiva possibile per installare e configurare un ambiente funzionante. Verranno inoltre forniti i link specifici per l'installazione di ogni componente qualora insorgano delle problematiche.
+
+Il procedimento di installazione è testato e funzionante su Debian \emph{7} Wheezy (con versioni precedenti potrebbero esserci problemi con le versioni delle librerie) e Ubuntu dalla versione \emph{12.10} alla \emph{13.10}. È stato anche possibile completare l'installazione su MacOSX ma non essendomene occupato personalmente non posso assicurare nulla al riguardo.
+
+\subsection{Installazioni preliminari}
+
+Questi sono i pacchetti che vanno installati su Debian 7 al fine di installare tutti i componenti successivi. Non è sicuro che siano gli unici necessari. È probabile che lo stesso comando vada bene anche per Ubuntu.
+
+\begin{bash}
+sudo apt-get install bison flex build-essential zlib1g-dev tk8.4-dev blt-dev libxml2-dev libpcap0.8-dev autoconf automake libtool libxerces-c2-dev libproj-dev libproj0 libfox-1.6-dev libgdal1h libboost-dev
+\end{bash}
+
+\subsection{OMNeT++} 
+
+AL momento di scrivere questo documento la versione usata per il progetto è la 4.4 ma in generale le versioni dalla 4.2 in su dovrebbero andare bene. Questo è il link per la versione 4.4 \url{http://www.omnetpp.org/omnetpp/cat_view/17-downloads/1-omnet-releases}. Dopo aver scaricato il tar.gz lo si estragga e si proceda con l'installazione:
+
+\begin{bash}
+./configure
+make
+bin/omnetpp
+\end{bash}
+
+\bigskip
+\noindent
+Durante l'installazione verrà detto di inserire alcune variabili d'ambiente nel file .bashrc non dimenticarsi di eseguire queste direttive.
+
+In Ubuntu 13.10 si può assistere a un bug che determina la sparizione dei menu di OMNeT++, per risolverlo è necessario impostare la seguente variabile d'ambiente nel file  \code{$\sim$/.basrc}:
+
+\begin{bash}
+export UBUNTU_MENUPROXY=0
+\end{bash}
+
+\noindent
+per maggiori informazioni guardare questa discussione su StackOverflow \url{http://stackoverflow.com/questions/19452390/eclipse-menus-dont-show-up-after-upgrading-to-ubuntu-13-10}
+
+\subsection{SUMO}
+
+Seppur SUMO sia disponibile tra i pacchetti di Debian/Ubuntu è necessario comunque scaricare i sorgenti tramite SVN di una versione successiva alla \emph{15340} e compilarli. Questo perchè la versione attualmente disponibile tramite il gestore di pacchetti, ovvero la \emph{0.19.0}, non supporta l'importazione nelle mappe (i file .net.xml) dei dati del profilo altimetrico, fondamentali per avere un modello di consumo energetico del veicolo realistico.
+
+Quindi i comandi necessari, presupponendo di avere Subversion installato, sono:
+
+\begin{bash}
+svn co https://sumo.svn.sourceforge.net/svnroot/sumo/trunk/sumo
+make -f Makefile.cvs
+./configure
+make
+sudo make install
+\end{bash}
+
+Per una trattazione più completa dell'installazione rimando il sito ufficiale \url{http://sourceforge.net/apps/mediawiki/sumo/index.php?title=Installing/Linux_Build}
+
+\subsection{SMART-M3}
+
+La tecnologia Smart-M3 forisce la SIB, ovvero il database semantico usato per lo scambio di informazioni tra i vari componenti del sistema. Noi utilizzeremo nello specifico la RedSIB sviluppata da ARCES e basata su un progetto di Nokia
+(Nokia C Smart M3).
+La versione supportata dal nostro ambiente è la 0.9 ma anche le successive dovrebbero andare bene. Il link per il download è questo: \url{http://sourceforge.net/projects/smart-m3/files/Smart-M3-RedSIB_0.9/}. Una volta estratto il tar.gz al suo interno troveremo sia i sorgenti che i pacchetti per Debian. Nel caso si intenda compilare i sorgenti rimando alle istruzioni contenute all'interno del pacchetto. Qui ci limiteremo a installare i deb attraverso gli script forniti:
+
+\begin{bash}
+sudo ./install.sh     #per architetture x86
+sudo ./install_x64.sh #per architetture amd64
+\end{bash}
+
+All'interno del pacchetto viene data la possibilità di utilizzare Virtuoso come database RDF ma, seppur probabilmente sia più performante, non lo utilizzeremo in quanto è una feature introdotta recentemente e quindi non abbastanza testata.
+
+\subsection{KPI_Low}
+
+La libreria KPI_Low è un API scritta in C che, attraverso il protocollo SSAP, permette di interfacciarsi alla SIB. È stata scritta da Jussi Kiljander, un ricercatore del VTT Technical Research Centre of Finland, e successivamente modificata da Federico Montori di UNIBO per aggiungervi il supporto alle query SPARQL. Io l'ho modificata al fine di rimuovere dei Memory Leak trovati grazie al tool Valgrind.
+In quanto la versione della libreria non è quella originale è necessario usare la nostra versione che si trova nella cartella \code{kpi_low_mod} nella root del progetto.
+Le KPI_Low necessitano della libreria SCEW per il parsing XML, la quale non si trova nei repository di Debian/Ubutnu,  è quindi necessario scaricarla dal seguente indirizzo \url{http://nongnu.askapache.com/scew/scew-1.1.3.tar.gz} e compilarla. Una volta scaricata estrarla e spostarsi nella cartella estratta:
+
+\begin{bash}
+./configure
+make
+sudo make install
+\end{bash}
+
+Adesso possiamo procedere con l'installazione delle KPI_Low, spostarsi dunque nella cartella \code{kpi\_low\_mod}:
+
+\begin{bash}
+./autogen.sh
+./configure
+make
+sudo make install
+\end{bash}
+
+per istruzioni più dettagliate guardare il documento \code{kpi_low_mod/KPI_Low.pdf}
+
+\subsection{Importare il progetto in OMNeT++}
+
+Adesso che abbiamo predisposto l'ambiente possiamo procedere con l'importazione in OMNeT++ del simulatore e con la compilazione. Apriamo OMNeT++, se è il primo avvio ci chiederà che Workspace usare proponendocene uno predefinito, in tal caso noi scegliamo la cartella \code{simulator} all'interno della root del progetto. Probabilmente verrà chiesto anche se si vuole abilitare il supporto ai framework MiXiM e INET e se si vogliono importare i porgetti di esmpio, in entrambi i casi diciamo di no. Nel caso in cui il workspace fosse già impostato allora andiamo su \code{File -> Switch Workspace -> Other...} e selezioniamo la cartella \code{simulator} nella root del progetto proprio come sopra. Se a seguito della selezione del workspace \code{simulator} la scheda dei progetti rimane vuota allora andiamo su \code{File -> Import... -> General/Existing Project into Workspace -> Next} e come root directory scegliamo \code{simulator}, dovremmo vedere il progetto \code{veins-2.1} nel riquadro \code{Projects}, lo selezioniamo e clicchiamo su \code{Finish}.
+
+A questo punto non rimane che compilare il progetto. La compilazione può avvenire in due modalità:
+
+\begin{itemize}
+	\item \textbf{gcc-debug}: Compila includendo le informazioni di debug rendendo possibile l'utilizzo di \code{gdb} per analizzare il funzionamento del programma. OMNeT++ mette a disposizione un front-end visuale per \code{gdb} che permette di inserire breakpoint nel sorgente ed eseguire l'avanzamento step a step. Inoltre permette di visualizzare il contenuto delle variabili durante l'esecuzione semplicemente semplicemente spostando il cursore sulla variabile interessata nel riquadro dei sorgenti. Queste funzionalità sono da prendere seriamente in considerazione qualora, a seguito di modifiche, la simulazione dovesse fallire.
+	\item \textbf{gcc-release}: Compila non includendo le informazioni di debug e applicando le ottimizzazioni previste dal compilatore \code{gcc} con il flag \code{-O2}. Ovviamente questa configurazione è più performante della precedente e andrebbe usata quando, una volta ritenuto stabile il codice, si vogliono eseguire simulazioni batch.
+\end{itemize}
+
+Il cambio di modalità di compilazione si può effettuare tramite: \code{Tasto DX su veins-2.1 -> Build Configurations -> Set Active -> gcc-debug/gcc-release}.
+
+I file che fanno parte del simulatore si trovano sotto la directory \code{simulator/veins-2.1/examples/veins}. 
+
+
+\section{B - UniboGeoTools}
+
+Libreria java sviluppata per motivi strani

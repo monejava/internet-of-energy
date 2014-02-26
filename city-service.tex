@@ -1,0 +1,10 @@
+\chapter{Servizio Cittadino}
+
+Il servizio cittadino è il cuore dell'architettura software e, al fine di supportare le interazioni tra gli EV e la Smart Grid, fornisce un servizio di prenotazione delle ricariche estremante flessibile. Lo scambio di informazioni avviene tramite un SIB cittadino e la struttura dei messaggi è definita all'interno dell'Ontologia. 
+
+\section{Architettura}
+
+Al fine di rispettare i principi di alta coesione e basso accoppiamento ho deciso di implementare, per ogni classe presente nell'ontologia, una corrispettiva classe \code{Entity} Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella SIB.
+
+Lo scambio dei messaggi è implementato tramite il meccanismo delle   
+

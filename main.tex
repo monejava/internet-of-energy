@@ -6,7 +6,7 @@
 \usepackage[utf8x]{inputenc} %fornisce i caratteri accentati
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{listings} %box per codice sorgente
+
 \usepackage{xcolor}
 \usepackage{caption}
 \usepackage{subcaption}
@@ -14,110 +14,7 @@
 \usepackage{hyperref}
 \usepackage{underscore}
 
-\newcommand{\code}[1]{\texttt{#1} }
-
-\newcounter{main}
-\setcounter{main}{1}
-
-    % bash commands from:
-    %http://www.math.montana.edu/Rweb/Rhelp/00Index.html
-%addgroup,adduser,alias,ant,apropos,apt-get,aptitude,aspell,awk,basename,bash,bc,bg,break,builtin,bzip2,cal,case,cat,cd,cfdisk,chgrp,chkconfig,chmod,chown,chroot,cksum,clear,cmp,comm,command,continue,cp,cron,crontab,csplit,cut,date,dc,dd,ddrescue,declare,df,diff,diff3,
-%    dig,dir,dircolors,dirname,dirs,dmesg,du,echo,egrep,eject,enable,env,
-%    ethtool,eval,exec,exit,expand,expect,export,expr,false,fdformat,
-%    fdisk,fg,fgrep,file,find,fmt,fold,for,format,free,fsck,ftp,function,
-%    fuser,gawk,getopts,git,grep,groups,gzip,gunzip,hash,head,help,history,hostname,
-%    id,if,ifconfig,ifdown,ifup,import,install,java, java6, java_cur
-%    join,kill,killall,less,let,ln,local,locate,logname,logout,look,lpc,lpr,lprint,lprintd,
-%    lprintq,lprm,ls,lsof,make,man,mkdir,mkfifo,mkisofs,mknod,mmv,more,
-%    mount,mtools,mtr,mv, mysql, netstat,nice,nl,nohup,notify-send,
-%    noweb,noweave,nslookup,op, open,passwd,paste,pathchk,ping,pkill,popd,pr,printcap,printenv,
-%    printf,ps,pushd,pwd,quota,quotacheck,quotactl,ram,rcp,read,
-%    readarray,readonly,reboot,remsync,rename,renice,return,rev,rm,rmdir,
-%    rsync,scp,screen,sdiff,sed,select,seq,set,sftp,shift,shopt,shutdown,
-%    sleep,slocate,sort,source,split,ssh,strace,su,sudo,sum,svn, svn2git,
-%    symlink,sync,tail,tar,tee,test,time,times,top,touch,tr,traceroute,trap,true,
-%    tsort,tty,type,ulimit,umask,umount,unalias,uname,unexpand,uniq,
-%    units, unrar, unset,unshar,until,useradd,usermod,users,uudecode,uuencode,
-%    vdir,vi,vmstat,watch,wc,Wget,whereis,which,while,who,whoami,write,zcat
-
-\lstdefinelanguage{BASH}
-{
-    otherkeywords={=, +, [, ], (, ), \{, \}, *},
-    morecomment=[s]{?}{?},
-    %morestring=[s]{"}{"},
-    morekeywords={make,apt-get,sudo},
-    breaklines=true,
-    keywordstyle=\bfseries,
-    stringstyle=\color{red},
-    emphstyle=\color{black}\bfseries,
-    commentstyle=\color{dark-green}\slshape,
-}
-
-\lstnewenvironment{bash}[1][firstnumber=\themain,name=main]
-  {\lstset{language=BASH,
-           basicstyle=\ttfamily\footnotesize,
-           numbers=left,
-           numberstyle=\tiny\color{gray},
-           backgroundcolor=\color{lightgray},
-           breaklines=true,
-           prebreak=\small\symbol{'134},
-           breakatwhitespace=true,
-           mathescape=false
-           morecomment=[l]{\#}
-           #1
-          }
-}
-{\setcounter{main}{\value{lstnumber}}}
-
-%XML
-\definecolor{maroon}{rgb}{0.5,0,0}
-\definecolor{darkgreen}{rgb}{0,0.5,0}
-\lstdefinelanguage{XML}
-{
-  basicstyle=\ttfamily,
-  morestring=[s]{"}{"},
-  morecomment=[s]{?}{?},
-  morecomment=[s]{!--}{--},
-  commentstyle=\color{darkgreen},
-  moredelim=[s][\color{black}]{>}{<},
-  moredelim=[s][\color{red}]{\ }{=},
-  stringstyle=\color{blue},
-  identifierstyle=\color{maroon}
-}
-
-\lstnewenvironment{xml}[1][firstnumber=\themain,name=main]
-  {\lstset{language=xml,
-           basicstyle=\ttfamily\footnotesize,
-           numbers=left,
-           numberstyle=\tiny\color{gray},
-           backgroundcolor=\color{lightgray},
-           breaklines=true,
-           breakatwhitespace=true,
-           #1
-          }
-}
-{\setcounter{main}{\value{lstnumber}}}
-
-%\lstnewenvironment{bash}{\begin{lstlisting}[basicstyle=\ttfamily\footnotesize,frame=single,breaklines=true,prebreak=\small\symbol{'134},breakatwhitespace=true]}{\end{lstlisting}}
-
-
-
-%\begin{lstlisting}[basicstyle=\ttfamily\footnotesize,frame=single,breaklines=true,prebreak=\small\symbol{'134},breakatwhitespace=true]
-%
-%\end{lstlisting}
-
-%\lstdefinestyle{BashInputStyle}{
-%  language=bash,
-%  basicstyle=\small\sffamily,
-%  numbers=left,
-%  numberstyle=\tiny,
-%  numbersep=3pt,
-%  frame=tb,
-%  columns=fullflexible,
-%  backgroundcolor=\color{yellow!20},
-%  linewidth=0.9\linewidth,
-%  xleftmargin=0.1\linewidth
-%}
+\input{source-code-util.tex}
 
 \textwidth=450pt\oddsidemargin=0pt
 \begin{document}

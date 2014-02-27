@@ -1,10 +1,55 @@
 \chapter{Servizio Cittadino}
 
-Il servizio cittadino è il cuore dell'architettura software e, al fine di supportare le interazioni tra gli EV e la Smart Grid, fornisce un servizio di prenotazione delle ricariche estremante flessibile. Lo scambio di informazioni avviene tramite un SIB cittadino e la struttura dei messaggi è definita all'interno dell'Ontologia. 
+Il servizio cittadino è il cuore dell'architettura software e, al fine di supportare le interazioni tra gli EV e la Smart Grid. Lo scambio di informazioni avviene tramite un SIB cittadino e la struttura dei messaggi è definita all'interno dell'Ontologia. 
 
 \section{Architettura}
 
-Al fine di rispettare i principi di alta coesione e basso accoppiamento ho deciso di implementare, per ogni classe presente nell'ontologia, una corrispettiva classe \code{Entity} Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella SIB.
+Il principio di base con cui ho progettato il servizio cittadino è la modularità e riusabilità. Ho quindi creato una libreria, \code{ioe_lib}, condivisa tra il servizio cittadino e l'applicazione mobile. Essa fornisce i servizi di base di accesso al \emph{SIB}, nonchè un approccio \emph{Object Oriented} ai dati in essa contenuti. Ho infatti implementato, per ogni classe presente nell'ontologia, una corrispettiva classe \code{Entity} Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella \emph{SIB}. 
 
-Lo scambio dei messaggi è implementato tramite il meccanismo delle \code{Subscription}. Questo comporta che i messaggi non sono inviati direttamente al destinatario, ma vengono scritti sul SIB cittadino il quale, notifica 
+%rispettare i principi di alta coesione e basso accoppiamento ho deciso di implementare
+
+Lo scambio dei messaggi è implementato tramite il meccanismo delle \code{Subscription}. Questo comporta che i messaggi non sono inviati direttamente al destinatario, ma vengono scritti sul \emph{SIB} cittadino il quale manda una notifica al \emph{KP} che era sottoscritto a quella particolare modifica.
+
+\subsection{La libreria IoE}
+
+Questa libreria implementa la logica applicativa ovvero il nucleo operativo del nostro strato di servizi. Viene infatti sfruttata sia dal servizio cittadino che dall'applicazione mobile. Viene inoltre utilizzato da un visualizzatore di ricariche, nato da un progetto parallelo al mio, del quale sviluppo si è occupata una ragazza di Ingegneria.
+
+\subsubsection{Connessione al SIB}
+
+La connessione al \emph{SIB} viene eseguita da una libreria Java (JavaKPI), sviluppata da ARCES, che implementa il protocollo SSAP. Ho creato un wrapper di questa libreria che ne semplifica l'utilizzo e aggiunge alcune funzionalità. Essa si trova nel package \code{it.unibo.ioe.sib}.
+
+La libreria JavaKPI rappresenta le triple RDF come vettore di Stringhe di 5 elementi (\code{Vector<String>}): soggetto, predicato, oggetto, tipo soggetto, tipo oggetto. 
+Per semplificare la gestione delle triple RDF, che sono l'entità di base su cui si basa il SIB, ho creato una classe \code{RdfTriple} che possiede gli attributi \code{subject},\code{predicate}, \code{object}, \code{subjectType}, \code{objectType} e i corrispettivi \code{getter} e \code{setter}.
+
+La maggior parte delle operazioni che si possono eseguire con la libreria JavaKPI richiedono due passaggi: l'invio del comando, e il parsing della risposta. Questo perché ogni operazione di interazione con il SIB avviene tramite messaggi XML, conformi al protocollo SSAP. La libreria genera automaticamente il messaggio da inviare alla SIB ma lascia al programmatore l'onere di effettuare il parsing della risposta. 
+
+Ho quindi mappato tutte le operazioni di interazione con la SIB all'interno della classe \code{SibController} svolgendo le operazioni di parsing anche sui messaggi di risposta. Al posto dei vettori di stringhe ho utilizzato istanze della classe \code{RdfTriple}. Mentre dove venivano usate liste di triple (es: inserimento multiplo di triple, risultati di query SPARQL) ho sostituito con liste di oggeti di tipo \code{RdfTriple} (\code{List<RdfTriple>}). La classe che si occupa di convertire i tipi di dato usati dalla libreria \code{JavaKPI} ai tipi usati dal wrapper da me creato è \code{RdfParser}.
+
+%Inoltre ho creato una classe chiamata \code{SibUtil} che fornisce funzioni per velocizzare alcuni compiti, come la creazione di URI univoci  per le istanze di classi dell'ontologia, oppure la conversione di una lista di \code{RdfTriple}
+
+
+
+%\begin{itemize}
+%	\item \code{connect()}:
+%	\item \code{disconnect()}:
+%	\item \code{isConnected(String)}:
+%	\item \code{updateQuery(String)}:
+%	\item \code{deleteQuery(String)}:
+%	\item \code{insertQuery(String)}:
+%	\item \code{insert(RdfTriple)}:
+%	\item \code{update(RdfTriple,RdfTriple)}:
+%	\item \code{remove(RdfTriple)}:
+%\end{itemize}
+
+%http://sourceforge.net/projects/smartm3-javakpi/
+
+\subsubsection{Entities}
+
+Ogni classe dell'ontologia viene mappata con una rispettiva classe Java. Per questa scelta architetturale mi sono ispirato all'ORM (Object Relational Mapping) che è una tecnica di programmazione che favorisce l'integrazione di sistemi software aderenti al paradigma della programmazione orientata agli oggetti con sistemi RDBMS (Relational database management system). %http://it.wikipedia.org/wiki/Object-relational_mapping
+Il mapping che ho creato è molto semplice e tiene conto solo delle proprietà strettamente necessarie nello strato di servizi e tralascia alcuni dettagli come l'unità di misura che attualmente, malgrado siano previsti nell'ontologia, vengono dati per scontati a livello applicativo.
+Le proprietà delle classi che hanno come oggetto un tilo letterale sono state mappate con tipi primitivi Java (\code{int},\code{double},\code{String} ecc..). Mentre le proprietà che come oggetto 
+
+
+
+
 

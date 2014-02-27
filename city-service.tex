@@ -1,10 +1,10 @@
 \chapter{Servizio Cittadino}
 
-Il servizio cittadino è il cuore dell'architettura software e, al fine di supportare le interazioni tra gli EV e la Smart Grid. Lo scambio di informazioni avviene tramite un SIB cittadino e la struttura dei messaggi è definita all'interno dell'Ontologia. 
+Il servizio cittadino (\emph{City Service}) è il cuore dell'architettura software e, al fine di supportare le interazioni tra gli EV e la Smart Grid. Lo scambio di informazioni avviene tramite un SIB cittadino e la struttura dei messaggi è definita all'interno dell'Ontologia. 
 
 \section{Architettura}
 
-Il principio di base con cui ho progettato il servizio cittadino è la modularità e riusabilità. Ho quindi creato una libreria, \code{ioe_lib}, condivisa tra il servizio cittadino e l'applicazione mobile. Essa fornisce i servizi di base di accesso al \emph{SIB}, nonchè un approccio \emph{Object Oriented} ai dati in essa contenuti. Ho infatti implementato, per ogni classe presente nell'ontologia, una corrispettiva classe \code{Entity} Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella \emph{SIB}. 
+Il principio di base con cui ho progettato il \emph{City Service} è la modularità e riusabilità. Ho quindi creato una libreria, \code{ioe_lib}, condivisa tra il servizio cittadino e l'applicazione mobile. Essa fornisce i servizi di base di accesso al \emph{SIB}, nonchè un approccio \emph{Object Oriented} ai dati in essa contenuti. Ho infatti implementato, per ogni classe presente nell'ontologia, una corrispettiva classe \code{Entity} Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella \emph{SIB}. 
 
 %rispettare i principi di alta coesione e basso accoppiamento ho deciso di implementare
 
@@ -12,7 +12,7 @@ Lo scambio dei messaggi è implementato tramite il meccanismo delle \code{Subscr
 
 \subsection{La libreria IoE}
 
-Questa libreria implementa la logica applicativa ovvero il nucleo operativo del nostro strato di servizi. Viene infatti sfruttata sia dal servizio cittadino che dall'applicazione mobile. Viene inoltre utilizzato da un visualizzatore di ricariche, nato da un progetto parallelo al mio, del quale sviluppo si è occupata una ragazza di Ingegneria.
+Questa libreria implementa la logica applicativa ovvero il nucleo operativo del nostro strato di servizi. Viene infatti sfruttata sia dal \emph{City Service} che dall'applicazione mobile. Viene inoltre utilizzato da un visualizzatore di ricariche, nato da un progetto parallelo al mio, del quale sviluppo si è occupata una ragazza di Ingegneria.
 
 \subsubsection{Connessione al SIB}
 
@@ -23,11 +23,9 @@ Per semplificare la gestione delle triple RDF, che sono l'entità di base su cui
 
 La maggior parte delle operazioni che si possono eseguire con la libreria JavaKPI richiedono due passaggi: l'invio del comando, e il parsing della risposta. Questo perché ogni operazione di interazione con il SIB avviene tramite messaggi XML, conformi al protocollo SSAP. La libreria genera automaticamente il messaggio da inviare alla SIB ma lascia al programmatore l'onere di effettuare il parsing della risposta. 
 
-Ho quindi mappato tutte le operazioni di interazione con la SIB all'interno della classe \code{SibController} svolgendo le operazioni di parsing anche sui messaggi di risposta. Al posto dei vettori di stringhe ho utilizzato istanze della classe \code{RdfTriple}. Mentre dove venivano usate liste di triple (es: inserimento multiplo di triple, risultati di query SPARQL) ho sostituito con liste di oggeti di tipo \code{RdfTriple} (\code{List<RdfTriple>}). La classe che si occupa di convertire i tipi di dato usati dalla libreria \code{JavaKPI} ai tipi usati dal wrapper da me creato è \code{RdfParser}.
+Ho quindi mappato tutte le operazioni di interazione con la SIB all'interno della classe \code{KpConnector} svolgendo le operazioni di parsing anche sui messaggi di risposta. Al posto dei vettori di stringhe ho utilizzato istanze della classe \code{RdfTriple}. Mentre dove venivano usate liste di triple (es: inserimento multiplo di triple, risultati di query SPARQL) ho sostituito con liste di oggeti di tipo \code{RdfTriple} (\code{List<RdfTriple>}). La classe che si occupa di convertire i tipi di dato usati dalla libreria \code{JavaKPI} ai tipi usati dal wrapper da me creato è \code{RdfParser}.
 
-%Inoltre ho creato una classe chiamata \code{SibUtil} che fornisce funzioni per velocizzare alcuni compiti, come la creazione di URI univoci  per le istanze di classi dell'ontologia, oppure la conversione di una lista di \code{RdfTriple}
-
-
+La classe \code{KpConnector} necessita di indirizzo, porta e nome del SIB a cui ci si vuole connettere, questo perché il suo utilizzo deve essere il più generico possibile. Nel nostro caso però le connessioni avvengono sempre verso gli stessi due SIB (CITY e DASH), ho quindi creato una classe factory (\code{KpFactory}) che, conoscendo i parametri di connessione necessari, crea due istanze di \code{KpConnector}, una per il CITY SIB e una per il DASH SIB, e restituisce sempre quello evitando quindi la creazione di istanze di oggetti inutili. Essendo la libreria \code{JavaKPI} non thread-safe viene comunque data la possibilità di creare istanze in modo veloce nel caso si lavori in ambienti multi-thread. Questo aspetto verrà approfondito più avanti dove vedremo come, tramite la tecnica dei pool di oggetti, possiamo risparmiare il tempo necessario a creare nuove istanze.
 
 %\begin{itemize}
 %	\item \code{connect()}:
@@ -45,9 +43,95 @@ Ho quindi mappato tutte le operazioni di interazione con la SIB all'interno dell
 
 \subsubsection{Entities}
 
-Ogni classe dell'ontologia viene mappata con una rispettiva classe Java. Per questa scelta architetturale mi sono ispirato all'ORM (Object Relational Mapping) che è una tecnica di programmazione che favorisce l'integrazione di sistemi software aderenti al paradigma della programmazione orientata agli oggetti con sistemi RDBMS (Relational database management system). %http://it.wikipedia.org/wiki/Object-relational_mapping
-Il mapping che ho creato è molto semplice e tiene conto solo delle proprietà strettamente necessarie nello strato di servizi e tralascia alcuni dettagli come l'unità di misura che attualmente, malgrado siano previsti nell'ontologia, vengono dati per scontati a livello applicativo.
-Le proprietà delle classi che hanno come oggetto un tilo letterale sono state mappate con tipi primitivi Java (\code{int},\code{double},\code{String} ecc..). Mentre le proprietà che come oggetto 
+Ogni classe dell'ontologia è stata mappata con una rispettiva classe Java (\code{Entity}) nel package \code{it.unibo.ioe.entity} . Per questa scelta architetturale mi sono ispirato all'ORM (Object Relational Mapping) che è una tecnica di programmazione che favorisce l'integrazione di sistemi software aderenti al paradigma della programmazione orientata agli oggetti con sistemi RDBMS (Relational database management system). %http://it.wikipedia.org/wiki/Object-relational_mapping
+
+\paragraph{Mapping} Il mapping che ho creato è molto semplice e tiene conto solo delle proprietà strettamente necessarie nello strato di servizi e tralascia alcuni dettagli come l'unità di misura che attualmente, malgrado siano previsti nell'ontologia, vengono dati per scontati a livello applicativo.
+Le proprietà delle classi che hanno come oggetto un letterale sono state mappate con tipi primitivi Java (\code{int},\code{double},\code{String} ecc..). Mentre le proprietà che come oggetto hanno un'altra classe sono rappresentate come attributo che come tipo ha l'\code{Entity}
+che corrisponde alla classe. 
+
+\paragraph{Serializzazone} Alcune \code{Entity} sono state opportunamente annotate al fine di poter essere serializzate in XML tramite la tecnologia \code{JAXB}. Questo è risultato necessario nel caso dei \emph{GCP} che vengono caricati da un file XML, nella cartella del \emph{City Service}, il quale si occupa poi di inserirli nel SIB. Ogni classe inoltre implementa l'interfaccia \code{java.io.Serializable} al fine di permettere il passaggio delle \code{Entity} tra le varie \code{Activity} dell'applicazione mobile.
+
+\paragraph{Esempio}
+
+La proprietà dell'ontologia \code{ioe:hasEVSE} ha come dominio \code{ioe:GridConnectionPoint} e come codominio \code{ioe:EVSE}. Inoltre tutte le classi dell'ontologia hanno al proprietà code{vcard:hasName}.
+
+Questa situazione viene tradotta nell'\code{Entity}:
+
+\begin{java}[caption={prova},label={lst:prova}]
+@XmlRootElement(name = "GCP")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class GCP implements Serializable {
+	@XmlTransient
+	private String URI;
+	private String gcpName;
+	@XmlElement(name = "EVSE")
+	private List<EVSE> evseList;
+	/* other properties*/
+	/* getter & setter*/	
+}
+\end{java}
+
+%\paragraph{Lista}
+
+%La lista di tutte le \code{Entity} usate nel progetto:
+
+%\begin{itemize}
+%	\item \code{Vehicle}: Veicolo Elettrico
+%	\item \code{Battery}:  Batteria del Veicolo Elettrico
+%	\item \code{GCP}
+%	\item \code{EVSE}
+%	\item \code{ChargeProfile}: Informazioni 
+%	\item \code{ChargeResponse}
+%	\item \code{EnergyInfo}
+%	\item \code{Recharge}
+%	\item \code{ReservationRetire}
+%	\item \code{ChargeOption}
+%	\item \code{ChargeRequest}
+%	\item \code{Connector}
+%	\item \code{GPS}
+%	\item \code{Reservation}
+%\end{itemize}
+
+\subsubsection{Controller}
+
+I \code{Controller} sono le classi delegate ad eseguire le operazioni \code{CRUD} (create, read, delete, update) con il SIB e si trovano nel package \code{it.unibo.ioe.controller}. Ne esiste uno per ogni \code{Entity}. Ogni \code{Controller} possiede un istanza di \code{KpConnector} che permette la comunicazione con il SIB. 
+
+\paragraph{Lettura} Le operazioni di lettura vengono eseguite tramite una query \code{SPARQL} che preleva dal SIB le informazioni necessarie che poi vengono inserite in una nuova istanza di \code{Entity} la quale viene restituita all'utente.
+
+\paragraph{Scrittura} Le operazioni di scrittura ricavano una lista di triple RDF a partire da un istanza di \code{Entity}. La lista di triple viene poi convertita in una \code{SPARQL} insert al fine di ridurre i dati inviati al SIB. L'operazione di conversione è eseguita da una funzione di della  classe \code{SibUtil}. Questa tecnica si rivela particolarmente utile quando si utilizza la libreria da un dispositivo mobile connesso a internet tramite rete cellulare (es: EDGE, GPRS, HSDPA ecc\dots).
+
+\paragraph{Aggiornamento} Le operazioni di aggiornamento ricavano i dati aggiornati tramite una query \code{SPARQL} che andranno a sostituire quelli obsoleti all'intenro di un istanza di \code{Entity}
+
+\paragraph{Rimozione} Le operazioni di rimozione lato \emph{City Service} sono eseguite direttamente tramite \code{SPARQL} delete. Mentre le operazioni di rimozione all'esterno (es. applicazione mobile), per motivi di sicurezza, sono eseguite tramite richiesta al servizio cittadino il quale si occupa di effettuare la rimozione vera e propria.
+
+\section{Il Protocollo di Prenotazione Ricarica}
+
+Lo scopo principale del \emph{City Service} è aderire al protocollo di richiesta di ricarica. Esso è asincrono e si basa sul meccanismo delle Sottoscrizioni offerto dal SIB. I dettagli implementativi verranno discussi più avanti.
+
+\subsubsection{Protocollo di Richiesta di Prenotazione}
+
+Qui verranno descritti tutti i passaggi necessari al completamento del protocollo di richiesta di Prenotazione.
+
+
+\begin{enumerate}[label=\textbf{\arabic*}]
+	\item \textbf{Richiesta da Parte dell'utente}: Quando l'utente necessita di fare una ricarica inserisce una richiesta nel SIB. La richiesta è descritta dalla classe dell'ontologia \code{ioe:ChargeRequest}.
+	\item \textbf{Risposta da parte del City Service}: Il servizio cittadino è sottoscritto all'inserimento di nuove istanze di \code{ioe:ChargeRequest}. Quindi, quando viene inserita la richiesta, arriva una notifica che ne contiene l'URI dal quale si possono ricavare tutti i parametri che la compongono. A questo punto viene creata una lista di opzioni di ricarica conformi alla richiesta dell'utente compatibilmente con la disponibilità degli EVSE. Le opzioni di ricarica sono classi di tipo \code{ioe:ChargeOption} e vengono inserite dentro a una classe di tipo \code{ioe:ChargeResponse}.
+	\item \label{confirmByUser} \textbf{Conferma da parte dell'utente}: L'utente che è sottoscritto all'inserimento di nuove istanze della classe \code{ioe:ChargeResponse} viene notificato quando il \emph{City Service} inserisce la risposta. Le opzioni di ricarica vengono analizzate dall'utente il quale sceglie quella che più si addice alle sue esigenze. La scelta viene notificata al sistema tramite inserimento di una tripla così formata:
+	\\ \code{[ioe:chargeOptURI ioe:confirmByUser "true"]} presupponendo che \code{ioe:chargeOptURI} sia un istanza di \code{ioe:ChargeOption}.
+	\item \textbf{Conferma da parte del City Service)}: Il servizio cittadino è iscritto all'inserimento di triple che come predicato hanno \code{ioe:confirmByUser} e quindi verifica se l'opzione selezionata è ancora disponibile in tal caso inserisce una tripla siffatta:
+	\\ \code{[ioe:chargeOptURI ioe:confirmBySystem "true"]}. 
+	\item \textbf{Acknowledgment da parte dell'utente}: L'utente riceve la notifica della conferma da parte di \emph{City Service}. Se l'opzione è confermata allora invia una tripla di Acknowledgment \code{[ioe:userURI ioe:ackByUser "true"]}. Altrimenti può provare con un altra opzione e il protocollo riprende dal punto ~\ref{confirmByUser}
+	\item \textbf{Creazione Prenotazione}: Quando il \emph{City Service} riceve l'acknowledgment dall'utente "blocca" l'EVSE nella finestra di tempo richiesta creando un istanza della classe {ioe:Reservation}. Inoltre cancella dal SIB tutte le triple necessarie allo svolgimento del protocollo che  , una volta terminato, diventano inutili.
+\end{enumerate}
+
+\section{Il Protocollo di Rimozione di una Prenotazione di Ricarica}
+
+Una volta completata la procedura di prenotazione l'EVSE è diventa inagibile nell'orario richiesto dall'utente. Nel caso in cui un utente voglia ritirare la prenotazione deve mandare una richiesta al \emph{City Service}. Attualmente il servizio cittadino rimuove semplicemente dal SIB i dati relativi alla prenotazione rendendo nuovamente disponibile la ricarica. In futuro il servizio potrà stabilire, in base a regole dettate dai gestori della rete elettrica, se accettare o meno la richiesta ed eventualmente accreditare una penale all'utente.
+
+\section{Implementazione}
+
+
+
 
 
 

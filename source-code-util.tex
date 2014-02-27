@@ -1,4 +1,5 @@
 \usepackage{listings} %box per codice sorgente
+\usepackage{color}
 
 \newcommand{\code}[1]{\texttt{#1} }
 
@@ -52,7 +53,7 @@
 }
 
 \lstnewenvironment{xml}[1][firstnumber=\themain,name=main]
-  {\lstset{language=xml,
+  {\lstset{language=XML,
            basicstyle=\ttfamily\footnotesize,
            numbers=left,
            numberstyle=\tiny\color{gray},
@@ -64,13 +65,35 @@
 }
 {\setcounter{main}{\value{lstnumber}}}
 
-\newfontfamily\listingsfont[Scale=0.7]{Courier} 
-\newfontfamily\listingsfontinline[Scale=0.8]{Courier New} 
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
 
-\usepackage{color}
-\definecolor{sh_comment}{rgb}{0.12, 0.38, 0.18 } %adjusted, in Eclipse: {0.25, 0.42, 0.30 } = #3F6A4D
-\definecolor{sh_keyword}{rgb}{0.37, 0.08, 0.25}  % #5F1441
-\definecolor{sh_string}{rgb}{0.06, 0.10, 0.98} % #101AF9
+%\lstdefinelanguage{JAVA}
+%{
+%
+%}
 
-\def\lstsmallmath{\leavevmode\ifmmode \scriptstyle \else  \fi}
-\def\lstsmallmathend{\leavevmode\ifmmode  \else  \fi}
+\lstnewenvironment{java}[1][firstnumber=\themain,name=main]
+  {\lstset{	language=Java,
+			basicstyle=\ttfamily,
+			keywordstyle=\color{javapurple}\bfseries,
+			stringstyle=\color{javared},
+			commentstyle=\color{javagreen},
+			morecomment=[s][\color{javadocblue}]{/**}{*/},
+			showspaces=false,
+			showstringspaces=false
+            basicstyle=\ttfamily\footnotesize,
+            numbers=left,
+            tabsize=2,
+            numberstyle=\tiny\color{gray},
+            backgroundcolor=\color{lightgray},
+            breaklines=true,
+            breakatwhitespace=true,
+           #1
+          }
+}
+{\setcounter{main}{\value{lstnumber}}}
+
+%http://jevopi.blogspot.it/2010/03/nicely-formatted-listings-in-latex-with.html

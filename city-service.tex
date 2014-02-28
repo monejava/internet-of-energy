@@ -4,17 +4,13 @@ Il servizio cittadino (\emph{City Service}) è il cuore dell'architettura softwa
 
 \section{Architettura}
 
-Il principio di base con cui ho progettato il \emph{City Service} è la modularità e riusabilità. Ho quindi creato una libreria, \code{ioe_lib}, condivisa tra il servizio cittadino e l'applicazione mobile. Essa fornisce i servizi di base di accesso al \emph{SIB}, nonchè un approccio \emph{Object Oriented} ai dati in essa contenuti. Ho infatti implementato, per ogni classe presente nell'ontologia, una corrispettiva classe \code{Entity} Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella \emph{SIB}. 
-
-%rispettare i principi di alta coesione e basso accoppiamento ho deciso di implementare
-
-Lo scambio dei messaggi è implementato tramite il meccanismo delle \code{Subscription}. Questo comporta che i messaggi non sono inviati direttamente al destinatario, ma vengono scritti sul \emph{SIB} cittadino il quale manda una notifica al \emph{KP} che era sottoscritto a quella particolare modifica.
+Il principio di base con cui ho progettato il \emph{City Service} è la modularità e riusabilità. Ho quindi creato una libreria, \code{ioe_lib}, condivisa tra il servizio cittadino e l'applicazione mobile. Essa fornisce i servizi di base di accesso al \emph{SIB}, nonchè un approccio \emph{Object Oriented} ai dati in essa contenuti. Ho infatti implementato, per ogni classe presente nell'ontologia, una corrispettiva classe \code{Entity} Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella \emph{SIB}. Questa scelta progettuale si rifà ai principi di Ingegneria del Software \emph{High Cohesion} e \emph{Low Coupling} \cite{larcab2005}
 
 \subsection{La libreria IoE}
 
 Questa libreria implementa la logica applicativa ovvero il nucleo operativo del nostro strato di servizi. Viene infatti sfruttata sia dal \emph{City Service} che dall'applicazione mobile. Viene inoltre utilizzato da un visualizzatore di ricariche, nato da un progetto parallelo al mio, del quale sviluppo si è occupata una ragazza di Ingegneria.
 
-\subsubsection{Connessione al SIB}
+\subsubsection{Connessione al SIB}\label{conn-sib}
 
 La connessione al \emph{SIB} viene eseguita da una libreria Java (JavaKPI), sviluppata da ARCES, che implementa il protocollo SSAP. Ho creato un wrapper di questa libreria che ne semplifica l'utilizzo e aggiunge alcune funzionalità. Essa si trova nel package \code{it.unibo.ioe.sib}.
 
@@ -53,11 +49,11 @@ che corrisponde alla classe.
 
 \paragraph{Esempio}
 
-La proprietà dell'ontologia \code{ioe:hasEVSE} ha come dominio \code{ioe:GridConnectionPoint} e come codominio \code{ioe:EVSE}. Inoltre tutte le classi dell'ontologia hanno al proprietà code{vcard:hasName}.
+La proprietà dell'ontologia \code{ioe:hasEVSE} ha come dominio \\ \code{ioe:GridConnectionPoint} e come codominio \code{ioe:EVSE}. Inoltre tutte le classi dell'ontologia hanno al proprietà code{vcard:hasName}.
 
 Questa situazione viene tradotta nell'\code{Entity}:
 
-\begin{java}[caption={prova},label={lst:prova}]
+\begin{java}[caption={Entity di esempio},label={lst:entity}]
 @XmlRootElement(name = "GCP")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GCP implements Serializable {
@@ -104,23 +100,24 @@ I \code{Controller} sono le classi delegate ad eseguire le operazioni \code{CRUD
 
 \paragraph{Rimozione} Le operazioni di rimozione lato \emph{City Service} sono eseguite direttamente tramite \code{SPARQL} delete. Mentre le operazioni di rimozione all'esterno (es. applicazione mobile), per motivi di sicurezza, sono eseguite tramite richiesta al servizio cittadino il quale si occupa di effettuare la rimozione vera e propria.
 
-\section{Il Protocollo di Prenotazione Ricarica}
+\section{La comunicazione con il City Service}\label{sec:protocol}
 
-Lo scopo principale del \emph{City Service} è aderire al protocollo di richiesta di ricarica. Esso è asincrono e si basa sul meccanismo delle Sottoscrizioni offerto dal SIB. I dettagli implementativi verranno discussi più avanti.
+In questa sezione analizzeremo in dettaglio come avviene la comunicazione da e verso il servizio cittadino. Per ogni operazione esiste un protocollo basato su scambi di messaggi la quale struttura è definita attraverso classi dell'ontologia. Attualmente le uniche operazioni supportate sono la richiesta di prenotazione e la richiesta di ritiro di prenotazione.
 
-\subsubsection{Protocollo di Richiesta di Prenotazione}
+Lo scambio dei messaggi è implementato tramite il meccanismo delle \code{Subscription} messo a disposizione dal SIB. Questo comporta che i messaggi vengono scritti sul \emph{SIB} cittadino il quale manda una notifica al \emph{KP} che era sottoscritto a quella particolare modifica. Questo rende il protocollo di comunicazione asincrono.
 
-Qui verranno descritti tutti i passaggi necessari al completamento del protocollo di richiesta di Prenotazione.
 
+\subsection{Protocollo di Richiesta di Prenotazione}
+
+Qui verranno descritti tutti i passaggi necessari al completamento del protocollo di Richiesta di Prenotazione, in particolare quali messaggi vengono scambiati. Il fine della Prenotazione è avere la certezza che quando andremo a caricarci troveremo l'EVSE libero. Come già detto in precedenza, i tempi di ricarica per i veicoli elettrici possono essere molto lunghi. È quindi necessario dare all'utente la sicurezza che potrà ricaricare il suo veicolo senza dover rimanere a piedi.
 
 \begin{enumerate}[label=\textbf{\arabic*}]
-	\item \textbf{Richiesta da Parte dell'utente}: Quando l'utente necessita di fare una ricarica inserisce una richiesta nel SIB. La richiesta è descritta dalla classe dell'ontologia \code{ioe:ChargeRequest}.
+	\item \textbf{Richiesta di Prenotazione}: Quando l'utente necessita di fare una ricarica inserisce una richiesta nel SIB. La richiesta è descritta dalla classe dell'ontologia \code{ioe:ChargeRequest}.
 	\item \textbf{Risposta da parte del City Service}: Il servizio cittadino è sottoscritto all'inserimento di nuove istanze di \code{ioe:ChargeRequest}. Quindi, quando viene inserita la richiesta, arriva una notifica che ne contiene l'URI dal quale si possono ricavare tutti i parametri che la compongono. A questo punto viene creata una lista di opzioni di ricarica conformi alla richiesta dell'utente compatibilmente con la disponibilità degli EVSE. Le opzioni di ricarica sono classi di tipo \code{ioe:ChargeOption} e vengono inserite dentro a una classe di tipo \code{ioe:ChargeResponse}.
-	\item \label{confirmByUser} \textbf{Conferma da parte dell'utente}: L'utente che è sottoscritto all'inserimento di nuove istanze della classe \code{ioe:ChargeResponse} viene notificato quando il \emph{City Service} inserisce la risposta. Le opzioni di ricarica vengono analizzate dall'utente il quale sceglie quella che più si addice alle sue esigenze. La scelta viene notificata al sistema tramite inserimento di una tripla così formata:
-	\\ \code{[ioe:chargeOptURI ioe:confirmByUser "true"]} presupponendo che \code{ioe:chargeOptURI} sia un istanza di \code{ioe:ChargeOption}.
+	\item \label{item:confirmByUser} \textbf{Conferma da parte dell'utente}: L'utente che è sottoscritto all'inserimento di nuove istanze della classe  \code{ioe:ChargeResponse} viene notificato quando il \emph{City Service} inserisce la risposta. Le opzioni di ricarica vengono analizzate dall'utente il quale sceglie quella che più si addice alle sue esigenze. La scelta viene notificata al sistema tramite inserimento di una tripla così formata: \code{[ioe:chargeOptURI ioe:confirmByUser "true"]} presupponendo che \code{ioe:chargeOptURI} sia un istanza di \code{ioe:ChargeOption}.
 	\item \textbf{Conferma da parte del City Service)}: Il servizio cittadino è iscritto all'inserimento di triple che come predicato hanno \code{ioe:confirmByUser} e quindi verifica se l'opzione selezionata è ancora disponibile in tal caso inserisce una tripla siffatta:
 	\\ \code{[ioe:chargeOptURI ioe:confirmBySystem "true"]}. 
-	\item \textbf{Acknowledgment da parte dell'utente}: L'utente riceve la notifica della conferma da parte di \emph{City Service}. Se l'opzione è confermata allora invia una tripla di Acknowledgment \code{[ioe:userURI ioe:ackByUser "true"]}. Altrimenti può provare con un altra opzione e il protocollo riprende dal punto ~\ref{confirmByUser}
+	\item \textbf{Acknowledgment da parte dell'utente}: L'utente riceve la notifica della conferma da parte di \emph{City Service}. Se l'opzione è confermata allora invia una tripla di Acknowledgment \code{[ioe:userURI ioe:ackByUser "true"]}. Altrimenti può provare con un altra opzione e il protocollo riprende dal punto ~\ref{item:confirmByUser}
 	\item \textbf{Creazione Prenotazione}: Quando il \emph{City Service} riceve l'acknowledgment dall'utente "blocca" l'EVSE nella finestra di tempo richiesta creando un istanza della classe {ioe:Reservation}. Inoltre cancella dal SIB tutte le triple necessarie allo svolgimento del protocollo che  , una volta terminato, diventano inutili.
 \end{enumerate}
 
@@ -128,8 +125,110 @@ Qui verranno descritti tutti i passaggi necessari al completamento del protocoll
 
 Una volta completata la procedura di prenotazione l'EVSE è diventa inagibile nell'orario richiesto dall'utente. Nel caso in cui un utente voglia ritirare la prenotazione deve mandare una richiesta al \emph{City Service}. Attualmente il servizio cittadino rimuove semplicemente dal SIB i dati relativi alla prenotazione rendendo nuovamente disponibile la ricarica. In futuro il servizio potrà stabilire, in base a regole dettate dai gestori della rete elettrica, se accettare o meno la richiesta ed eventualmente accreditare una penale all'utente.
 
-\section{Implementazione}
+Il Protocollo si basa su cambio di messaggi proprio come nel caso precedente.
 
+\begin{enumerate}
+	\item \textbf{Richiesta ritiro Prenotazione}: L'utente inserisce nel SIB cittadino un istanza della classe \code{ioe:ReservationRetire} 
+	\item \textbf{Ritiro della Prenotazione}: Il \emph{City Service}, che ovviamente era sottoscritto alla creazione di nuove istanze di \code{ioe:ReservationRetire}, provvede a rimuovere dal SIB le triple relative alla Prenotazione.
+	\item \textbf{Notifica avvenuta cancellazione}: Attualmente l'utente come unico modo per sapere dell'avvenuta cancellazione deve sottoscriversi ai cambiamenti dell'URI della Prenotazione che sta cancellando.
+\end{enumerate}
+
+\section{Implementazione}\label{sec:impl}
+
+In questa sezione discuteremo i dettagli implementativi del \emph{City Service}, dalle tecnologie usate alle scelte Architetturali. Principalmente il serbizio cittadino deve essere altamente performante in quanto, una vota a regime, dovrebbe poter soddisfare le richieste di centinaia di utenti se non migliaia. Contemporaneamente bisogna preoccuparsi del fatto che l'alto parallelismo non intacchi l'integrità dei dati residenti sul SIB cittadino evitando, ad esempio, che due persone che fanno una prenotazione nello stesso momento, nello stesso EVSE, alla stessa ora non riescano entrambe a completare la procedura di prenotazione. 
+
+Il servizio è scritto interamente in Java il che lo rende multi piattaforma, facile da debuggare, e sopratutto permette di usare utilità messe a disposizione del linguaggio per quanto riguarda il multithreading. Inoltre permette di accedere alla moltitudine di librerie scritte per questo linguaggio per i più disparati propositi. Tra queste troviamo (\code{log4j}), un robusto quanto versatile sistema di logging, che permette di tenere costantemente sotto controllo l'esecuzione del servizio con vari gradi di granularità del log.
+
+Al fine di rendere il servizio più performante possibile sono state adottate tecniche di programmazione quali: pool di oggetti, pool di thread, e caching delle risorse.
+
+
+\subsection{Pool Di Oggetti}
+
+Per effettuare le connessioni al SIB cittadino è necessario istanziare oggetti di tipo \code{KpConnector}, inoltre, per effettuare il parsing delle risposte alle sottoscrizioni sono necessari oggetti di tipo \code{SSAP_XMLTools} che sono forniti dalla libreria \code{JavaKPI}. Come è stato detto nella sezione ~\ref{sec:impl} il \emph{City Service} deve supportare connessioni multiple simultanee, ognuna delle quali dialoga con il SIB. Dal momento che la libreria {JavaKPI} non è thread-safe e nemmeno il wrapper che ho creato io lo è, è necessario istanziare un oggetto \code{KpConnector} per ogni connessione insieme a uno di tipo \code{SSAP_XMLTools} per parsare i risultati delle sottoscrizioni.
+
+Per evitare che all'avvio di ogni connessione venisse creato un oggetto \code{KpConnector}, che comunque è un oggetto "pesante", ho deciso di usare la tecnica dei pool di oggetti. La tecnica consiste nel creare un numero sufficienti di oggetti all'inizio dell'applicazione e quando si necessita di usarne uno lo si chiede al pool il quale lo fornisce al tempo di una chiamata a metodo. Una volta terminato di utilizzare l'oggetto lo si restituisce al pool il quale poi potrà a sua volta cederlo ad un altro richiedente.
+In questo modo si evita che ogni volta che viene fatta una richiesta al \emph{City Service} ci sia il delay necessario a instanziare una connessione con il SIB.
+
+Il cuore di questo sistema è la classe \code{ObjectPool<T>} (\cite{objectpool}) che troviamo nel package \code{it.unibo.cityservice.pool} che rappresenta un pool di oggeti di tipo \code{T}. Questa classe contiene un metodo astratto \code{createObject()} che va implementato nelle sottoclassi mettendoci dentro la logica di creazione dell'oggetto di cui volgiamo creare il pool.
+
+Nel mio caso ho creato \code{XmlToolsPool} e \code{CitySibPool} e a titolo esemplificativo mostrerò l'implementazione del primo:
+
+\begin{java}[caption={Implementazione di ObjectPool},label={lst:objectPool}]
+public class XmlToolsPool extends ObjectPool<SSAP_XMLTools>{
+	
+	public XmlToolsPool(final int minIdle) {
+		super(minIdle);
+	}
+
+	@Override
+	protected SSAP_XMLTools createObject() {
+		return new SSAP_XMLTools();
+	}
+}
+\end{java}
+
+\noindent
+Come si può vedere è molto semplice creare un pool per un determinato tipo di dato. Una volta creato il pool, per interagire con esso, si usano i seguenti metodi:
+
+\begin{itemize}
+	\item \code{public T borrowObject()}: che preleva un oggetto dal pool.
+	\item \code{public void returnObject(T object)}: che restituisce un oggetto al pool.
+\end{itemize}
+
+\subsection{Pool Di Thread}
+
+Adesso che abbiamo visto come è che cos'è il meccanismo dei pool degli oggetti e perchè è stato utilizzato vediamo invece di capire cosa sono i pool di thread e quali problematiche vanno a risolvere.
+La creazione di thread può creare problemi in termini di performance (in quanto la creazione e distruzione di questo oggetti è abbastanza onerosa), di controllare il numero del numero dei thread creati e infine di scalabilità (\cite{vetti2008}).
+
+Pertanto è necessario ricorrere alle classi del package \code{java.util.concurrent} che implementano l'interfaccia \code{Executor}. In questo caso sono state poi utilizzate istanze dell'interfaccia \code{ExecutorService} che mette a disposizioni metodi volti a controllare il ciclo di vita del pool stesso.
+
+L'inizializzazione degli \code{ExecutorService} avviene tramite l'invocazione di un metodo statico della classe \code{Executors} che specifica la dimensione del pool che si vuole creare. Quando invece si vuole assegnare un compito ad uno dei thread del pool si usa il metodo \code{execute} che prende in ingresso un istanza dell'interfaccia \code{Runnable}.
+
+\begin{java}[caption={Creazione Pool di Thread},label={lst:threadPool}]
+ExecutorService pool = Executors.newFixedThreadPool(30);
+pool.execute(new Runnable() {
+	@Override
+	public void run() {
+		System.out.println("hello world");
+	}
+});
+\end{java}
+
+\subsection{Il funzionamento del City Service}
+ 
+Come visto nella sezione ~\ref{sec:protocol} il servizio cittadino deve gestire un gran numero di messaggi a ogni tipologia dei quali corrisponde una sottoscrizione al SIB cittadino. Inoltre per poter rispondere alle richieste degli utenti deve anche avere le informazioni relative a tutti gli EVSE.
+
+\subsubsection{Inizializzazione}
+
+All'avvio il \emph{City Service} compie innumerevoli compiti:
+
+\begin{itemize}
+	\item \textbf{Lettura file di configurazione}: Cerca il file di configurazione \code{cityservice.properties} dal quale carica le informazioni del SIB cittadino, il nome dell'ontologia, il nome del file contenente i GCP.
+	\item \textbf{Scrittura Ontologia}: L'ontologia viene scritta nel SIB cittadino
+	\item \textbf{Caricamento Informazioni GCP}: Le informazioni di tutte le stazioni di ricarica presenti in città vengono caricate da un file xml. Le stesse informazioni vengono inserite nel SIB al fine di poterle condividee con le altre entità del sistema.
+	\item \textbf{Creazione Pool}: Vengono creati i pool di thred e di oggetti.
+	\item \label{item:subscr} \textbf{Sottoscrizioni}: Ci si sottoscrive alle informazioni su cui si vuole rimanere aggiornate. Sostanzialmente ci si assicura che arrivino le notifiche per i messaggi descritti nella sezione ~\ref{sec:protocol}:
+	\begin{enumerate}
+		\item Creazione di nuove istanze di \code{ioe:ChargeRequest}
+		\item Inserimento di triple contenenti come predicato \code{ioe:confirmByUser}
+		\item Inserimento di triple contenenti come predicato \code{ioe:ackByUser}
+		\item Creazione di nuove istanze di \code{ioe:ReservationRetire}
+	\end{enumerate}
+\end{itemize}
+
+\subsubsection{Gestione delle richieste}
+
+Quando ci si sottoscrive a qualcosa nel SIB oltre a definire a cosa ci vogliamo sottoscrivere dobbiamo anche definire un \emph{handler} che verrà eseguito quando avverà il cambiamento a cui siamo interessati. Come visto sopra (~\ref{enum:subscr} di sottoscrizioni ne vengono fatte 4, per ognuna di esse viene definito lo stesso \emph{hanlder} il quale lancia un thread istanza della classe \code{RequestDispatcher}. Esso si occupa semplicemente di gestire la richiesta e di eseguire un altro thread, sempre contenuto in un pool, che la soddisfi.
+
+I pool di thread sono dunque 5:
+
+\begin{enumerate}
+	\item \code{requestDispatcher}:
+	\item \code{chargeRequestExecutor}:
+	\item \code{confirmByUserExecutr}:
+	\item \code{ackByUserExecutor}:
+	\item \code{retireReservationExecutor}:
+\end{enumerate}
 
 
 

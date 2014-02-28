@@ -3,7 +3,7 @@
 \usepackage[italian]{babel} %a capo italiano
 \usepackage[T1]{fontenc}
 \usepackage{newlfont}
-\usepackage[utf8x]{inputenc} %fornisce i caratteri accentati
+\usepackage[utf8]{inputenc} %fornisce i caratteri accentati
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{enumitem} % ref enumerate
@@ -13,6 +13,14 @@
 \usepackage[hyphens]{url}
 \usepackage{hyperref}
 \usepackage{underscore}
+
+\usepackage[babel]{csquotes}
+\usepackage[backend=biber]{biblatex} %biblio
+
+\defbibheading{cartaceo}{\subsection*{Manuali cartacei}}
+\defbibheading{web}{\subsection*{Siti Web consultati}}
+
+\addbibresource{biblio.bib}
 
 \input{source-code-util.tex}
 
@@ -76,8 +84,14 @@
   
   \input{simulator.tex}
   
-  \input{appendix.tex}
+  \appendix%tutti i capitoli da qui in avanti sono considerati appendici
   
-  \input{biblio.tex}
+  \input{appendix.tex}
+
+
+\chapter*{\refname}
+\printbibliography[heading=cartaceo,nottype=online]
+\printbibliography[heading=web,type=online]
+
   
 \end{document}

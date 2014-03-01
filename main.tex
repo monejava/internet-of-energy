@@ -29,7 +29,7 @@
 \rhead[\fancyplain{}{\bfseries\leftmark}]{\fancyplain{}{\bfseries\thepage}}
 \cfoot{}
 
-%\newcommand{\clear}{\clearpage{\pagestyle{empty}\cleardoublepage}}
+\newcommand{\clear}{\clearpage{\pagestyle{empty}\cleardoublepage}}
 
 
 % comando per impostare l'interlinea
@@ -48,34 +48,42 @@
 		
 	\input{abstract.tex}
 	
-%	\clearpage{\pagestyle{empty}\cleardoublepage}
+	\clear
 	
 	\tableofcontents{}
 	
 	
-%	\clear
+	\clear
 	  
 	\input{intro.tex}
 	
-	%\clearpage{\pagestyle{empty}\cleardoublepage}
+	\clear
+	
+	\input{architecture.tex}
+	
+	\clear
+	
+	\input{ontology-model.tex}
+	
+	\clear
 	  
 	\input{city-service.tex}
 	
-	%\clearpage{\pagestyle{empty}\cleardoublepage}
+	\clear
 	  
 	\input{mobile-app.tex}
 	
-	%\clearpage{\pagestyle{empty}\cleardoublepage}
+	\clear
 	  
 	\input{simulator.tex}
 	
-	%\clearpage{\pagestyle{empty}\cleardoublepage}
+	\clear
 	  
 	\appendix%tutti i capitoli da qui in avanti sono considerati appendici
 	  
 	\input{appendix.tex}
 	
-	%\clearpage{\pagestyle{empty}\cleardoublepage}
+	\clear
 	
 	\chapter*{\refname}
 	\printbibliography[heading=cartaceo,nottype=online]

@@ -34,19 +34,11 @@ per fornire servizi di supporto all'EM e permettere alle parti interessate di co
 Sebbene siano state sviluppate diverse applicazioni su scenari in piccola scala, si è ancora lontani
 dall'ottenere l'interoperabilità tra gli attori in gioco i quali utilizzano diverse tecnologie e dispositivi.
 
-Dato l'elevato costo che avrebbero i test su larga scala, la simulazione costituisce lo strumento più adatto
-per testare l'efficenza delle suluzioni ICT prima che vengano realmente sviluppate. Al giorno d'oggi sono stati
-sviluppati alcuni simulatori veicolari che permettono un controllo molto fine a livello di veicolo e similarmante
-altrettanti modelli di batteria sono stati create al fine di riprodurre in modo realistico le dinamiche di carica e
-scarica della batteria.
+Dato l'elevato costo che avrebbero i test su larga scala, la simulazione costituisce lo strumento più adatto per testare l'efficenza delle suluzioni ICT prima che vengano realmente sviluppate. Al giorno d'oggi sono stati sviluppati alcuni simulatori veicolari che permettono un controllo molto fine a livello di veicolo e similarmante altrettanti modelli di batteria sono stati create al fine di riprodurre in modo realistico le dinamiche di carica e scarica della batteria.
 Tuttavia nessuno di questo strumenti è adatto al fine di studiare le dinamiche assai complesse che si presentano 
-nello scenario dell'EM, come l'impatto degli EV sulla rete elettrca cittadina oppure l'effettiva
-utilità dell'utilizzo di sistemi di prenotazione delle ricariche. 
+nello scenario dell'EM, come l'impatto degli EV sulla rete elettrca cittadina oppure l'effettiva utilità dell'utilizzo di sistemi di prenotazione delle ricariche. 
 
-Il progetto Internet of Energy (IoE) for Electrical Mobility, il quale è stato fondato dall'Unione Europea
-e comprende 40 partner da 10 nazioni Europee, mira a colmare queste lacuna, sviluppando hardware, software 
-e sistemi middleware che forniranno un infrastruttura di comunicazione interpolabile tra le parti in gioco
-all'interno della (? dire due parole a riguardo smart grid).
+Il progetto Internet of Energy (IoE) for Electrical Mobility, fondato dall'Unione Europea e comprendente 40 partner da 10 nazioni Europee, mira a colmare queste lacuna, sviluppando hardware, software e sistemi middleware che forniranno un infrastruttura di comunicazione interpolabile tra le parti in gioco all'interno della (? dire due parole a riguardo smart grid).
 
 Lo scopo di questa tesi, frutto del lavoro congiunto tra UNIBO e ARCES, seguito della tesi di laurea di 
 Federico Montori, è fornire contributi su tre diversi fronti a questo progetto. 
@@ -73,27 +65,6 @@ far comunicare i due simulatori viene usata l'interfaccia TRACI, messa a disposi
 comunica con OMNET++ attraverso Veins. Grazie a SUMO riusciamo a modellare l'ambiante urbano, nel nostro 
 caso Bologna e Torino, includendo dati topografici e altimetrici realistici. OMNET++ invece è stato
 utilizzato per implementare i modelli dell'EV, compresa la batteria e il comportamento dell'autista.
-
-\section{Smart-M3}
-
-M3 è un architettura middleware per consentire L'interoperabilità delle informazioni in maniera cross-domain, multi-vendor, multi-device, multi-piattaforma. Smart-M3 è la sua prima implementazione Open Source, proposta da SOFIA, un Progetto Europeo (2009-11), appartenente al framework ARTEMIS. 
-La piattaforma implementa il disaccoppiamento tra produttori e consumatori di informazione. In questa architettura tutti gli attori (sensori, dispositivi, servizi, attuatori ecc..) cooperano attraverso un database RDF che è lo standard deciso dal World Wide Web Consortium per la descrizione di informazioni e concetti.
-
-Il Semantic Information Broker (SIB) è l'entità responsabile della conservazione e della gestione delle informazioni condivise nell'architettura M3. Gli agenti Software che si scambiano le informazioni vengono chiamati Knowledge Processors (KPs). L'accesso alla SIB da parte dei KP avviene attraverso lo Smart Space Access Protocol  (SSAP), esso consiste in messaggi XML scambiati attraverso socket TCP/IP. Vengono fornite API che implementano il protocollo SSAP in diversi linguaggi.
-
-L'architettura Smart-M3 permette:
-
-\begin{itemize}
-	\item \textbf{Interoperabilità dell'informazione}: L'interoperabilità è resa possibile da un modello di dati condiviso che si basa su tecnologie tipiche del Semantic Web.
-	\item \textbf{Notifiche al variare dei dati}: Grazie a un meccanismo di sottoscrizione è possibile ricevere notifiche al variare dei dati specificati.
-\end{itemize}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.5\textwidth]{assets/smart-m3.jpg}
-	\caption{Architettura Smart-M3}
-	\label{fig:smart-m3}
-\end{figure}
 
 \section{Lavori Correlati}
 

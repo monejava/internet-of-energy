@@ -12,20 +12,18 @@ La piattaforma di sviluppo scelta è \emph{Android} vista la sua grandissima dif
 
 La piattaforma scelta per lo sviluppo è Android dalla versione \emph{4.0.3} in su. Questo perché vanta maggiori performance e un interfaccia utente più bella è più facile da programmare. La libreria di base per interfacciarsi con il SIB è quella esposta nella sezione ~\ref{subsec:ioe-lib}.
 
-\subsection{Android}
+\subsection{Interazione con L'esterno}
 
-\subsection{Google Play Service}
+L'interazione con il servizio cittadino avviene tramite scambio di messaggi con il \emph{City SIB}, mentre le informazioni relative al veicolo, in particolar modo se quest'ultimo è simulato, arrivano dal \emph{Dash SIB}.
 
-\subsection{Bluetooth}
-
-\subsection{UniboGeoTools}
 
 \section{Modalità di esecuzione}
 
 L'applicazione al fine di adattarsi ai diversi scenari possibili offre molteplici modalità di esecuzione, questo per adattarsi alle specifiche richieste per le dimostrazioni del Remote ??Monitoring¿¿. La scelta della modalità di esecuzione avviene nella schermata iniziale come si può vedere in figura ~\ref{fig:main-activity}
 
 \subsection{Simulazione}
-Questa modalità permette di prendere il controllo di un veicolo contenuto nel simulatore, il quale deve essere avviato con appositi parametri che causino la scrittura dei parametri relativi ai veicoli sul \emph{Dash SIB}. Questo implica che una volta che i abbiamo premuto sul pulsante \emph{Connect} (Fig. ~\ref{fig:main-activity}), dobbiamo scegliere l'utente Luciano Bononi in quanto è l'utente di default usato dalle macchine del simulatore (Fig. ~\ref{fig:select-user}). Una volta selezionato l'utente ci troveremo nel menu principale con solo due opzioni. Questo perché le altre opzioni sono subordinate alla scelta di un veicolo. Una volta selezionato il veicolo vedremo esattamente i parametri che esso ha nel simulatore (posizione, carica, potenza ecc..). La posizione segnata nella mappa dell'app sarà la stessa segnata su SUMO.
+
+Questa modalità permette di prendere il controllo di un veicolo contenuto nel simulatore, il quale deve essere avviato con appositi parametri che causino la scrittura dei parametri relativi ai veicoli sul \emph{Dash SIB}. Questo implica che una volta che i abbiamo premuto sul pulsante \emph{Connect} (Fig. ~\ref{fig:main-activity}), dobbiamo scegliere l'utente Luciano Bononi in quanto è l'utente di default usato dalle macchine del simulatore (Fig. ~\ref{fig:select-user}). Una volta selezionato l'utente ci troveremo nel menu principale con solo due opzioni (Fig. ~\ref{fig:main-menu}). Questo perché le altre opzioni sono subordinate alla scelta di un veicolo. Una volta selezionato il veicolo (Fig. ~\ref{fig:select-veh}) vedremo esattamente i parametri che esso ha nel simulatore (posizione, carica, potenza ecc..). La posizione segnata nella mappa dell'app sarà la stessa segnata su SUMO. L'interazione tra il veicolo 
 
 \begin{figure}[H]
         \centering

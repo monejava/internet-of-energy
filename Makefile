@@ -4,7 +4,7 @@ MAIN = main
 
 dist: build 
 
-build: main.tex
+build: main.tex city-service.tex appendix.tex main.tex mobile-app.tex simulator.tex biblio.bib intro.tex source-code-util.tex
 	pdflatex -synctex=1 -interaction=nonstopmode main.tex 
 	biber main
 	pdflatex -synctex=1 -interaction=nonstopmode main.tex 

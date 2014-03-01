@@ -6,11 +6,11 @@ Il servizio cittadino (\emph{City Service}) è il cuore dell'architettura softwa
 
 Il principio di base con cui ho progettato il \emph{City Service} è la modularità e riusabilità. Ho quindi creato una libreria, \code{ioe_lib}, condivisa tra il servizio cittadino e l'applicazione mobile. Essa fornisce i servizi di base di accesso al \emph{SIB}, nonchè un approccio \emph{Object Oriented} ai dati in essa contenuti. Ho infatti implementato, per ogni classe presente nell'ontologia, una corrispettiva classe Entity Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella \emph{SIB}. Questa scelta progettuale si rifà ai principi di Ingegneria del Software \emph{High Cohesion} e \emph{Low Coupling} \cite{larcab2005}
 
-\subsection{La libreria IoE}
+\subsection{La libreria IoE}\label{subsec:ioe-lib}
 
 Questa libreria implementa la logica applicativa ovvero il nucleo operativo del nostro strato di servizi. Viene infatti sfruttata sia dal \emph{City Service} che dall'applicazione mobile. Viene inoltre utilizzato da un visualizzatore di ricariche, nato da un progetto parallelo al mio, del quale sviluppo si è occupata una ragazza di Ingegneria.
 
-\subsubsection{Connessione al SIB}\label{seconn-sib}
+\subsubsection{Connessione al SIB}
 
 La connessione al \emph{SIB} viene eseguita da una libreria Java (JavaKPI), sviluppata da ARCES, che implementa il protocollo SSAP. Ho creato un wrapper di questa libreria che ne semplifica l'utilizzo e aggiunge alcune funzionalità. Essa si trova nel package \code{it.unibo.ioe.sib}.
 
@@ -283,6 +283,15 @@ if (chargeRequestSubId.equals(subscriptionID)) {
 
 xmlToolsPool.returnObject(xmlTools);
 \end{java}	
+
+
+\section{Testing}
+
+bla bla bla
+
+ecc ecc ecc
+
+spacca bella ciao
 
 
 

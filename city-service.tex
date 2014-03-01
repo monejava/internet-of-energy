@@ -4,13 +4,13 @@ Il servizio cittadino (\emph{City Service}) è il cuore dell'architettura softwa
 
 \section{Architettura}
 
-Il principio di base con cui ho progettato il \emph{City Service} è la modularità e riusabilità. Ho quindi creato una libreria, \code{ioe_lib}, condivisa tra il servizio cittadino e l'applicazione mobile. Essa fornisce i servizi di base di accesso al \emph{SIB}, nonchè un approccio \emph{Object Oriented} ai dati in essa contenuti. Ho infatti implementato, per ogni classe presente nell'ontologia, una corrispettiva classe \code{Entity} Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella \emph{SIB}. Questa scelta progettuale si rifà ai principi di Ingegneria del Software \emph{High Cohesion} e \emph{Low Coupling} \cite{larcab2005}
+Il principio di base con cui ho progettato il \emph{City Service} è la modularità e riusabilità. Ho quindi creato una libreria, \code{ioe_lib}, condivisa tra il servizio cittadino e l'applicazione mobile. Essa fornisce i servizi di base di accesso al \emph{SIB}, nonchè un approccio \emph{Object Oriented} ai dati in essa contenuti. Ho infatti implementato, per ogni classe presente nell'ontologia, una corrispettiva classe Entity Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella \emph{SIB}. Questa scelta progettuale si rifà ai principi di Ingegneria del Software \emph{High Cohesion} e \emph{Low Coupling} \cite{larcab2005}
 
 \subsection{La libreria IoE}
 
 Questa libreria implementa la logica applicativa ovvero il nucleo operativo del nostro strato di servizi. Viene infatti sfruttata sia dal \emph{City Service} che dall'applicazione mobile. Viene inoltre utilizzato da un visualizzatore di ricariche, nato da un progetto parallelo al mio, del quale sviluppo si è occupata una ragazza di Ingegneria.
 
-\subsubsection{Connessione al SIB}\label{conn-sib}
+\subsubsection{Connessione al SIB}\label{seconn-sib}
 
 La connessione al \emph{SIB} viene eseguita da una libreria Java (JavaKPI), sviluppata da ARCES, che implementa il protocollo SSAP. Ho creato un wrapper di questa libreria che ne semplifica l'utilizzo e aggiunge alcune funzionalità. Essa si trova nel package \code{it.unibo.ioe.sib}.
 
@@ -39,21 +39,21 @@ La classe \code{KpConnector} necessita di indirizzo, porta e nome del SIB a cui 
 
 \subsubsection{Entities}
 
-Ogni classe dell'ontologia è stata mappata con una rispettiva classe Java (\code{Entity}) nel package \code{it.unibo.ioe.entity} . Per questa scelta architetturale mi sono ispirato all'ORM (Object Relational Mapping) che è una tecnica di programmazione che favorisce l'integrazione di sistemi software aderenti al paradigma della programmazione orientata agli oggetti con sistemi RDBMS (Relational database management system). %http://it.wikipedia.org/wiki/Object-relational_mapping
+Ogni classe dell'ontologia è stata mappata con una rispettiva classe Java (Entity) nel package \code{it.unibo.ioe.entity} . Per questa scelta architetturale mi sono ispirato all'ORM (Object Relational Mapping) che è una tecnica di programmazione che favorisce l'integrazione di sistemi software aderenti al paradigma della programmazione orientata agli oggetti con sistemi RDBMS (Relational database management system). %http://it.wikipedia.org/wiki/Object-relational_mapping
 
 \paragraph{Mapping} Il mapping che ho creato è molto semplice e tiene conto solo delle proprietà strettamente necessarie nello strato di servizi e tralascia alcuni dettagli come l'unità di misura che attualmente, malgrado siano previsti nell'ontologia, vengono dati per scontati a livello applicativo.
-Le proprietà delle classi che hanno come oggetto un letterale sono state mappate con tipi primitivi Java (\code{int},\code{double},\code{String} ecc..). Mentre le proprietà che come oggetto hanno un'altra classe sono rappresentate come attributo che come tipo ha l'\code{Entity}
+Le proprietà delle classi che hanno come oggetto un letterale sono state mappate con tipi primitivi Java (\code{int},\code{double},\code{String} ecc..). Mentre le proprietà che come oggetto hanno un'altra classe sono rappresentate come attributo che come tipo ha l'Entity
 che corrisponde alla classe. 
 
-\paragraph{Serializzazone} Alcune \code{Entity} sono state opportunamente annotate al fine di poter essere serializzate in XML tramite la tecnologia \code{JAXB}. Questo è risultato necessario nel caso dei \emph{GCP} che vengono caricati da un file XML, nella cartella del \emph{City Service}, il quale si occupa poi di inserirli nel SIB. Ogni classe inoltre implementa l'interfaccia \code{java.io.Serializable} al fine di permettere il passaggio delle \code{Entity} tra le varie \code{Activity} dell'applicazione mobile.
+\paragraph{Serializzazone} Alcune Entity sono state opportunamente annotate al fine di poter essere serializzate in XML tramite la tecnologia \code{JAXB}. Questo è risultato necessario nel caso dei \emph{GCP} che vengono caricati da un file XML, nella cartella del \emph{City Service}, il quale si occupa poi di inserirli nel SIB. Ogni classe inoltre implementa l'interfaccia \code{java.io.Serializable} al fine di permettere il passaggio delle Entity tra le varie \code{Activity} dell'applicazione mobile.
 
 \paragraph{Esempio}
 
 La proprietà dell'ontologia \code{ioe:hasEVSE} ha come dominio \\ \code{ioe:GridConnectionPoint} e come codominio \code{ioe:EVSE}. Inoltre tutte le classi dell'ontologia hanno al proprietà code{vcard:hasName}.
 
-Questa situazione viene tradotta nell'\code{Entity}:
+Questa situazione viene tradotta nell'Entity:
 
-\begin{java}[caption={Entity di esempio},label={lst:entity}]
+\begin{java}[caption={Entity di esempio},label=lst:entity]
 @XmlRootElement(name = "GCP")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GCP implements Serializable {
@@ -69,7 +69,7 @@ public class GCP implements Serializable {
 
 %\paragraph{Lista}
 
-%La lista di tutte le \code{Entity} usate nel progetto:
+%La lista di tutte le Entity usate nel progetto:
 
 %\begin{itemize}
 %	\item \code{Vehicle}: Veicolo Elettrico
@@ -90,13 +90,13 @@ public class GCP implements Serializable {
 
 \subsubsection{Controller}
 
-I \code{Controller} sono le classi delegate ad eseguire le operazioni \code{CRUD} (create, read, delete, update) con il SIB e si trovano nel package \code{it.unibo.ioe.controller}. Ne esiste uno per ogni \code{Entity}. Ogni \code{Controller} possiede un istanza di \code{KpConnector} che permette la comunicazione con il SIB. 
+I \code{Controller} sono le classi delegate ad eseguire le operazioni \code{CRUD} (create, read, delete, update) con il SIB e si trovano nel package \code{it.unibo.ioe.controller}. Ne esiste uno per ogni Entity. Ogni \code{Controller} possiede un istanza di \code{KpConnector} che permette la comunicazione con il SIB. 
 
-\paragraph{Lettura} Le operazioni di lettura vengono eseguite tramite una query \code{SPARQL} che preleva dal SIB le informazioni necessarie che poi vengono inserite in una nuova istanza di \code{Entity} la quale viene restituita all'utente.
+\paragraph{Lettura} Le operazioni di lettura vengono eseguite tramite una query \code{SPARQL} che preleva dal SIB le informazioni necessarie che poi vengono inserite in una nuova istanza di Entity la quale viene restituita all'utente.
 
-\paragraph{Scrittura} Le operazioni di scrittura ricavano una lista di triple RDF a partire da un istanza di \code{Entity}. La lista di triple viene poi convertita in una \code{SPARQL} insert al fine di ridurre i dati inviati al SIB. L'operazione di conversione è eseguita da una funzione di della  classe \code{SibUtil}. Questa tecnica si rivela particolarmente utile quando si utilizza la libreria da un dispositivo mobile connesso a internet tramite rete cellulare (es: EDGE, GPRS, HSDPA ecc\dots).
+\paragraph{Scrittura} Le operazioni di scrittura ricavano una lista di triple RDF a partire da un istanza di Entity. La lista di triple viene poi convertita in una \code{SPARQL} insert al fine di ridurre i dati inviati al SIB. L'operazione di conversione è eseguita da una funzione di della  classe \code{SibUtil}. Questa tecnica si rivela particolarmente utile quando si utilizza la libreria da un dispositivo mobile connesso a internet tramite rete cellulare (es: EDGE, GPRS, HSDPA ecc\dots).
 
-\paragraph{Aggiornamento} Le operazioni di aggiornamento ricavano i dati aggiornati tramite una query \code{SPARQL} che andranno a sostituire quelli obsoleti all'intenro di un istanza di \code{Entity}
+\paragraph{Aggiornamento} Le operazioni di aggiornamento ricavano i dati aggiornati tramite una query \code{SPARQL} che andranno a sostituire quelli obsoleti all'intenro di un istanza di Entity
 
 \paragraph{Rimozione} Le operazioni di rimozione lato \emph{City Service} sono eseguite direttamente tramite \code{SPARQL} delete. Mentre le operazioni di rimozione all'esterno (es. applicazione mobile), per motivi di sicurezza, sono eseguite tramite richiesta al servizio cittadino il quale si occupa di effettuare la rimozione vera e propria.
 
@@ -148,6 +148,8 @@ Per effettuare le connessioni al SIB cittadino è necessario istanziare oggetti 
 
 Per evitare che all'avvio di ogni connessione venisse creato un oggetto \code{KpConnector}, che comunque è un oggetto "pesante", ho deciso di usare la tecnica dei pool di oggetti. La tecnica consiste nel creare un numero sufficienti di oggetti all'inizio dell'applicazione e quando si necessita di usarne uno lo si chiede al pool il quale lo fornisce al tempo di una chiamata a metodo. Una volta terminato di utilizzare l'oggetto lo si restituisce al pool il quale poi potrà a sua volta cederlo ad un altro richiedente.
 In questo modo si evita che ogni volta che viene fatta una richiesta al \emph{City Service} ci sia il delay necessario a instanziare una connessione con il SIB.
+
+C'è da dire che vista le ottimizzazioni delle moderne \emph{Java Virtual Machine} e del \emph{Garbage Collector} per quanto riguarda gli oggetti con breve durata questa tecnica può rischiare di abbassare le performance anziché aumentarle \cite{torok2011}. Rimane comunque vantaggiosa nel caso di oggetti la quale creazione può essere abbastanza onerosa come per le connessioni ai database o alla rete.
 
 Il cuore di questo sistema è la classe \code{ObjectPool<T>} (\cite{objectpool}) che troviamo nel package \code{it.unibo.cityservice.pool} che rappresenta un pool di oggeti di tipo \code{T}. Questa classe contiene un metodo astratto \code{createObject()} che va implementato nelle sottoclassi mettendoci dentro la logica di creazione dell'oggetto di cui volgiamo creare il pool.
 
@@ -218,17 +220,71 @@ All'avvio il \emph{City Service} compie innumerevoli compiti:
 
 \subsubsection{Gestione delle richieste}
 
-Quando ci si sottoscrive a qualcosa nel SIB oltre a definire a cosa ci vogliamo sottoscrivere dobbiamo anche definire un \emph{handler} che verrà eseguito quando avverà il cambiamento a cui siamo interessati. Come visto sopra (~\ref{enum:subscr} di sottoscrizioni ne vengono fatte 4, per ognuna di esse viene definito lo stesso \emph{hanlder} il quale lancia un thread istanza della classe \code{RequestDispatcher}. Esso si occupa semplicemente di gestire la richiesta e di eseguire un altro thread, sempre contenuto in un pool, che la soddisfi.
+Quando ci si sottoscrive a qualcosa nel SIB oltre a definire a cosa ci vogliamo sottoscrivere dobbiamo anche definire un \emph{handler} che verrà eseguito quando avverà il cambiamento a cui siamo interessati. Come visto sopra, nella sezione ~\ref{sec:protocol}, di sottoscrizioni ne vengono fatte 4, per ognuna di esse viene definito lo stesso \emph{hanlder} il quale lancia un thread istanza della classe \code{RequestDispatcher}. Esso si occupa semplicemente di gestire la richiesta e di eseguire un altro thread, sempre contenuto in un pool, che la soddisfi.
 
-I pool di thread sono dunque 5:
+\paragraph{Sessioni}
 
-\begin{enumerate}
-	\item \code{requestDispatcher}:
-	\item \code{chargeRequestExecutor}:
-	\item \code{confirmByUserExecutr}:
-	\item \code{ackByUserExecutor}:
-	\item \code{retireReservationExecutor}:
-\end{enumerate}
+Per ottenere un ulteriore incremento di performace è stato introdotto il concetto di sessione. La sessione inizia al quando il \emph{City Service} riceve la richiesta e finisce quando riceve l'acknowledgment. Il fine della sessione è mantenere una cache dei dati che vengono scambiati al fine di risparmiare query SPARQL, che sono assai onerose in termini di performance, e di dare un limite temporale alle sessioni stesse. La classe che si occupa di gestire le sessioni è \code{SessionManager} mentre la sessione è rappresentata dalla classe \code{session}.
+
+All'interno della sessione vengono salvate le seguenti informazioni:
+
+\begin{itemize}
+	\item \textbf{chargeRequest}: Un istanza dell'entity \code{ChargeRequest} ricevuta all'utente. 
+	\item \textbf{chargeResponse}: Un istanza dell'entity \code{ChargeResponse} inviata all'utente. 
+	\item \textbf{reservation}: Un istanza dell'entity \code{Reservation} creata in seguito alla conferma dell'utente.
+	\item \textbf{startTime}: Il momento in cui inizia la sessione.
+	\item \textbf{endTime}: Il momento in cui finisce la sessione che corrisponde all'arrivo dell'acknowledgment dell'utente.
+\end{itemize}
+
+\noindent
+La classe \code{SessionManager} possiede un timer che a tempo prefissato lancia un thread che controlla le sessioni attive. Se una delle sessioni è attiva da molto tempo senza essere stata chiusa allora significa che probabilmente c'è stato un problema e quindi vengono rimossi dal SIB tutti i dati relativi alla sessione compresa la prenotazione.
+
+\paragraph{Prenotazioni}
+
+La gestione delle prenotazioni, una volta che sono state create e confermate dall'utente, è delegata alla classe \code{ReservationManager}. A suo interno vengono salvate in una cache le istanze di \code{Reservation} create. Quando arriva una nuova richiesta di prenotazione la verifica della disponibilità viene fatta su questa cache anziché sul SIB. Questo sempre al fine di ridurre gli accessi al database e il successivo parsing delle risposte.
+Siccome l'uso di questa classe è altamente parallelo, ovvero possono accedervi molti thread contemporaneamente, viene utilizzata una mappa thread-safe messa a disposizione da java \code{ConcurrentHashMap}. Inoltre le operazioni di verifica di disponibilità delle prenotazioni vengono sono atomiche a livello di EVSE grazie a un lock per ognuno di essi. 
+
+\paragraph{Thread}
+
+Ci sono cinque classi diverse che implementano l'interfaccia \code{Runnable} ognuna delle quali ha il compito di gestire un determinato aspetto dei protocolli di richiesta. Ovviamente c'è un pool di esecuzione per ognuna di esse.
+
+\begin{itemize}
+	\item \code{RequestDispatcher}: È il thread che si occupa di smistare le richieste agli altri esecutori, viene eseguito ogni volta che arriva una notifica da una sottoscrizione. La decisione avviene in base all'id della sottoscrizione che viene assegnato in fase di inizializzazione ed immagazzinato all'interno di variabili globali. Il codice di questo del corpo di questo thread è mostrato nel listato ~\ref{lst:requestDispatcher} dive si nota chiaramente l'utilizzo del pool di oggetti e dei pool di thread nonché del \code{logger}. Questo approccio viene usato anche per gli altri thread con l'aggiunta del reperimento dei \code{KpConnector} dal relativo pool.
+	\item \code{ChargeRequestHandler}: Viene eseguito quando un utente inserisce un istanza istanza di \code{ioe:ChargeRequest} nel SIB. Dalla sottoscrizione ne ricava l'URI e con l'apposito controller \code{ChargeRequestController} la trasforma in un Entity java istanza della classe \code{ChargeRequest}. I passaggi che dalla richiesta elaborano una risposta sono i seguenti:
+	\begin{enumerate}
+		\item Controllo di coerenza sulla richiesta. Se la richiesta non è valida allora viene inviata una risposta vuota. Altrimenti si procede con il resto delle operazioni.
+		\item Viene creata un istanza di \code{Session} gestita dalla classe \code{SessionManager}.
+		\item Scelta dei \emph{GCP} che si trovano nell'area scelta dall'utente tramite la libreria \code{UniboGeoTools}.
+		\item Vengono ciclati tutti gli \emph{EVSE} appartenenti ai \emph{GCP} selezionati.
+		\item Per ogni \emph{EVSE} vengono ricavati gli slot di tempo compatibili con la fascia oraria e la quantità di carica richieste dall'utente.
+		\item Viene generata la risposta istanza dell'Entity \code{ChargeResponse}. Al fine di minimizzare lo scambio di dati attraverso la rete sopratutto per non penalizzare i dispositivi mobili, le richieste vengono filtrate. Vengono inviate le opzioni di ricarica provenienti dai 5 \emph{GCP} più vicini e ne vengono scelte al massimo 2 per ogni \emph{EVSE}
+		\item La risposta viene trasformata inserita nel SIB tramite la classe \\ \code{ChargeResponseController}.
+	\end{enumerate}
+	\item \code{ConfirmByUserHandler}: Questo thread viene invocato quando l'utente scaglie un opzione di ricarica e semplicemente controlla che sia ancora disponibile. In tal caso crea la prenotazione in modo che nessun altro possa usare la colonnina nell'orario richiesto. Da notare che l'istanza di \code{ChargeOption} viene presa dalla cache contenuta nella sessione anziché tramite query SPARQL e che l'istanza di \code{Reservation} viene salvata nel gestore di prenotazioni \code{ReservationManager}.
+	\item \code{AckByUserHandler}: Viene invocato quando l'utente conferma l'opzione di ricarica. A questo punto il protocollo può considerarsi terminato e quindi vengono eliminate tutte le informazioni ad esso relative dal SIB e la sessione associata. L'unica informazione che rimane è un istanza di \code{ioe:Reservation} nel SIB.
+	\item \code{RetireReservationHandler}: Si occupa semplicemente di eliminare le istanze di \code{ioe:Reservation} dal SIB e le corrispettive informazioni nella cache contenuta in \code{ReservationManager}.
+\end{itemize}
+
+\begin{java}[caption={Corpo di RequestDispatcher},label={lst:requestDispatcher}]
+SSAP_XMLTools xmlTools = xmlToolsPool.borrowObject();
+String subscriptionID = xmlTools.getSubscriptionID(subscribeResult);
+
+if (chargeRequestSubId.equals(subscriptionID)) {
+	chargeRequestExecutor.execute(new ChargeRequestHandler(subscribeResult));
+} else if (confirmByUserSubId.equals(subscriptionID)) {
+	confirmByUserExecutr.execute(new ConfirmByUserHandler(subscribeResult));
+} else if (ackByUserSubId.equals(subscriptionID)) {
+	ackByUserExecutor.execute(new AckByUserHandler(subscribeResult));
+} else if (retireReservationSubId.equals(subscriptionID)) {
+	retireReservationExecutor.execute(new RetireReservationHandler(subscribeResult));
+} else {
+	logger.error("Unexpected subscription id: " + subscriptionID);
+}
+
+xmlToolsPool.returnObject(xmlTools);
+\end{java}	
+
+
 
 
 

@@ -1,15 +1,27 @@
 \usepackage{listings} %box per codice sorgente
-\usepackage{color}
+\usepackage{color} %colori
+\usepackage{courier} %usa il curier in \ttfamily
 
-\newcommand{\code}[1]{\texttt{#1} }
+% pacchetto che usa bergami!!
+% permette ad esempio di usare \ttfamily (monospaced) nel codice e avere comunque alcune parole in grassetto (come loop nel codice arduino, ecc..)
+\usepackage[scaled]{beramono}
 
-\newcounter{main}
-\setcounter{main}{1}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% per vedere ``Listato'' anziché ``Listing'' come didascalia sopra ai frammenti di codice
+\addto\captionsitalian{\renewcommand{\lstlistingname}{Listato}}
+% per vedere ``Listato'' anziché ``Listings'' come indice dei frammenti di codice
+\addto\captionsitalian{\renewcommand{\lstlistlistingname}{Elenco dei Listati}}
+
+%\DeclareCaptionFont{white}{\color{white}}
+%\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\dimexpr\textwidth-2\fboxsep\relax}{#1#2#3}}}
+%\captionsetup[code]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
+\definecolor{my_gray}{RGB}{240,240,240}
 
 
-\lstdefinelanguage{BASH}
-{
-    otherkeywords={=, +, [, ], (, ), \{, \}, *},
+\lstdefinelanguage{BASH} {
+	otherkeywords={=, +, [, ], (, ), \{, \}, *},
     %morecomment=[l]{#},
     %morestring=[s]{"}{"},
     morekeywords={make,apt-get,sudo},
@@ -17,67 +29,66 @@
     keywordstyle=\bfseries,
     stringstyle=\color{red},
     emphstyle=\color{black}\bfseries,
-    commentstyle=\color{dark-green}\slshape,
+    commentstyle=\color{darkgreen}\slshape,
 }
 
-\lstnewenvironment{bash}[1][firstnumber=\themain,name=main]
-  {\lstset{language=BASH,
+\lstnewenvironment{bash}[1][] {
+	\lstset{language=BASH,
            basicstyle=\ttfamily\footnotesize,
            numbers=left,
            numberstyle=\tiny\color{gray},
            backgroundcolor=\color{lightgray},
            breaklines=true,
-           prebreak=\small\symbol{'134},
            breakatwhitespace=true,
-           mathescape=false
-           morecomment=[l]{\#}
+           mathescape=false,
+           morecomment=[l]{\#},
+           stepnumber=1,
+		   firstnumber=1,
            #1
           }
-}
-{\setcounter{main}{\value{lstnumber}}}
+}{}
 
 %XML
 \definecolor{maroon}{rgb}{0.5,0,0}
 \definecolor{darkgreen}{rgb}{0,0.5,0}
-\lstdefinelanguage{XML}
-{
-  basicstyle=\ttfamily,
-  morestring=[s]{"}{"},
-  morecomment=[s]{?}{?},
-  morecomment=[s]{!--}{--},
-  commentstyle=\color{darkgreen},
-  moredelim=[s][\color{black}]{>}{<},
-  moredelim=[s][\color{red}]{\ }{=},
-  stringstyle=\color{blue},
-  identifierstyle=\color{maroon}
+\lstdefinelanguage{XML} {
+	basicstyle=\ttfamily,
+	morestring=[s]{"}{"},
+	morecomment=[s]{?}{?},
+	morecomment=[s]{!--}{--},
+	commentstyle=\color{darkgreen},
+	moredelim=[s][\color{black}]{>}{<},
+	moredelim=[s][\color{red}]{\ }{=},
+	stringstyle=\color{blue},
+	identifierstyle=\color{maroon}
 }
 
-\lstnewenvironment{xml}[1][firstnumber=\themain,name=main]
-  {\lstset{language=XML,
-           basicstyle=\ttfamily\footnotesize,
-           numbers=left,
-           numberstyle=\tiny\color{gray},
-           backgroundcolor=\color{lightgray},
-           breaklines=true,
-           breakatwhitespace=true,
+\lstnewenvironment{xml}[1][] {
+	\lstset{language=XML,
+            basicstyle=\ttfamily\footnotesize,
+            numbers=left,
+            numberstyle=\tiny\color{gray},
+            backgroundcolor=\color{lightgray},
+            breaklines=true,
+            breakatwhitespace=true,
+            stepnumber=1,
+			firstnumber=1,
+			captionpos=bc,
            #1
           }
-}
-{\setcounter{main}{\value{lstnumber}}}
+}{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% JAVA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \definecolor{javared}{rgb}{0.6,0,0} % for strings
 \definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
 \definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
 \definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
 
-%\lstdefinelanguage{JAVA}
-%{
-%
-%}
-
-\lstnewenvironment{java}[1][firstnumber=\themain,name=main]
-  {\lstset{	language=Java,
-			basicstyle=\ttfamily,
+\lstnewenvironment{java}[1][] {
+	\noindent\minipage{\linewidth}%
+	\lstset{language=Java,
+			basicstyle=\ttfamily\footnotesize,
 			keywordstyle=\color{javapurple}\bfseries,
 			stringstyle=\color{javared},
 			commentstyle=\color{javagreen},
@@ -87,13 +98,16 @@
             basicstyle=\ttfamily\footnotesize,
             numbers=left,
             tabsize=2,
-            numberstyle=\tiny\color{gray},
+            numberstyle=\tiny\color{black},
             backgroundcolor=\color{lightgray},
             breaklines=true,
             breakatwhitespace=true,
-           #1
+            stepnumber=1,
+			firstnumber=1,
+			captionpos=bc,
+            #1
           }
-}
-{\setcounter{main}{\value{lstnumber}}}
+	%\captionsetup{options=code}
+}{\endminipage}
 
 %http://jevopi.blogspot.it/2010/03/nicely-formatted-listings-in-latex-with.html

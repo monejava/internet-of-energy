@@ -15,10 +15,6 @@ La piattaforma implementa il disaccoppiamento tra produttori e consumatori di in
 
 Il Semantic Web è un framework sviluppato dal World Wide Web Consortium per consentire la condivisione e il riutilizzo dei dati attraverso  applicazioni, aziende e comunità eterogenee.
 
-\subsection{Semantic Information Broker}\label{subsec:sib}
-
-Il \emph{Semantic Information Broker} (SIB) è l'entità responsabile della conservazione e della gestione delle informazioni condivise nell'architettura M3. Gli agenti Software che si scambiano le informazioni vengono chiamati \emph{Knowledge Processors} (KPs). L'accesso alla SIB da parte dei KP avviene attraverso lo \emph{Smart Space Access Protocol}  (SSAP), esso consiste in messaggi XML scambiati attraverso socket TCP/IP. Vengono fornite API che implementano il protocollo SSAP in diversi linguaggi.
-
 La figura ~\ref{fig:smart-m3} mostra il funzionamento dell'architettura M3. Il "legacy gate" è un interfaccia con il mondo esterno e di essi ne possono coesistere innumerevoli in un architettura M3.
 
 \begin{figure}[H]
@@ -26,6 +22,41 @@ La figura ~\ref{fig:smart-m3} mostra il funzionamento dell'architettura M3. Il "
 	\includegraphics[width=0.5\textwidth]{assets/smart-m3.jpg}
 	\caption{Architettura Smart-M3}
 	\label{fig:smart-m3}
+\end{figure}
+
+\subsection{Semantic Information Broker}\label{subsec:sib}
+
+Il \emph{Semantic Information Broker} (SIB) è l'entità responsabile della conservazione e della gestione delle informazioni condivise nell'architettura M3. Gli agenti Software che si scambiano le informazioni vengono chiamati \emph{Knowledge Processors} (KPs). L'accesso alla SIB da parte dei KP avviene attraverso lo \emph{Smart Space Access Protocol}  (SSAP), esso consiste in messaggi XML scambiati attraverso socket TCP/IP. Vengono fornite API che implementano il protocollo SSAP in diversi linguaggi.
+
+Il SIB è un architettura a 5 livelli (\cite{smart2010}) come mostrato in figura ~\ref{fig:sib-architecture}:
+
+\begin{enumerate}
+	\item \textbf{Transport}: Questo livello consiste in una o più comunicazioni di rete a livello di trasporto che permette al SIB di comunicare con diverse reti e architetture. Il livello di trasporto è collegato a quello sottostante tramite il DBus, rendendo possibile l'aggiunta e la rimozione di connettori a runtime.
+	\item \label{enum:handling}\textbf{Operation Handling}: A questo livello vengono gestite le operazioni del protocollo SSAP e ognuna di esse viene eseguita in un thread dedicato. Malgrado l'uso intensivo di thread possa degradare le performance la chiarezza di codice che ne consegue è stata ritenuta più importante.
+	\item \label{enum:graph}\textbf{Graph Operations}: Questo livello gestisce le operazioni di inserimento, rimozione e query dal database RDF come richiesto dal livello ~\ref{enum:handling}. Viene eseguito all'interno di un singolo thread che schedula ed esegue le richieste provenienti dai thread che gestiscono le operazioni SSAP la quale comunicazione avviene tramite code asincrone.
+	\item \textbf{Triple Operations}: A questo livello vengono gestite le operazioni SPARQL, WQL e le query basate su pattern-matching di triple RDF. Attualmente è implementato tramite Piglet, un database RDF che si appoggia ad SQL lite per la persistenza delle informazioni. Questo strato può essere tranquillamente cambiato a patto che si scriva il codice necessario ad interfacciare le operazioni a livello di grafo (~\ref{enum:graph}) con l'interfaccia fornita dal nuovo store RDF.
+	\item \textbf{Persistent storage}: Quetso è il livello che assicura la persistenza dei dati.
+\end{enumerate}
+
+\subsection{I Knowledge Processor}
+
+I Knowledge Processor (KP) sono le parti attive dell'architettura Smart-M3. Un KP interagisce con il SIB non direttamente tramite il protocollo SSAP ma tramite le Knowledge Processor Interface (KPI) ovvero delle librerie che lo implementano. Esse possono trovarsi a qualunque livello di astrazione ed essere scritte in qualunque linguaggio. Le funzioni messe a disposizione dal KPI in genere sono speculari alle operazioni del protocollo SSAP.
+
+I KP sono quelle entità che forniscono, modificano e richiedono le informazioni le informazioni contenute nello smart-space. L'architettura dei KP è mostrata in figura ~\ref{fig:kp-architecture}.
+
+\begin{figure}[H]
+        \centering
+        \begin{subfigure}[H]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{assets/sib-architecture.jpg}
+                \caption{Architettura del SIB}
+                \label{fig:sib-architecture}
+        \end{subfigure}%
+        \begin{subfigure}[H]{0.42\textwidth}
+                \includegraphics[width=\textwidth]{assets/kp-architecture.jpg}
+                \caption{Architettura dei KP}
+                \label{fig:kp-architecture}
+        \end{subfigure}
+        \caption{Architetture SIB e KP}
 \end{figure}
 
 \subsection{Le triple RDF}
@@ -48,18 +79,27 @@ Così come SQL riflette, nella rappresentazione della query, il modello relazion
 
 \subsection{Il protocollo SSAP}
 
-L'SSAP (\emph{Smart Space Access Protocol}) è il protocollo con cui si comunica con il SIB (\cite{smart2010}). Il protocollo è session-based, i KP che vogliono comunicare con lo smart-space dovranno prima aderirvi con un operazione di Join prevista dall'SSAP. Il KP fornisce le sue credenziali nel messaggio di Join, il SIB esamina le credenziali e decide se accetare il KP o meno. Dopo l'operazione di Join, il KP può eseguire le altre operazioni. 
+L'SSAP (\emph{Smart Space Access Protocol}) è il protocollo con cui si comunica con il SIB. Il protocollo è session-based, i KP che vogliono comunicare con lo smart-space dovranno prima aderirvi con un operazione di Join prevista dall'SSAP. Il KP fornisce le sue credenziali nel messaggio di Join, il SIB esamina le credenziali e decide se accetare il KP o meno. Dopo l'operazione di Join, il KP può eseguire le altre operazioni. 
 L'SSAP è il punto di integrazione principale dell'architettura Smart-M3. Le implementazioni di SIB e KP devono implementare tutte le operazioni del protocollo SSAP al fine di garantire l'interoperabilità.
 
 Le operazioni supportate dal protocollo SSAP sono:
 
 \begin{itemize}
-	\item \textbf{JOIN}:
-	\item \textbf{LEAVE}:
-	\item \textbf{INSERT}:
-	\item \textbf{REMOVE}:
-	\item \textbf{UPDATE}:
-	\item \textbf{QUERY}:
-	\item \textbf{SUBSCRIBE}:
-	\item \textbf{UNSUBSCRIBE}:
+	\item \textbf{JOIN}: Associa il KP allo smart-space solo se le credenziali verranno ritenute valide. Determina l'inizio della sessione.
+	\item \textbf{LEAVE}: Determina il termine dell'associazione con lo smart-space e quindi la fine della sessione. Da questo momento in poi non potranno essere eseguite altre operazione di associazione allo smart-space.
+	\item \textbf{INSERT}: Operazione atomica di inserzione di un Grafo, formato da triple RDF, nel SIB.
+	\item \textbf{REMOVE}: Operazione atomica di rimozione di un Grafo, formato da triple RDF, nel SIB.
+	\item \textbf{UPDATE}: Operazione atomica di aggiornamento di un Grafo, formato da triple RDF, nel SIB. In realtà si tratta di una combinazione di DELETE e INSERT eseguita in modo atomico dove l'operazione di DELETE viene eseguita per prima.\textsl{•}
+	\item \textbf{QUERY}: Richiesta di informazioni contenute nel SIB attraverso una delle modalità supportate.
+	\item \textbf{SUBSCRIBE}: Sottoscrizione a un set di triple contenute nel SIB. Il KP riceve una notifica quando avviene un cambiamento su una di queste triple.
+	\item \textbf{UNSUBSCRIBE}: Cancella una sottoscrizione.
 \end{itemize}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{assets/smart-m3-domain.jpg}
+	\caption{Smart-M3 modello di dominio}
+	\label{fig:smart-m3-domain}
+\end{figure}
+
+

@@ -132,7 +132,7 @@ Una classe può essere sottoclasse di un'altra classe, ereditando le caratterist
 Nel modello di dati utilizzato in questo progetto si è cercato di tenere disaccoppiato il concetto di dato dalle altre entità fisiche. Ne consegue che tutte le entità fisiche sono sottoclassi dirette di \code{owl:Thing}, mentre le classi destinate a rappresentare i dati sono sottoclasse di \code{ioe:Data} che a sua volta è sottoclasse di \code{owl:Thing}.\newline
 Nel resto di questo documento userò il prefisso \code{ioe:} come abbreviazione di \emph{http://www.m3.com/2012/05/m3/ioe-ontology.owl\#} che è il namespace scelto per l'ontologia. In generale userò questo prefisso per distinguere le classi dell'ontologia dalle classi Java che come vedremo nella sezione ~\ref{subsec:ioe-lib} hanno lo stesso nome essendo mapping diretto di quest'ultime.
 
-\subsection{Sottoclassi di owl:Thing}
+\subsection{Sottoclassi di owl:Thing}\label{subsec:thing}
 
 Come già accennato tutte le entità fisiche del nostro modello ontologico sono sottoclasse diretta di owl:Thing. Quellla mostrata di seguito è una lista delle Classi utilizzate in questo progetto, vengono omesse quelle che sono attualmente irrilevanti o inutilizzate.
 
@@ -169,14 +169,97 @@ In questa sezione viene mostrata una lista di tutte le tipologie di dato utilizz
 	\item \textbf{LocationData}: Rappresenta i dati geografici dell'entità a cui si riferisce. In realtà non viene mai utilizzato ma viene usata direttamente la sua sottoclasse GPSData.
 	\item \textbf{GPSData}: Rappresenta le coordinate GPS ovvero latitudine e longitudine, l'unità di misura non 
 	\item \textbf{SpatialRangeData}: Rappresenta uno spazio geografico determinato da un punto GPS e un raggio intorno ad esso, l'unità di misurata usata è il metro (m).
-	\item \textbf{PriceData}: Rappresenta un 
-	\item \textbf{TimeIntervalData}:
+	\item \textbf{PriceData}: Rappresenta le informazioni relative a un prezzo ad esso è associata una valuta (sezione ~\ref{subsec:thing})
+	\item \textbf{TimeIntervalData}: Rappresenta un intervallo di tempo compreso tra due date. Originariamente veniva usato con le date nella forma gg/mm/aa, attualmente invece vengono indicati gli intervalli in millisecondi.
 \end{description}
-
-
 
 \subsection{Modifiche apportate all'ontologia}
 
-\subsubsection{ChargeRequest}\label{subsubsec:chargerequest}
+La versione dell'ontologia su cui ho iniziato a lavorare era la \emph{1.5.4} dalla quale sono seguiti 10 successivi rilasci fino ad arrivare alla versione attuale \emph{1.6.2}. Le modifiche più importanti sono state quelle relative al supporto di un nuovo protocollo di prenotazione delle ricariche, inoltre sono state operate operazioni di refactoring e di correzione di errori.
 
-\subsubsection{ChargeRequest}\label{subsubsec:chargeresponse}
+\subsubsection{Il concetto di Utente}\label{subsubsec:person}
+
+Inizialmente il concetto di utente non era previsto nell'ontologia in quanto non trovava nessuna applicazione pratica.
+L'entità che interagiva con la smart-grid era il veicolo e non l'utente. Questo approccio presenta i suoi limiti nel caso in cui un utente possieda più veicoli e voglia monitorare le ricariche effettuate o le prenotazioni pendenti con un unica soluzione. Inoltre, anche dal punto di vista dei fornitori di corrente elettrica, può essere utile avere una visione a livello di utente in modo da semplificare le operazioni di fatturazione. 
+Successivamente è stata introdotta la necessità di autenticare gli utenti al fine di poter cifrare le comunicazioni con l SIB. 
+
+È stata quindi introdotta la classe \code{ioe:Person}. Seppur esistano già delle ontologie con delle classi che rappresentano questo concetto è stato ritenuto più semplice crearne uno nostro. Sviluppi futiri potrebbero legare questo concetto a uno già esistente in modo da rendere più semplice l'interoperabilità tra sistemi diversi. La classe presenta le seguenti proprietà:
+
+\begin{itemize}
+	\item \code{ioe:hasName}: Nome e cognome dell'utente in formato stringa. Attualmente è irrilevante avere una separazione dei due. 
+	\item \code{ioe:hasUserIdentifier}: Codice che identifica univocamente l'utente.
+	\item \code{ioe:hasVehicle}: Questa proprietà associa a un utente uno o più veicoli.
+\end{itemize}
+
+\noindent
+Come si può vedere attualmente l'utente è modellato in modo molto primitivo, sono state infatti incluse solo le proprietà strettamente necessarie al nostro dominio di interesse. 
+
+\subsubsection{Il concetto di Veicolo}\label{subsubsec:vehicle}
+
+Nel vecchio modello ontologico il concetto di veicolo in quanto non essenziale non veniva considerato, infatti, al momento di generare i veicoli, veniva inserita una tripla 
+
+\subsubsection{Il concetto di Ricarica}
+
+Nella prime versioni dell'ontologia non esisteva nulla che indicasse il concetto di "ricarica avvenuta" molto utile al fine di far statistiche sia lato utente (es: quanto si è speso in un mese per ricaricare il veicolo) sia lato smart-grid (es: Quanta energia è stata erogata, quali sono stati gli introiti). Questo perché i tempi previsti dalla prenotazione possono differire sensibilmente da quelli reali, basti pensare a una persona che arriva in ritardo a ricaricarsi o lascia la colonnina in anticipo. 
+
+%\paragraph{Coordinamento con AICIA} È stato inoltre necessario dimostrare l'interoperabilità con un altro partner di IoE ovvero AICIA. Questo al fine di dimostrare il buon lavoro di partnership tra i membri di IoE 
+
+È stata quindi introdotta la classe \code{ioe:Recharge}, da notare che le proprietà di seguito elencate sono state accordate con un altro partner del progetto IoE ovvero la spagnola AICIA al fine di eseguire un demo congiunta dove si dimostrava l'interoperabilità tra la nostra piattaforma e quella sviluppata da loro.
+
+\begin{itemize}
+	\item \code{ioe:hasDate}: Data e ora in cui è avvenuta la ricarica.
+	\item \code{ioe:hasUser}: Utente che ha effettuato la ricarica, qui si nota la necessità di inserire la classe \code{ioe:Person} (~\ref{subsubsec:person}).
+	\item \code{ioe:hasRechargeTime}: Il tempo necessario ad eseguire la ricarica.
+	\item \code{ioe:hasConsumption}: La quantità di corrente impiegata per effettuare la ricarica.
+\end{itemize}
+
+\subsubsection{Il Vecchio Protocollo di Prenotazione}\label{subsubsec:old-proto}
+
+Il protocollo di prenotazione iniziale era in stato embrionale e serviva a scopo esemplificativo per dimostrare la fattibilità della cosa. I parametri previsti per la richiesta di richiesta, ovvero come proprietà della classe \code{ioe:ChargeRequest} erano:
+
+\begin{itemize}
+	\item \code{ioe:hasPreferredTime}: Indica la data in cui l'utente vorrebbe effettuare la ricarica.
+	\item \code{ioe:hasPosition}: Indica la posizione da cui si sta eseguendo la richiesta.
+	\item \code{ioe:hasRequestedEnergy}: Indica la quantità di carica richiesta. 
+	\item \code{ioe:hasRequestingVehicle}: Indica il veicolo che richiede la ricarica.
+	\item \code{ioe:hasChargeResponse}: Indica la risposta che viene fornita dal sistema.
+\end{itemize}
+
+\noindent
+In quanto embrionale in seguito ad alcune simulazioni è sorta la necessità di aggiornare il protocollo per risolvere alcune problematiche. \\ 
+Al di la della mancanza del concetto di utente, l'assenza di range nei campi \code{ioe:hasPreferredTime} ed \code{ioe:hasPosition} potevano portare ad ambiguità nella risposta che non avendo alcun limite poteva diventare eccessivamente grande. Questo poteva portare problemi di traffico nel caso di utilizzo di smartphone agganciati alla rete tramite connettività mobile.
+
+\subsubsection{Il nuovo Protocollo di prenotazione}\label{subsubsec:chargerequest}
+
+In seguito ai problemi messi in luce nel paragrafo precedente (~\ref{subsubsec:old-proto}) è stato deciso di sviluppare un nuovo protocollo di prenotazione che prendesse in considerazioni i nuovi requisiti funzionali.
+
+La classe è \code{ioe:ChargeRequest} è stata quindi ridefinita con le seguenti proprietà:
+
+\begin{itemize}
+	\item \code{ioe:hasRequestingUser}: Utente che ha effettuato la ricarica. Malgrado si possa risalire all'utente tramite il veicolo è stato comunque inserita la proprietà al fine di semplificare le query SPARQL.
+	\item \code{ioe:hasSpatialRange}: Area nella quale si vuole eseguire la ricarica. Il punto centrale di quest'area non corrisponde necessariamente con la posizione dell'utente. Come vedremo nella sezione relativa all'applicazione mobile (~\ref{chap:mobile-app}) l'area di prenotazione può essere scelta arbitrariamente sulla mappa.
+	\item \code{ioe:hasTimeInterval}: Indica il range temporale all'interno del quale si è disposti ad eseguire la ricarica. Può anche essere molto superiore al tempo necessario per la ricarica nel caso in cui non ci siano particolari preferenze di tempo.
+	\item \code{ioe:hasRequestingVehicle}: Indica il veicolo per cui si richiede la ricarica. Non differisce rispetto al vecchio protocollo.
+	\item \code{ioe:hasRequestedEnergy}: Indica la quantità di carica richiesta. Non differisce rispetto al vecchio protocollo.
+\end{itemize}
+
+\noindent
+Per quanto sia stato migliorato il protocollo è ancora incompleto ed in quanto tale è ancora aperto a migliorie. Ad esempio non è possibile specificare la volontà dell'utente di essere più flessibile per quanto riguarda la quantità di carica richiesta e nemmeno, nel caso fosse richiesto dalla smart-grid, se fosse disposto a cedere parte della sua carica.
+\\ \\
+Oltre alla richiesta è stata modificata anche la risposta. Alla classe \code{ioe:ChargeResponse} è stata aggiunta la proprietà \code{ioe:hasRelatedRequest} al fine di semplificare le query SPARQL.
+Anche le opzioni di ricarica contenute nella risposta sono state modificate con lo scopo di farle aderire ai nuovi requisiti funzionali ma anche per semplificare le query SPARQL.
+
+Di seguito verranno esposte le proprietà della classe \code{ioe:ChargeOption}. Dalla vecchia definizione è stata rimossa la proprietà \code{ioe:hasChargeProfile}. Le proprietà ereditate dalla vecchia ontologia verranno opportunamente segnalate.
+
+\begin{itemize}
+	\item \code{ioe:optionHasEVSE}: EVSE presso il quale avverrà la ricarica (ereditata).
+	\item \code{ioe:hasTimeInterval}: Specifica il tempo necessario a ricaricarsi calcolato sulla base dell'energia richiesta e la potenza della colonnina. Questa proprietà era presente anche nella vecchia definizione dove i tempi venivano indicati con le date in formato gg/mm/aaaa, attualmente i tempi vengono indicati in millisecondi (passati dalla mezzanotte del 1 Gennaio 1970 UTC) con le proprietà \code{ioe:hasFromTimeMillisec} e \code{ioe:hasToTimeMillisec}.
+	\item \code{ioe:hasRequestingVehicle}: Il veicolo per cui è stata effettuata la richiesta. (ereditata)
+	\item \code{ioe:hasRequestingUser}: L'utente che ha effettuato la richiesta.
+	\item \code{ioe:hasGridConnectionPoint}: Il GCP presso cui avverrà la ricarica. Malgrado vi si possa accedere tramite l'EVSE è stato inserito al fine di semplificare le query SPARQL.
+	\item \code{ioe:hasTotalPrice}: Prezzo totale della ricarica.
+	\item \code{ioe:hasGcpPosition}: Posizione del GCP, anche questa proprietà è stata aggiunta per semplificare le query SPARQL.
+\end{itemize}
+
+
+\subsubsection{Rimozione }\label{subsubsec:chargeresponse}

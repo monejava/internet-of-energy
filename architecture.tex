@@ -136,7 +136,7 @@ Nel resto di questo documento userò il prefisso \code{ioe:} come abbreviazione 
 
 Come già accennato tutte le entità fisiche del nostro modello ontologico sono sottoclasse diretta di owl:Thing. Quellla mostrata di seguito è una lista delle Classi utilizzate in questo progetto, vengono omesse quelle che sono attualmente irrilevanti o inutilizzate.
 
-\begin{itemize}
+\begin{description}
 	\item \textbf{Person}: Questa classe rappresenta il concetto di persona. Ad ogni persona possono essere associati diversi veicoli (Vehicle), diverse richieste di ricarica (Reservation), nonché una storia delle ricariche effettuate (Recharge). Il concetto di persona viene utilizzato ai fini di autenticazione e in un futuro potrà essere determinante ai fini della fatturazione che il provider energetico eseguirà in seguito alle ricariche.
 	\item \textbf{Vehicle}: Rappresenta il concetto di Veicolo Elettrico, siccome i veicoli non elettrici sono irrilevanti al fine di questa trattazione è stata usata direttamente questa classe allo scopo. Ad ogni veicolo sono ovviamente associati i dati della batteria (BatteryData) che verranno trattati nella sezione relativa alle sottoclassi di \code{ioe:Data} (~\ref{subsec:ioe-data});
 	\item \textbf{GridConnectionPoint}: Il \emph{Grid Connection Pointer} (GCP) è la stazione di ricarica. Esso contiene almeno un EVSE che invece rappresenta la colonnina dove ci si ricarica effettivamente. Il rapporto tra un GCP e gli EVSE è lo stesso che intercorre tra una stazione di rifornimento e le pompe di benzina. 
@@ -153,9 +153,26 @@ Come già accennato tutte le entità fisiche del nostro modello ontologico sono 
 	\item \textbf{Recharge}: Quando un utente, in seguito a una prenotazione, termina di ricaricarsi, inserita questa entità ad esso associato. Denota l'avvenuta ricarica è può essere utile per tener traccia dell'attività dell'utente nonché per fare statistiche.
 	\item \textbf{UnityOfMeasure}: Rappresenta l'unità di misura per i dati del progetto. Deve esserne associata una ad ogni sottoclasse di \code{ioe:Data}. Attualmente sono hardcoded all'interno dell'ontologia (\code{ioe:Watt}, \code{ioe:Volt} ecc..) 	
 	\item \textbf{Data}: Questa classe rappresenta il concetto di dato misurabile e ogni sua sottoclasse sarà caratterizzata da un valore e da un unità di misura.
-\end{itemize}
+\end{description}
 
 \subsection{Sottoclassi di ioe:Data}\label{subsec:ioe-data}
+
+In questa sezione viene mostrata una lista di tutte le tipologie di dato utilizzate in questo progetto. Esse sono tutte sottoclassi di \code{ioe:Data} e sono caratterizzate da un valore e da unità di misura \code{ioe:UnityOfMeasure}. Le unità di misure che vengono elencate nel seguente elenco sono quelle utilizzate nell'ambito di questo progetto niente vieta di cambiarle.
+
+\begin{description}
+	\item \textbf{BatteryData}: In questa classe sono raggruppati tutti i dati relativi allo stato della batteria di un veicolo (ChargeData, VoltageData, PowerData, CurrentData, TempertureData)
+	\item \textbf{ChargeData}: Rappresenta la quantità di carica, l'unità di misurata usata è il kilowattora (kWh).
+	\item \textbf{VoltageData}: Rappresenta la tensione elettrica, l'unità di misurata usata è il volt (V).
+	\item \textbf{PowerData}: Rappresenta la potenza elettrica, l'unità di misurata usata è il kilowatt (kW). 
+	\item \textbf{CurrentData}: Rappresenta l'intensità di corrente, l'unità di misurata usata è l'ampere (A). Usato sia per indicare la corrente in uscita che quella in entrata, come ad esempio i cicli di carica e scarica della batteria.
+	\item \textbf{TempertureData}: Rappresenta la temperatura, l'unità di misurata usata è il grado celsius (\textcelsius). Attualmente non è considerato nei nostri modelli.
+	\item \textbf{LocationData}: Rappresenta i dati geografici dell'entità a cui si riferisce. In realtà non viene mai utilizzato ma viene usata direttamente la sua sottoclasse GPSData.
+	\item \textbf{GPSData}: Rappresenta le coordinate GPS ovvero latitudine e longitudine, l'unità di misura non 
+	\item \textbf{SpatialRangeData}: Rappresenta uno spazio geografico determinato da un punto GPS e un raggio intorno ad esso, l'unità di misurata usata è il metro (m).
+	\item \textbf{PriceData}: Rappresenta un 
+	\item \textbf{TimeIntervalData}:
+\end{description}
+
 
 
 \subsection{Modifiche apportate all'ontologia}

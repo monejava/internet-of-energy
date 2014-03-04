@@ -6,7 +6,7 @@ Lo scenario legato alla mobilità elettrica veicolare è caratterizzato dalla pr
 
 In particolare vedremo come possono coesistere elementi reali ed elementi simulati e come il passaggio dall'uno all'altro sia assolutamente trasparente a tutti i componenti del sistema grazie all'uso di tecnologie ontology-based.
 
-\section{Smart-M3}
+\section{Smart-M3}\label{sec:smart-m3}
 
 Prima di parlare dei componenti strettamente legati a questo progetto è doveroso fare un introduzione alla tecnologia che fa da collante tra di essi ovvero Smart-M3. Capire come funziona Smart-M3 e quali sono i suoi principi è fondamentale al fine di comprendere a fondo il resto di questo documento.
 
@@ -139,6 +139,7 @@ Come già accennato tutte le entità fisiche del nostro modello ontologico sono 
 \begin{description}
 	\item \textbf{Person}: Questa classe rappresenta il concetto di persona. Ad ogni persona possono essere associati diversi veicoli (Vehicle), diverse richieste di ricarica (Reservation), nonché una storia delle ricariche effettuate (Recharge). Il concetto di persona viene utilizzato ai fini di autenticazione e in un futuro potrà essere determinante ai fini della fatturazione che il provider energetico eseguirà in seguito alle ricariche.
 	\item \textbf{Vehicle}: Rappresenta il concetto di Veicolo Elettrico, siccome i veicoli non elettrici sono irrilevanti al fine di questa trattazione è stata usata direttamente questa classe allo scopo. Ad ogni veicolo sono ovviamente associati i dati della batteria (BatteryData) che verranno trattati nella sezione relativa alle sottoclassi di \code{ioe:Data} (~\ref{subsec:ioe-data});
+	\item \textbf{Zone}: Rappresenta l'area di copertura del \emph{City Service}. Essa è definita da un rettangolo formato dall'angolo nord-ovest e dall'angolo sud-est. 
 	\item \textbf{GridConnectionPoint}: Il \emph{Grid Connection Pointer} (GCP) è la stazione di ricarica. Esso contiene almeno un EVSE che invece rappresenta la colonnina dove ci si ricarica effettivamente. Il rapporto tra un GCP e gli EVSE è lo stesso che intercorre tra una stazione di rifornimento e le pompe di benzina. 
 	\item \textbf{EVSE}: Il \emph{Electrical Vehicle Supply Equipment} è il punto in cui il veicolo si connette alla rete elettrica. Una volta connesso può sia ricaricare la sua batteria che cedere energia alla smart-grid. Un EVSE ha diversi connettori (Connector) per adattarsi ai vari tipi di presa posseduti dai veicoli elettrici. Inoltre, ogni EVSE, ha una lista di prenotazioni associate.
 	\item \textbf{ChargeProfile}: È l'insieme dei parametri che caratterizzano il profilo energetico di un EVSE in un determinato istante. I parametri attualmente sono: potenza, orario di validità del profilo stesso e prezzo per unità di energia (in genere 1 kWh). Ovviamente può essere attivo un solo ChargeProfile alla volta e il variare di quest'ultimi può essere determinato da fasce orarie proprio come avviene per l'energia elettrica casalinga.
@@ -196,8 +197,19 @@ Come si può vedere attualmente l'utente è modellato in modo molto primitivo, s
 
 \subsubsection{Il concetto di Veicolo}\label{subsubsec:vehicle}
 
-Nel vecchio modello ontologico il concetto di veicolo, in quanto non essenziale, non veniva particolarmente enfatizzato. 
+Nel vecchio modello ontologico il concetto di veicolo, in quanto non essenziale, non veniva particolarmente enfatizzato. Nella ultime versioni dell'ontologia ho aggiunto alcune proprietà al veicolo per venire incontro all'esigenza di poter distinguere la provenienza dei veicoli stessi. Infatti i veicoli vengono inseriti nel SIB dal simulatore e possono anche essere reali come nel caso del Fiat Daily provato al CRF (App. ~\ref{app:crf}).
 
+Il veicolo è attualmente definito dalle seguenti proprietà:
+
+\begin{itemize}
+	\item \code{ioe:hasManufacturer}: Casa automobilistica che produce il veicolo.
+	\item \code{ioe:hasModel}: Modello del veicolo.
+	\item \code{ioe:hasGPSData}: Questa proprietà punta ad un istanza di \code{ioe:GPSData} che a sua volta contiene le informazioni di latitudine e longitudine.
+	\item \code{ioe:hasBatteryData}: Questa proprietà punta ad un istanza di \code{ioe:BatteryData} che contiene tutti i dati della batteria.
+	\item \code{ioe:hasIdentificationData}: Identificativo del veicolo, attualmente non viene usato e per semplificazione al suo posto viene usata la proprietà \code{ioe:hasName}.
+\end{itemize}
+
+Precedentemente 
 
 
 \subsubsection{Il concetto di Ricarica}
@@ -271,6 +283,106 @@ Fino alla versione \emph{1.5.11} dell'ontologia le informazioni relative ai GCP 
 Al fine di risolvere questo problema ho deciso di rimuovere questi dati dall'ontologia e inserirli all'interno di un file XML che viene caricato dal \emph{City Service} (Sez. ~\ref{subsubsec:city-init}) e dal simulatore (Sez. ~\ref{chap:sim}) in fase di inizializzazione.
 
 Grazie a questo approccio è diventato relativamente semplice impostare uno scenario del tutto diverso da quello previsto dal progetto.
+
+\section{I Semantic Information Broker}
+
+I SIB sono alla base dell'infrastruttura semantica che caratterizza questo progetto. I componenti del sistema (dal servizio cittadino, allo smartphone, all'EVSE ecc..) comunicano e rendono permanenti le informazioni grazie ad essi. L'architettura rimane sostanzialmente invariata da quella presentata da Federico Montori (\cite{montori2012}) nel suo progetto di tesi. Verrà comunque esposta al fine di comprendere il resto della trattazione e verranno evidenziate le variazioni apportate alla soluzione iniziale.
+
+L'architettura proposta prevede 2 SIB: il \emph{City SIB} e il \emph{Dash SIB}.
+
+\subsection{City SIB}\label{subsec:city-sib}
+
+Il \emph{City SIB} è il SIB cittadino. Al suo interno vengono immagazzinate tutte le informazioni utili a caratterizzare uno scenario di mobilità elettrica veicolare. Viene inoltre utilizzato come interfaccia di scambio dati tra il \emph{City Service} e gli agenti esterni, infatti è qui che vengono scritti i messaggi che compongono i protocolli i quali vengono cancellati una volta terminati. L'area di copertura di tale SIB e di conseguenza del \emph{City Service} è definita dalla classe dell'ontologia \code{ioe:Zone} anche se attualmente non viene utilizzata in quanto gli scenari proposti prendono in considerazione una città alla volta.
+
+Al fine di poter rispondere alle richieste di prenotazione degli utenti il \emph{City Service} contiene le informazioni su tutte le colonnine della zona che ricopre. Inoltre possiede le informazioni relative agli utenti e a i veicoli da essi posseduti. Non contiene le informazioni relative alla batteria che sono contenute nella \emph{Dash SIB} (~\ref{subsec:dash-sib}). Nell'architettura proposta nel progetto precedente a questo gli utenti non esistevano (~\ref{subsubsec:person}) e le informazioni relative ai veicoli si trovavano esclusivamente nella \emph{Dash SIB}.
+
+L'inizializzazione del \emph{City SIB}, contrariamente a quanto avveniva prima, viene eseguita dal servizio cittadino stesso, inoltre il servizio cittadino si occupa di caricare le informazioni dei GCP, caricate da un file XML, e di inserirle nel SIB (Sez. ~\ref{subsubsec:city-init}).
+
+
+\subsection{Dash SIB}\label{subsec:dash-sib}
+
+Il \emph{Dash SIB} è  un SIB che dovrebbe essere integrato a bordo di ogni veicolo. Il suo scopo è tenere costantemente traccia dei parametri che caratterizzano posizione, stato della batteria e tutti gli altri parametri variabili che caratterizzano un veicolo. Al fine di collegare questi dati a un veicolo la tripla che descrive un istanza di \code{ioe:Vehicle} viene ripetuta anche su questa SIB. 
+
+Inizialmente si pensava che questo SIB sarebbe stato eliminato in un contesto reale in quanto i dati in esso contenuti sarebbero stati presi direttamente dal veicolo. È stato invece deciso di mantenerlo per poterlo usare come interfaccia comune per l'interrogazione dei dati. Ovvero le applicazioni che utilizzano i dati del veicolo, come ad esempio l'applicazione mobile, dovrebbero essere agnostiche dalla sorgente di dati (es: Veicolo Reale, Veicolo Simulato). Compito del programmatore è scrivere un adattatore che scrive i dati in provenienti dalle varie fonti sul \textsc{Dash SIB}. Come vedremo più avanti (Cap. ~\ref{chap:sim}, ~\ref{chap:mobile-app}) grazie a questa tecnica è possibile controllare dal telefonino un veicolo presente nel simulatore tenendone monitorati tutti i parametri. I veicoli del simulatore scrivono tutti sullo stesso \emph{Dash SIB} in quanto sarebbe computazionalmente proibitivo e del tutto inutile fare altrimenti.
+
+Siccome attualmente non esistono veicoli che contengono un SIB esiste in fase di test su veicolo reale (App. ~\ref{app:crf}) è stato necessario portare un computer a bordo che contenesse il \textsc{Dash SIB} dal quale l'applicazione mobile attingeva per prelevare i dati.
+
+\section{La libreria IoE}\label{subsec:ioe-lib}
+
+Questa libreria implementa la logica applicativa ovvero il nucleo operativo del nostro strato di servizi. È la base per qualunque applicazione che intenda in interfacciarsi con il sistema in modo semplice ed efficace. Viene infatti sfruttata sia dal \emph{City Service} che dall'applicazione mobile, da me sviluppati, è inoltre utilizzata da un visualizzatore di ricariche, nato da un progetto parallelo al mio, del quale sviluppo si è occupata una ragazza di Ingegneria.
+
+\subsection{Connessione al SIB}
+
+La connessione al \emph{SIB} viene eseguita da una libreria Java (JavaKPI), sviluppata da ARCES, che implementa il protocollo SSAP. Ho creato un wrapper di questa libreria che ne semplifica l'utilizzo e aggiunge alcune funzionalità. Essa si trova nel package \code{it.unibo.ioe.sib}.
+
+\subsubsection{RdfTriple}
+La libreria JavaKPI rappresenta le triple RDF come vettore di Stringhe di 5 elementi (\code{Vector<String>}): soggetto, predicato, oggetto, tipo soggetto, tipo oggetto. 
+Per semplificare la gestione delle triple RDF, che sono l'entità di base su cui si basa il SIB, ho creato una classe \code{RdfTriple} che possiede gli attributi \code{subject},\code{predicate}, \code{object}, \code{subjectType}, \code{objectType} e i corrispettivi \code{getter} e \code{setter}.
+
+
+\subsubsection{KpConnector}
+
+La maggior parte delle operazioni che si possono eseguire con la libreria JavaKPI richiedono due passaggi: l'invio del comando, e il parsing della risposta. Questo perché ogni operazione di interazione con il SIB avviene tramite messaggi XML, conformi al protocollo SSAP. La libreria genera automaticamente il messaggio da inviare alla SIB ma lascia al programmatore l'onere di effettuare il parsing della risposta. Ho quindi mappato tutte le operazioni di interazione con la SIB all'interno della classe \code{KpConnector}.
+
+La classe \code{KpConnector} svolge le operazioni di parsing anche sui messaggi di risposta. Al posto dei vettori di stringhe ho utilizzato istanze della classe \code{RdfTriple}. Mentre dove venivano usate liste di triple (es: inserimento multiplo di triple, risultati di query SPARQL) ho sostituito con liste di oggeti di tipo \code{RdfTriple} (\code{List<RdfTriple>}). La classe che si occupa di convertire i tipi di dato usati dalla libreria \code{JavaKPI} ai tipi usati dal wrapper da me creato è \code{RdfParser}.
+
+\subsubsection{KpFactory}
+
+La classe \code{KpConnector} necessita di indirizzo, porta e nome del SIB a cui ci si vuole connettere, questo perché il suo utilizzo deve essere il più generico possibile. Nel nostro caso però le connessioni avvengono sempre verso gli stessi due SIB (CITY e DASH), ho quindi creato una classe factory (\code{KpFactory}) che, conoscendo i parametri di connessione necessari, crea due istanze di \code{KpConnector}, una per il CITY SIB e una per il DASH SIB, e restituisce sempre quello evitando quindi la creazione di istanze di oggetti inutili. Essendo la libreria \code{JavaKPI} non thread-safe viene comunque data la possibilità di creare istanze in modo veloce nel caso si lavori in ambienti multi-thread. Questo aspetto verrà approfondito più avanti dove vedremo come, tramite la tecnica dei pool di oggetti, possiamo risparmiare il tempo necessario a creare nuove istanze.
+
+%http://sourceforge.net/projects/smartm3-javakpi/
+
+\subsection{Entities}
+
+Ogni classe dell'ontologia è stata mappata con una rispettiva classe Java (Entity) nel package \code{it.unibo.ioe.entity} . Per questa scelta architetturale mi sono ispirato all'ORM (Object Relational Mapping) che è una tecnica di programmazione che favorisce l'integrazione di sistemi software aderenti al paradigma della programmazione orientata agli oggetti con sistemi RDBMS (Relational database management system). %http://it.wikipedia.org/wiki/Object-relational_mapping
+
+\subsubsection{Mapping} 
+
+Il mapping che ho creato è molto semplice e tiene conto solo delle proprietà strettamente necessarie nello strato di servizi e tralascia alcuni dettagli come l'unità di misura che attualmente, malgrado siano previsti nell'ontologia, vengono dati per scontati a livello applicativo.
+Le proprietà delle classi che hanno come oggetto un letterale sono state mappate con tipi primitivi Java (\code{int},\code{double},\code{String} ecc..). Mentre le proprietà che come oggetto hanno un'altra classe sono rappresentate come attributo che come tipo ha l'Entity
+che corrisponde alla classe. 
+
+\subsubsection{Serializzazone} 
+
+Alcune Entity sono state opportunamente annotate al fine di poter essere serializzate in XML tramite la tecnologia \code{JAXB}. Questo è risultato necessario nel caso dei \emph{GCP} che vengono caricati da un file XML, nella cartella del \emph{City Service}, il quale si occupa poi di inserirli nel SIB. Ogni classe inoltre implementa l'interfaccia \code{java.io.Serializable} al fine di permettere il passaggio delle Entity tra le varie \code{Activity} dell'applicazione mobile.
+
+\paragraph{Esempio}
+
+La proprietà dell'ontologia \code{ioe:hasEVSE} ha come dominio \\ \code{ioe:GridConnectionPoint} e come codominio \code{ioe:EVSE}. Inoltre tutte le classi dell'ontologia hanno al proprietà code{vcard:hasName}.
+
+Questa situazione viene tradotta nell'Entity:
+
+\begin{java}[caption={Entity di esempio},label=lst:entity]
+@XmlRootElement(name = "GCP")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class GCP implements Serializable {
+	@XmlTransient
+	private String URI;
+	private String gcpName;
+	@XmlElement(name = "EVSE")
+	private List<EVSE> evseList;
+	/* other properties*/
+	/* getter & setter*/	
+}
+\end{java}
+
+\subsection{Controller}
+
+I \code{Controller} sono le classi delegate ad eseguire le operazioni \code{CRUD} (create, read, delete, update) con il SIB e si trovano nel package \code{it.unibo.ioe.controller}. Ne esiste uno per ogni Entity. Ogni \code{Controller} possiede un istanza di \code{KpConnector} che permette la comunicazione con il SIB. 
+
+\begin{description}
+	\item \textbf{Lettura} Le operazioni di lettura vengono eseguite tramite una query \code{SPARQL} che preleva dal SIB le informazioni necessarie che poi vengono inserite in una nuova istanza di Entity la quale viene restituita all'utente.
+
+	\item \textbf{Scrittura} Le operazioni di scrittura ricavano una lista di triple RDF a partire da un istanza di Entity. La lista di triple viene poi convertita in una \code{SPARQL} insert al fine di ridurre i dati inviati al SIB. L'operazione di conversione è eseguita da una funzione di della  classe \code{SibUtil}. Questa tecnica si rivela particolarmente utile quando si utilizza la libreria da un dispositivo mobile connesso a internet tramite rete cellulare (es: EDGE, GPRS, HSDPA ecc\dots). Da notare che tutte le Entity possiedono un campo \code{URI} che viene valorizzato nell'operazione di inserzione con l'URI assegnato all'istanza che si sta per scrivere sul SIB. 
+
+	\item \textbf{Aggiornamento} Le operazioni di aggiornamento ricavano i dati aggiornati tramite una query \code{SPARQL} che andranno a sostituire quelli obsoleti all'intenro di un istanza di Entity
+
+	\item \textbf{Rimozione} Le operazioni di rimozione lato \emph{City Service} sono eseguite direttamente tramite \code{SPARQL} delete. Mentre le operazioni di rimozione all'esterno (es. applicazione mobile), per motivi di sicurezza, sono eseguite tramite richiesta al servizio cittadino il quale si occupa di effettuare la rimozione vera e propria.
+\end{description}
+
+
+
+
 
 
 

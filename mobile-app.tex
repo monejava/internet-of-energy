@@ -1,29 +1,92 @@
 \chapter{Applicazione Mobile}\label{chap:mobile-app}
 
-In questo capitolo verrà presentato un esempio di applicazione mobile in grado di connettersi al \emph{City Service} e di eseguire le operazione di prenotazione e ritiro delle ricariche. Il suo scopo è permettere all'utente di eseguire operazioni di interazioni con la smart-city al fine di ridurre le problematiche derivanti dall'utilizzo di veicoli elettrici. In particolare permette di eseguire richieste e cancellazioni di prenotazioni di ricariche attraverso i protocolli visti nella sezione ~\ref{sec:protocol}.
+In questo capitolo verrà presentato un esempio di applicazione mobile in grado di connettersi al \emph{City Service} e di eseguire le operazione di prenotazione e ritiro delle ricariche. Il suo scopo è permettere all'utente di interagire con la smart-city al fine di ridurre le problematiche derivanti dall'utilizzo di veicoli elettrici. La comunicazione avviene mediante i protocolli visti nella Sez. ~\ref{sec:protocol}.
 
-Inizialmente si limitava solo a queste operazioni ovvero prenotazione e cancellazioni di ricariche e inoltre funzionava solo in presenza del simulatore (~\ref{chap:sim}) in quanto prendeva il possesso di un veicolo gestito dal simulatore stesso. Il funzionamento è stato poi ampliato con la possibilità di connettersi tramite \emph{Bluetooth} a un veicolo reale, opportunità concessa dal \emph{Centro Ricerche Fiat} (\emph{CRF}), oppure di connettersi in assenza di veicoli.
+Inizialmente era possibile eseguire solo operazioni di prenotazione e cancellazione di ricariche e funzionava unicamente in presenza del simulatore in quanto si prendeva il possesso di un veicolo simulato. Il funzionamento è stato poi ampliato con la possibilità di connettersi tramite Bluetooth a un veicolo reale, opportunità concessa dal \emph{Centro Ricerche Fiat} (\emph{CRF}), oppure di connettersi in assenza di veicoli per permettere all'utente di effettuare una ricarica comodamente seduto a casa.
 
 A questo si è aggiunta la possibilità di analizzare il profilo altimetrico che separa il dispositivo mobile da un determinato EVSE con lo scopo di fare previsioni più accurate sui consumi necessari a raggiungerlo.
 
 La piattaforma di sviluppo scelta è \emph{Android} vista la sua grandissima diffusione e versatilità.
 
+\section{Funzionalità}
+
+
+
 \section{Architettura}
 
-La piattaforma scelta per lo sviluppo è Android dalla versione \emph{4.0.3} in su. Questo perché vanta maggiori performance e un interfaccia utente più bella è più facile da programmare. La libreria di base per interfacciarsi con il SIB è quella esposta nella sezione ~\ref{subsec:ioe-lib}.
+La piattaforma scelta per lo sviluppo è Android dalla versione \emph{4.0.3} in su. Questo perché vanta maggiori performance e un interfaccia utente più gradevole è facile da programmare. La libreria di base per interfacciarsi con il SIB è quella esposta nella sezione ~\ref{subsec:ioe-lib}.
 
-\subsection{Interazione con L'esterno}
+La comunicazione con il servizio cittadino avviene tramite scambio di messaggi con il \emph{City SIB}, mentre le informazioni relative al veicolo, in particolar modo se quest'ultimo è simulato, arrivano dal \emph{Dash SIB}. È possibile collegare l'applicazione ad un veicolo reale che sia provvisto della tecnologia Blue\&{}Me di Fiat. I dati del profilo altimetrico sono ottenuti tramite una libreria, chiamata \emph{UniboGeoTools}, che ho sviluppato appositamente per l'occasione.
 
-L'interazione con il servizio cittadino avviene tramite scambio di messaggi con il \emph{City SIB}, mentre le informazioni relative al veicolo, in particolar modo se quest'ultimo è simulato, arrivano dal \emph{Dash SIB}.
+\subsection{Android}
+
+Malgrado Android sia ampiamente conosciuto penso sia necessario spendere qualche parola al fine di introdurre i concetti che stanno alla base della programmazione di applicazioni su questo sistema operativo per poter capire approfonditamente il resto della trattazione.
+
+Android è un sistema operativo basato Linux-based, Open Source, orientato all'utilizzo su dispositivi mobili anche se negli ultimi anni sta prendendo sempre più piede all'interno di smart-tv, dispositivi embedded, mini computer ecc..
+
+La programmazione di applicazioni avviene attraverso una versione ad-hoc del linguaggio Java che, seppur venga eseguita su una virtual machine diversa dalla JVM (Dalvik), ne mantiene quasi tutte le caratteristiche e la libreria di base. Naturalmente oltre alla libreria standard vengono fornite le API che permettono l'interfacciamento con le funzionalità di Android.
+
+\subsubsection{Activity}
+
+Le Activity sono uno degli elementi centrali della programmazione di applicazioni Android (\cite{html:android}). In genere un Activity rappresenta una singola schermata della nostra applicazione. Le applicazioni possono definire una o più Activity per trattare diverse fasi del software, e generalmente ognuna di esse corrisponde ad un azione specifica che può essere eseguita dall'utente. 
+
+Ci può essere una sola Activity attiva in un determinato istante, quelle che invece non sono attive possono essere terminate in qualunque momento dal sistema operativo al fine di recuperare memoria, questo comporta che il programmatore debba prevedere per ogni Activity il codice necessario a salvarne lo stato per permetterne il ripristino nel caso sia necessario. Questo comporta, come si può vedere in figura ~\ref{fig:android-activity}, che le Activity di Android abbiano un ciclo di vita abbastanza complesso. 
+
+\subsubsection{Service}
+
+Un Service è un processo che gira in background (un concetto molto simile al deamon in ambiente Unix) e può essere vviato e comandato da Activity o altri Service. La classe Service viene utilizzata per creare componenti software che possono svolgere attività in modo ``invisibile'', senza interfaccia utente.
+
+Un Service può trovarsi in due stati(\cite{emanuele:android}):
+
+\begin{itemize}
+	\item \textbf{Started}: Un servizio si trova in questo stato quando viene invocato il metodo startService(), il servizio gira in background per un tempo indefinito o finché il componente che lo ha invocato non viene distrutto (Fig. ~\ref{fig:android-service} sinistra).
+	\item \textbf{Bounded}: Un servizio si trova in questo stato quando si invoca il metodo bindService(). I servizi di questo tipo offrono un'interfaccia per la comunicazione client-server, in questo modo le componenti che invocano il servizio possono interagire con esso. In questo caso il servizio è attivo solo finché le componenti sono associate con esso (Fig. ~\ref{fig:android-service} destra).
+\end{itemize}
+
+\noindent
+Un Servizio avviato ha una priorità più alta rispetto ad Activity in stato di inattività, in questo modo vi è minore probabilità per un Service di essere terminato dal gestore delle risorse di runtime. L’unica ragione per cui Android potrebbe fermare un Service prematuramente è per fornire risorse addizionali al componente software in primo piano (normalmente una Activity).
+
+I servizi vengono avviati nel thread principale del processo, ciò significa che se eseguissero operazioni bloccanti o ad alto consumo di risorse potrebbero portare al blocco dell'intero processo e far generare ad Android un errore del tipo: ``Application Not Responding'', per evitare questo è bene far gestire il servizio in un thread separato.
+
+\begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.49\textwidth}
+			\includegraphics[width=\textwidth]{assets/android-activity.png}
+			\caption{Ciclo di vita di un Activity Android}
+			\label{fig:android-activity}
+		\end{subfigure}
+        \begin{subfigure}[b]{0.49\textwidth}
+			\includegraphics[width=\textwidth]{assets/android-service.png}
+			\caption{Ciclo di vita di un Service Android}
+			\label{fig:android-service}
+		\end{subfigure}
+        \caption{Ciclo di vita Activity e Service Android}
+\end{figure}
+
+\subsection{Blue\&{}Me}
+
+Il Blue\&{}Me è il risultato di un accordo tra Fiat Auto e Microsoft con l'obiettivo di progettare sistemi telematici innovativi per l'automotive, il sistema è stato presentato nel 2006 (\cite{al2012android}). Basato sulla piattaforma Windows Embedded Automotive (unione del sistema operativo Windows CE con il middleware Microsoft Auto) è sviluppato da Magneti Marelli (azienda del gruppo FIAT) in collaborazione con Microsoft (\cite{wiki:blue-me}).
+
+Blue\&{}Me è un sistema viva voce con tecnologia Bluetooth, riconoscimento vocale, lettore multimediale con presa USB e comandi al volante. Fiat Auto e Microsoft, con il supporto di Magneti Marelli, offrono una piattaforma adattabile alla maggior parte dei telefoni cellulari e lettori musicali. Il sistema si interfaccia al cellulare mediante la tecnologia Bluetooth e permette al guidatore di rispondere al telefono lasciando il telefono in tasca. 
+
+Un'altra importante funzionalità del Blue\&{}Me è la possibilità di monitorare i parametri del veicolo. Nel nostro caso abbiamo lavorato con un prototipo di Fiat Daily elettrico opportunamente modificato per trasmettere i dati della batteria tramite tecnologia Bluetooth. La connessione è stata possibile grazie a delle librerie fornite dal CRF con tanto di applicazione di esempio.
+
+\subsection{Operazioni Asincrone}
+
+Tutte le operazioni che prevedono l'utilizzo della rete, quindi potenzialmente lunghe, sono eseguite all'interno di un \code{AsyncTask} ovvero una classe messa a disposizione dalla libreria di base di Android che permette di eseguire operazioni asincrone e contemporaneamente aggiornare l'interfaccia grafica. Questo da un lato permette di avere un applicazione fluida in quanto l'interfaccia non rimane bloccata in attesa dei risultati e dall'altro evita il verificarsi di errori dovuti al fatto che Android non permette di modificare l'interfaccia da un thread diverso da quello destinato al disegno di quest'ultima.
+
+La maggior parte delle operazioni effettuate tramite rete, quindi nel nostro caso scambio di dati con i SIB, reperisce liste di elementi (veicoli, utenti, prenotazioni ecc..) che vengono mostrate all'interno di un apposita tipologia di Activity di Android le \code{ListActivity}.
+
+Al fine di semplificare la programmazione delle Activity che contengono liste i quali elementi sono reperiti tramite la rete, ho creato la classe \code{ListLoaderTask<T>} che ne facilita il caricamento asincrono.
 
 
 \section{Modalità di esecuzione}
 
-L'applicazione al fine di adattarsi ai diversi scenari possibili offre molteplici modalità di esecuzione, questo per adattarsi alle specifiche richieste per le dimostrazioni del Remote ??Monitoring¿¿. La scelta della modalità di esecuzione avviene nella schermata iniziale come si può vedere in figura ~\ref{fig:main-activity}
+L'applicazione al fine di adattarsi ai diversi scenari possibili offre molteplici modalità di esecuzione, questo per adattarsi a tutti gli scenari possibili. La scelta della modalità di esecuzione avviene nella schermata iniziale come si può vedere in figura ~\ref{fig:main-activity}
 
 \subsection{Simulazione}
 
-Questa modalità permette di prendere il controllo di un veicolo contenuto nel simulatore, il quale deve essere avviato con appositi parametri che causino la scrittura dei parametri relativi ai veicoli sul \emph{Dash SIB}. Questo implica che una volta che i abbiamo premuto sul pulsante \emph{Connect} (Fig. ~\ref{fig:main-activity}), dobbiamo scegliere l'utente Luciano Bononi in quanto è l'utente di default usato dalle macchine del simulatore (Fig. ~\ref{fig:select-user}). Una volta selezionato l'utente ci troveremo nel menu principale con solo due opzioni (Fig. ~\ref{fig:main-menu}). Questo perché le altre opzioni sono subordinate alla scelta di un veicolo. Una volta selezionato il veicolo (Fig. ~\ref{fig:select-veh}) vedremo esattamente i parametri che esso ha nel simulatore (posizione, carica, potenza ecc..). La posizione segnata nella mappa dell'app sarà la stessa segnata su SUMO. L'interazione tra il veicolo 
+Questa modalità permette di prendere il controllo di un veicolo contenuto nel simulatore, il quale deve essere avviato con un apposito parametro che causa la scrittura dei dati relativi ai veicoli sul \emph{Dash SIB}. Questo implica che una volta premuto sul pulsante \emph{Connect} (Fig. ~\ref{fig:main-activity}), bisogna scegliere "Luciano Bononi" in quanto è l'utente di default usato dalle macchine del simulatore (Fig. ~\ref{fig:select-user}). Da qui in poi l'applicazione non ha molte differenze rispetto alla modalità di esecuzione con Blue\&{}Me se non che le azioni intraprese avranno ripercussioni sul simulatore e non sul mondo reale.
 
 \begin{figure}[H]
         \centering
@@ -47,9 +110,11 @@ Questa modalità permette di prendere il controllo di un veicolo contenuto nel s
         \caption{Schermate Applicazione Mobile}
 \end{figure}
 
-\subsection{Con Blue Me}
+\subsection{Con Blue\&{}Me}
 
-\subsection{Senza Blue Me}
+Questa modalità viene usata in un contesto reale e necessita la presenza di un veicolo che possegga la tecnologia Blue\&{}Me di Fiat. Le informazioni relative alla batteria vengono prelevate tramite bluetooth scritte nel \emph{Dash SIB}
+
+\subsection{Senza Blue\&{}Me}
 
 
 \begin{figure}

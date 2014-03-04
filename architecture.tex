@@ -196,7 +196,9 @@ Come si può vedere attualmente l'utente è modellato in modo molto primitivo, s
 
 \subsubsection{Il concetto di Veicolo}\label{subsubsec:vehicle}
 
-Nel vecchio modello ontologico il concetto di veicolo in quanto non essenziale non veniva considerato, infatti, al momento di generare i veicoli, veniva inserita una tripla 
+Nel vecchio modello ontologico il concetto di veicolo, in quanto non essenziale, non veniva particolarmente enfatizzato. 
+
+
 
 \subsubsection{Il concetto di Ricarica}
 
@@ -262,4 +264,19 @@ Di seguito verranno esposte le proprietà della classe \code{ioe:ChargeOption}. 
 \end{itemize}
 
 
-\subsubsection{Rimozione }\label{subsubsec:chargeresponse}
+\subsubsection{Rimozione informazioni Hardcoded}
+
+Fino alla versione \emph{1.5.11} dell'ontologia le informazioni relative ai GCP erano hardcoded nell'ontologia, scelta che all'inizio del progetto è stata necessaria a causa del poco tempo. Successivamente questo approccio ha si è rivelato fortemente limitante in quanto la modifica dell'ontologia è un operazione abbastanza tediosa e sopratutto è poco flessibile. 
+
+Al fine di risolvere questo problema ho deciso di rimuovere questi dati dall'ontologia e inserirli all'interno di un file XML che viene caricato dal \emph{City Service} (Sez. ~\ref{subsubsec:city-init}) e dal simulatore (Sez. ~\ref{chap:sim}) in fase di inizializzazione.
+
+Grazie a questo approccio è diventato relativamente semplice impostare uno scenario del tutto diverso da quello previsto dal progetto.
+
+
+
+
+
+
+
+
+

@@ -67,34 +67,13 @@ public class GCP implements Serializable {
 }
 \end{java}
 
-%\paragraph{Lista}
-
-%La lista di tutte le Entity usate nel progetto:
-
-%\begin{itemize}
-%	\item \code{Vehicle}: Veicolo Elettrico
-%	\item \code{Battery}:  Batteria del Veicolo Elettrico
-%	\item \code{GCP}
-%	\item \code{EVSE}
-%	\item \code{ChargeProfile}: Informazioni 
-%	\item \code{ChargeResponse}
-%	\item \code{EnergyInfo}
-%	\item \code{Recharge}
-%	\item \code{ReservationRetire}
-%	\item \code{ChargeOption}
-%	\item \code{ChargeRequest}
-%	\item \code{Connector}
-%	\item \code{GPS}
-%	\item \code{Reservation}
-%\end{itemize}
-
 \subsubsection{Controller}
 
 I \code{Controller} sono le classi delegate ad eseguire le operazioni \code{CRUD} (create, read, delete, update) con il SIB e si trovano nel package \code{it.unibo.ioe.controller}. Ne esiste uno per ogni Entity. Ogni \code{Controller} possiede un istanza di \code{KpConnector} che permette la comunicazione con il SIB. 
 
 \paragraph{Lettura} Le operazioni di lettura vengono eseguite tramite una query \code{SPARQL} che preleva dal SIB le informazioni necessarie che poi vengono inserite in una nuova istanza di Entity la quale viene restituita all'utente.
 
-\paragraph{Scrittura} Le operazioni di scrittura ricavano una lista di triple RDF a partire da un istanza di Entity. La lista di triple viene poi convertita in una \code{SPARQL} insert al fine di ridurre i dati inviati al SIB. L'operazione di conversione è eseguita da una funzione di della  classe \code{SibUtil}. Questa tecnica si rivela particolarmente utile quando si utilizza la libreria da un dispositivo mobile connesso a internet tramite rete cellulare (es: EDGE, GPRS, HSDPA ecc\dots).
+\paragraph{Scrittura} Le operazioni di scrittura ricavano una lista di triple RDF a partire da un istanza di Entity. La lista di triple viene poi convertita in una \code{SPARQL} insert al fine di ridurre i dati inviati al SIB. L'operazione di conversione è eseguita da una funzione di della  classe \code{SibUtil}. Questa tecnica si rivela particolarmente utile quando si utilizza la libreria da un dispositivo mobile connesso a internet tramite rete cellulare (es: EDGE, GPRS, HSDPA ecc\dots). Da notare che tutte le Entity possiedono un campo \code{URI} che viene valorizzato nell'operazione di inserzione con l'URI assegnato all'istanza che si sta per scrivere sul SIB. 
 
 \paragraph{Aggiornamento} Le operazioni di aggiornamento ricavano i dati aggiornati tramite una query \code{SPARQL} che andranno a sostituire quelli obsoleti all'intenro di un istanza di Entity
 
@@ -200,7 +179,7 @@ pool.execute(new Runnable() {
  
 Come visto nella sezione ~\ref{sec:protocol} il servizio cittadino deve gestire un gran numero di messaggi a ogni tipologia dei quali corrisponde una sottoscrizione al SIB cittadino. Inoltre per poter rispondere alle richieste degli utenti deve anche avere le informazioni relative a tutti gli EVSE.
 
-\subsubsection{Inizializzazione}
+\subsubsection{Inizializzazione}\label{subsubsec:city-init}
 
 All'avvio il \emph{City Service} compie innumerevoli compiti:
 
@@ -244,7 +223,7 @@ La classe \code{SessionManager} possiede un timer che a tempo prefissato lancia 
 La gestione delle prenotazioni, una volta che sono state create e confermate dall'utente, è delegata alla classe \code{ReservationManager}. A suo interno vengono salvate in una cache le istanze di \code{Reservation} create. Quando arriva una nuova richiesta di prenotazione la verifica della disponibilità viene fatta su questa cache anziché sul SIB. Questo sempre al fine di ridurre gli accessi al database e il successivo parsing delle risposte.
 Siccome l'uso di questa classe è altamente parallelo, ovvero possono accedervi molti thread contemporaneamente, viene utilizzata una mappa thread-safe messa a disposizione da java \code{ConcurrentHashMap}. Inoltre le operazioni di verifica di disponibilità delle prenotazioni vengono sono atomiche a livello di EVSE grazie a un lock per ognuno di essi. 
 
-\paragraph{Thread}
+\paragraph{Thread}\label{par:thread}
 
 Ci sono cinque classi diverse che implementano l'interfaccia \code{Runnable} ognuna delle quali ha il compito di gestire un determinato aspetto dei protocolli di richiesta. Ovviamente c'è un pool di esecuzione per ognuna di esse.
 
@@ -287,11 +266,64 @@ xmlToolsPool.returnObject(xmlTools);
 
 \section{Testing}
 
-bla bla bla
+Aspetto fondamentale che ha caratterizzato lo sviluppo del \emph{City Service} è stata l'integrazione con test di unità che ne hanno assicurato la continuità di funzionamento durante le fasi di modifica e sviluppo.
 
-ecc ecc ecc
+Il framework utilizzato per eseguire il testing è \code{junit4}, un ottima libreria Java che tramite il meccanismo delle annotazioni permette di scrivere ed eseguire i test i maniera semplice ed efficace.
 
-spacca bella ciao
+I test sono stati determinanti non solo per assicurare la stabilità del codice ma anche per testare le performance del sistema, soprattutto del SIB. 
+
+\subsection{Test Protocolli}
+
+Per testare i protocolli ho implementato un thread che svolgesse tutte lo operazioni necessarie per completare una richiesta di prenotazione ed il ritiro della stessa. L'incapsulamento della logica del protocollo di richiesta all'interno di un thread permette di fatto l'esecuzione multipla di istanze di quest'ultimo simulando quindi l'interazione di molteplici utenti. La classe delegata a svolgere questo compito è \code{ioe:ChargeProtocolTest} nel packacge \code{it.unibo.ioe.cityservice.chargeprotocol} situato nella cartella di test. All'interno di questa classe si trova una inner-class, \code{ReservationProtocol} che implementa \code{Runnable} rendendo quindi possibile la sua esecuzione all'interno di un thread separato. 
+
+Per simulare le attese dell'utente è stato usato il meccanismo dei lock. Ogni fase del protocollo ha un suo lock che viene acquisito subito dopo l'invio messaggio (List. ~\ref{lst:request-lock}) e viene rilasciato al momento dell'esecuzione l'handler associato alla sottoscrizione della risposta (List. ~\ref{lst:response-handler}).
+
+\begin{java}[caption={Inserimento della \code{CargeRequest} e attesa della risposta},label={lst:request-lock}]
+chargeRequestController.insertChargeRequest(request);
+synchronized (chargeResponseLock) {
+	try {
+		chargeResponseLock.wait();
+	} catch (InterruptedException ex) {
+		logger.error(ex.getMessage(), ex);
+	}
+}
+\end{java}
+
+\begin{java}[caption={Handler associato al messaggio di risposta},label={lst:response-handler}]
+String subscriptionID = xmlTools.getSubscriptionID(xml);
+if (chargeResponseSubId.equals(subscriptionID)) {
+		[...]
+		chargeResponsesUri = subscriptionResult.get(0);
+		synchronized (chargeResponseLock) {
+			chargeResponseLock.notify();
+		}
+	}
+}
+\end{java}
+\\
+\noindent
+L'opzione di ricarica viene scelta casualmente tra quelle fornite, nel caso in cui venisse confermata dal sistema il thread preleva la corrispondente istanza di \code{Reservation} creata e controlla che i parametri in essa contenuti siano coerenti con quelli dell'opzione scelta.\\
+Tutti i dati scambiati dal protocollo vengono testati se uno di essi dovesse fallire causerebbe la terminazione del protocollo stesso. A tal proposito \code{junit} mette a disposizione una serie di funzioni che permettono di fare asserzioni di ogni tipo al fine di validare i dati. Queste funzioni iniziano con il prefisso \code{assert}, un esempio si può vedere nel listato ~\ref{lst:assert}.
+
+\begin{java}[caption={Risposta ricavata a partire dall'uri, test del risultato},label={lst:assert}]
+response = chargeResponseController.findChargeResponse(chargeResponsesUri);
+assertNotNull(response);
+assertEquals(request.getUri(), response.getChargeRequestUri());
+\end{java}
+
+\subsection{Valutazione Performance}
+
+L'esecuzione di molteplici istanze del protocollo di richiesta è stato determinante al fine di testare le performance del sistema in quanto ha permesso di capire quante richieste contemporanee potessero essere servite e quali fossero i colli di bottiglia. È stato infatti scoperto che arrivati a un certo numero di connessioni simultanee il SIB allunga i tempi di risposta fino a far scattare il \code{socket-timeout} della libreria JavaKPI, in quanto, come indicato nella Sez. ~\ref{subsec:sib}, il SIB comunica con l'esterno tramite protocollo \emph{TCP/IP}. Questa scoperta ha portato a trovare un bug che affliggeva il SIB stesso, il quale, una volta interrotta brutalmente la connessione con il socket di JavaKPI, dava seri problemi di memory-leak come si può ben vedere in Fig. ~\ref{fig:sib-memory-leak}. L'immagine l'ho presa dal mio computer e l'ho inviata agli sviluppatori di Smart-M3-B per dimostrare il problema. Si nota chiaramente il momento precedente all'uccisione del SIB in cui erano allocati circa 8GB di Ram e 3Gb di Swap. Il problema è stato risolto e la versione attuale (0.901) ne è esente.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.0\textwidth]{assets/sib-memory-leak.png}
+	\caption{Memory Leak del SIB che avveniva quando la connessione viene interrotta da un socket-timeout}
+	\label{fig:sib-memory-leak}
+\end{figure}
+
+\\ \\
+La scoperta di questo problema ha portato quindi alla necessità di ottimizzare le performance, è stato quindi deciso di limitare il numero di risposte fornite dal servizio cittadino (Par. ~\ref{par:thread}) che causa un ingente traffico di dati da e verso il SIB. Altra ottimizzazione che decisa in seguito a queste scoperte è stata quella di trasformare le operazioni di INSERT di triple in query SPARQL, in quanto, grazie all'uso dei prefissi al posto degli URL interi, si riesce ad ottimizzare notevolmente il volume di dati scambiato, il che porta a notevoli vantaggi durante l'uso nell'applicazione mobile.
 
 
 

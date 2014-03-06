@@ -154,8 +154,10 @@ Questa modalità d'uso è rivolta principalmente a chi vuole svolgere le attivit
 
 \section{Funzionalità}
 
-In questa sezione eseguirò un analisi dettagliata delle funzionalità dell'applicazione. La descrizione cercherà di essere il più possibile funzionalità-centrica e non activity-centrica anche se spesso le due cose coincidono. Questo significa che a partire dalle funzionalità cercherò di introdurre le Activity coinvolte nello svolgimento.
-Le Activity si trovano nel package \code{it.unibo.ioe.activities}, nel package \code{it.unibo.ioe.activities.maps} invece si trovano le Activity destinate alla gestione delle mappe e infine nel package \code{it.unibo.ioe.services} troviamo i servizi. 
+In questa sezione eseguirò un analisi dettagliata delle funzionalità dell'applicazione. La descrizione cercherà di essere il più possibile funzionalità-centrica e non activity-centrica anche se spesso le due cose coincidono. 
+
+%Questo significa che a partire dalle funzionalità cercherò di introdurre le Activity coinvolte nello svolgimento.
+%Le Activity si trovano nel package \code{it.unibo.ioe.activities}, nel package \code{it.unibo.ioe.activities.maps} invece si trovano le Activity destinate alla gestione delle mappe e infine nel package \code{it.unibo.ioe.services} troviamo i servizi. 
 
 \subsection{Il menu principale}
 
@@ -197,7 +199,7 @@ Dal menu principale si può accedere al monitoraggio dei parametri della batteri
 
 \subsection{Effettuare una richiesta di prenotazione}
 
-Per accedere a questa funzionalità bisogna scegliere dal menu principale l'opzione \emph{Reserve}. Ci troveremo davanti alla schermata che ci permette di impostare i parametri necessari a creare una richiesta di prenotazione (~\ref{fig:reservation}). Come si può vedere in figura ~\ref{fig:reservation} io servizio mette a disposizioni svariate opzioni per personalizzare il processo di prenotazione. Essenzialmente in questa schermata viene data una veste grafica al protocollo di richiesta descritto nella sezione ~\ref{sec:protocol}.
+Per accedere a questa funzionalità bisogna scegliere dal menu principale l'opzione \emph{Reserve}. Ci troveremo davanti alla schermata che ci permette di impostare i parametri necessari a creare una richiesta di prenotazione. Come si può vedere in figura ~\ref{fig:charge-request} il servizio mette a disposizioni svariate opzioni per personalizzare il processo di prenotazione. Essenzialmente in questa schermata viene data una veste grafica al protocollo di richiesta descritto nella sezione ~\ref{sec:protocol}.
 
 \subsubsection{Creazione della richiesta}
 
@@ -205,7 +207,7 @@ La scelta dell'area dentro la quale cercare le colonnine assume di default la po
 
 Una volta scelto centrata la nostra area di interesse si procede scegliendo il raggio di ricerca. Di default è impostato a 6 e al massimo si può impostare a 15, di più non avrebbe senso visto che in linea di massima si sposta il punto di interesse.
 
-La barra che permette di scegliere la quantità di energia ha come dimensione massima la capacità della batteria. Nell'immagine in Fig. ~\ref{fig:reservation} abbiamo una batteria con capacità 40kWh e una quantità di energia residua di 12kWh, questo si capisce dal colore rosso del numero a destra della barra che indica che stiamo tentando di acquistare 0kWh. Spostando la barra verso destra andremo a indicare fino a che punto volgiamo ricaricare la batteria, il numero a destra a questo punto diventa nero. Non si può procedere finché non si acquista almeno 1kWh. 
+La barra che permette di scegliere la quantità di energia ha come dimensione massima la capacità della batteria. Nell'immagine in Fig. ~\ref{fig:charge-request} abbiamo una batteria con capacità 40kWh e una quantità di energia residua di 12kWh, questo si capisce dal colore rosso del numero a destra della barra che indica che stiamo tentando di acquistare 0kWh. Spostando la barra verso destra andremo a indicare fino a che punto volgiamo ricaricare la batteria, il numero a destra a questo punto diventa nero. Non si può procedere finché non si acquista almeno 1kWh. 
 Nel caso in cui la capacità e la quantità di carica non siano disponibili allora viene data la possibilità di scegliere qualunque quantità di energia, l'utente viene però messo in guardia del fatto che potrebbe acquistare più energia di quella che può contenere la batteria del veicolo.
 
 L'ultimo parametro da impostare è l'intervallo di tempo in cui siamo disposti a ricaricarci. Di default viene proposto un lasso temporale di 3 ore. È possibile variarlo premendo sui pulsanti nel quale è scritta la data i quali mostreranno un calendario e un selettore di orario. Ovviamente sono stati messi dei controlli che impediscono di mettere orari incoerenti come ora di inizio successiva a quella di fine.
@@ -230,14 +232,20 @@ Le informazioni sul profilo altimetrico ed il contributo energetico vengono most
 
 Viene data inoltre la possibilità di eseguire operazioni di ordinamento delle varie ricariche in base ai parametri sopra elencati ovvero: distanza, prezzo, orario, contributo energetico ecc.. Infine volendo si possono guardare le opzioni di ricarica sulla mappa. Premendo su una di esse viene disegnato il percorso necessario ad arrivarci con la particolarità che i tratti in salita sono colorati di rosso, quelli in discesa di verde e infine quelli in pianura di grigio. Le caratteristiche della mappa sono comunque approfondite nella Sez. ~\ref{subsec:map}.
 
-Scegliendo l'opzione di ricarica viene eseguita la parte restante del protocollo, e nel caso in cui sia ancora valida allora verremo mandati alla schermata che presenta le prenotazioni attive per l'utente.
+Scegliendo l'opzione di ricarica viene eseguita la parte restante del protocollo, e nel caso in cui sia ancora valida allora verremo mandati alla schermata che presenta le prenotazioni attive per l'utente (Fig. \ref{fig:reservation}).
+
+\subsection{Visualizzazione e Ritiro delle Prenotazioni}
+
+In questa schermata vengono visualizzate le prenotazioni pendenti per l'utente (Fig. \ref{fig:reservation}). Vi si può accedere tramite il menu principale \emph{Reservation List} oppure ci si viene portati direttamente se viene confermata dal sistema l'opzione di ricarica scelta durante il processo di prenotazione. 
+
+Selezionando una delle prenotazioni apparirà un menu che permette di mostrarla sulla mappa oppure di ritirarla.
 
 \begin{figure}
 	\centering
 	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{assets/mobile-app-charge-request.png}
 		\caption{Inserimento Prenotazione}
-		\label{fig:reservation}
+		\label{fig:charge-request}
 	\end{subfigure}
 	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{assets/mobile-app-map-chooser.png}
@@ -274,10 +282,6 @@ La libreria UniboGeoTools, usata a questo scopo, permette inoltre di fare delle 
 \noindent
 Ulteriori informazioni sul profilo altimetrico vengono date sulla mappa aspetto approfondito nella Sez. ~\ref{subsec:map}.
 
-
-\subsection{Mappa}\label{subsec:map}
-
-
 \begin{figure}
 	\centering
 	\begin{subfigure}{0.45\textwidth}
@@ -299,6 +303,48 @@ Ulteriori informazioni sul profilo altimetrico vengono date sulla mappa aspetto 
 		\includegraphics[width=\textwidth]{assets/mobile-app-altimetry-3.png}
 		\caption{Menu opzioni di ricarica}
 		\label{fig:altimetry-3}
+    \end{subfigure}
+\end{figure}
+
+\subsection{Mappa}\label{subsec:map}
+
+La mappa, quando mostrata, viene centrata sulla città di riferimento. Su di essa si può vedere il veicolo che si muove, sia che esso sia simulato sia che sia reale. Premendo il pulsante di localizzazione in alto a destra viene effettuato lo zoom sul veicolo. La mappa può essere mostrata in diverse occasioni:
+
+\begin{itemize}
+	\item \textbf{Menu principale}: Dal menu principale si seleziona \emph{Map} e si può accedere alla mappa la quale mostrerà tutti i GCP della città e da qui potremo effettuare una prenotazione cliccando direttamente sul GCP interessato (Fig. \ref{fig:map-gcp}).
+	\item \textbf{Scelta delle Opzioni Ricarica}: Quando il \emph{City Service} ci restituisce le opzioni di carica disponibili possiamo visualizzarle sulla mappa. Se scegliamo di visualizzare la mappa a partire da un opzione di ricarica allora verrà anche disegnato il percorso che ci separa dalla colonnina, altrimenti verranno visualizzate tutte le colonnine e per visualizzare il percorso dovremmo selezionare quella interessata (Fig. \ref{fig:map-altimetry}). 
+	\item \textbf{Prenotazioni}: Dalla schermata delle prenotazioni pendenti possiamo visualizzare sulla mappa e volendo effettuare l'operazione di ritiro semplicemente selezionando la colonnina associata.
+\end{itemize}
+
+Come mostrato in Fig. \ref{fig:map-altimetry} viene disegnato il percorso che ci separa dalla destinazione evidenziando i tratti in discesa, rosso, in salita, verde e pianura grigio.
+
+Premendo su una delle colonnine visualizzate nella mappe viene aperto un popup che mostra informazioni sommarie e una freccia che permette di accedere a un menu con altre opzioni (Fig. \ref{fig:map-menu}). Da questo menu si può eseguire una prenotazione, vedere i dettagli sul profilo altimetrico oppure aprire il navigatore messo a disposizione dal Sistema Operativo con partenza il punto dove ci troviamo e destinazione il punto della mappa selezionato (Fig. \ref{fig:navigator}).
+
+\section{Notifica batteria Scarica}
+
+Un funzionalità molto importante è quella delle notifiche che avvisano l'utente quendo la batteria sta per scaricarsi (Fig. \ref{fig:notify}). Quando la batteria scende sotto una certa soglia, che attualmente è impostata al 30\%, viene lanciata una notifica all'utente che apparirà nell'area di notifica presente nei Sistemi Operativi Android, la notifica viene lanciata nuovamente a intervalli di 5\% di batteria. Premendo sulla notifica Si apre direttamente la schermata destinata alle prenotazioni.
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-map-menu.png}
+		\caption{Menu Mappa}
+		\label{fig:map-menu}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-notify.png}
+		\caption{Notifica batteria scarica}
+		\label{fig:notify}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-navigator.png}
+		\caption{Navigatore Satellitare}
+		\label{fig:navigator}
+    \end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-map-gcp.png}
+		\caption{Visione di tutti i GCP della città}
+		\label{fig:map-gcp}
     \end{subfigure}
 \end{figure}
 

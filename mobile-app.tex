@@ -81,6 +81,12 @@ La maggior parte delle operazioni effettuate tramite rete, quindi nel nostro cas
 
 Al fine di semplificare la programmazione delle Activity che contengono liste i quali elementi sono reperiti tramite la rete, ho creato la classe \code{ListLoaderTask<T>} che ne facilita il caricamento asincrono.
 
+\subsection{Profilo Altimetrico e Contributo Energetico}
+
+Grazie allo sviluppo di un apposita libreria, UniboGeoTools (App. ~\ref{app:unibo-geo-tools}) l'applicazione è in grado di prelevare i dati relativi al profilo altimetrico che separa l'utente da una determinata destinazione e quindi fare uno studio sul contributo energetico necessario a vincere il dislivello. Le informazioni riguardo al consumo energetico sono approssimative ma danno comunque un indicazione valida all'utente il quale se vede che l'energia necessaria a vincere il dislivello è maggiore di quella contenuta nella batteria allora saprà per certo che in quel determinato punto non ci potrà arrivare.
+
+La libreria UniboGeoTools possiede anche funzioni utili a trovare il percorso, in strada, tra due punti. Queste si sono rivelate particolarmente utili al fine di mostrare i percorsi sulla mappa e la distanza precisa che separa l'utente, ad esempio, da una colonnina di ricarica.
+
 
 \section{Modalità di esecuzione}
 
@@ -89,15 +95,25 @@ L'applicazione al fine di adattarsi ai diversi scenari possibili offre molteplic
 
 \begin{figure}
 	\centering
-	\begin{subfigure}{0.49\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{assets/mobile-app-main.png}
 		\caption{Schermata Principale}
 		\label{fig:main-activity}
 	\end{subfigure}
-	\begin{subfigure}{0.49\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{assets/mobile-app-select-user.png}
 		\caption{Selezione Utente}
 		\label{fig:select-user}
+    \end{subfigure}
+    	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-main-menu.png}
+		\caption{Menu Principale}
+		\label{fig:main-menu}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-select-veh.png}
+		\caption{Selezione Veicolo}
+		\label{fig:select-veh}
     \end{subfigure}
 \end{figure}
 
@@ -131,7 +147,7 @@ Questa modalità permette di prendere il controllo di un veicolo contenuto nel s
 
 Questa modalità viene usata in un contesto reale e necessita la presenza di un veicolo che possegga la tecnologia Blue\&{}Me di Fiat. Le informazioni relative alla batteria vengono prelevate tramite Bluetooth scritte nel \emph{Dash SIB} per i motivi di interoperabilità spiegati nella Sez. ~\ref{subsec:dash-sib} ovvero dare la possibilità a chiunque di interfacciarsi con l'applicazione mobile a patto di scrivere un adattatore che scriva i dati sulla \emph{Dash SIB}. Le informazioni relative al GPS, siccome non fornite dal veicolo, vengono prelevati dal GPS (o altre fonti) fornito dallo smartphone.
 
-\subsection{Senza Blue\&{}Me}
+\subsection{Senza Blue\&{}Me}\label{subsec:noblueme}
 
 Questa modalità d'uso è rivolta principalmente a chi vuole svolgere le attività di interazione con il \emph{City Service} senza essere a bordo del proprio veicolo. Questo comporta l'assenza della \textsc{Dash SIB}, infatti quando viene scelta viene disabilitato l'inserimento dei parametri di quest'ultima. Diviene quindi impossibile monitorare i parametri del veicolo e di conseguenza parte del menu principale viene disabilitata. Anche se la \emph{Dash SIB} fosse situata sul cellulare anziché sul veicolo a poco servirebbe in quanto il veicolo sarebbe comunque fuori portata o comunque spento. Si possono comunque svolgere le operazioni di prenotazione e ritiro delle ricariche e tenere monitorato lo stato di quelle già effettuate nonché guardare la mappa con le colonnine.
 
@@ -143,8 +159,147 @@ Le Activity si trovano nel package \code{it.unibo.ioe.activities}, nel package \
 
 \subsection{Il menu principale}
 
-La prima schermata dell'applicazione è quella che permette di scegliere i parametri di connessione ai SIB (Fig. ~\ref{fig:main-activity})  e la modalità di esecuzione. Una volta premuto il tasto connect ci troveremo a scegliere l'utente (Fig. ~\ref{fig:select-user}) a questo punto ci troveremo davanti il menu principale.
+La prima schermata dell'applicazione è quella che permette di scegliere i parametri di connessione ai SIB (Fig. ~\ref{fig:main-activity})  e la modalità di esecuzione. Una volta premuto il tasto \emph{connect} ci troveremo a scegliere l'utente (Fig. ~\ref{fig:select-user}) a questo punto ci troveremo davanti il menu principale (Fig. ~\ref{fig:main-menu}).
 
-Il menu apparirà con solo due opzioni: Recharge History e Select Vehicle. Questo perchè tutte le altre opzioni sono subordinate al veicolo che si sta utilizzando e quindi non vengono mostrate finché non se ne sceglie uno attraverso l'apposito menu.
- 
+Il menu apparirà con solo due opzioni: \emph{Recharge History} e \emph{Select Vehicle}. Questo perché tutte le altre opzioni sono subordinate al veicolo che si sta utilizzando e quindi non vengono mostrate finché non se ne sceglie uno attraverso l'apposito menu (Fig. ~\ref{fig:select-veh}). 
+
+\subsection{Storia delle ricariche effettuate}
+
+In questa schermata (Fig. ~\ref{fig:recharge-history}) possiamo tener monitorata la storia delle ricariche effettuate. Questa parte è stata introdotta anche per dimostrare l'interoperabilità del nostro sistema con uno SIB-based sviluppato dalla spagnola AICIA.
+
+\subsection{Monitoraggio Parametri Batteria}
+
+Dal menu principale si può accedere al monitoraggio dei parametri della batteria attraverso l'opzione \emph{Battery}. Il monitoraggio consente di vedere sia i parametri variabili (Fig. ~\ref{fig:battery-var}) che quelli nominali (Fig. ~\ref{fig:battery-nom}). I dati relativi all'intensità di corrente e al voltaggio sono visibili solo se si è connessi a un veicolo reale tramite Blue\&{}Me in quanto il nostro modello di simulazione non li implementa. Mentre i dati nominali sono disponibili in modalità di simulazione ma non in quella reale in quanto queste informazioni non vengono fornite dalla centralina del veicolo.
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-battery-var.png}
+		\caption{Dati variabili della batteria}
+		\label{fig:battery-var}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-battery-nom.png}
+		\caption{Dati fissi della batteria}
+		\label{fig:battery-nom}
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-recharge-history.png}
+		\caption{Storia Ricariche}
+		\label{fig:recharge-history}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-reservation.png}
+		\caption{Selezione Veicolo}
+		\label{fig:reservation}
+    \end{subfigure}
+\end{figure}
+
+\subsection{Effettuare una richiesta di prenotazione}
+
+Per accedere a questa funzionalità bisogna scegliere dal menu principale l'opzione \emph{Reserve}. Ci troveremo davanti alla schermata che ci permette di impostare i parametri necessari a creare una richiesta di prenotazione (~\ref{fig:reservation}). Come si può vedere in figura ~\ref{fig:reservation} io servizio mette a disposizioni svariate opzioni per personalizzare il processo di prenotazione. Essenzialmente in questa schermata viene data una veste grafica al protocollo di richiesta descritto nella sezione ~\ref{sec:protocol}.
+
+\subsubsection{Creazione della richiesta}
+
+La scelta dell'area dentro la quale cercare le colonnine assume di default la posizione del veicolo come punto centrale, nel caso essa non sia disponibile (modalità \emph{Senza Blue\&{}Me}, Sez. ~\ref{subsec:noblueme}) allora l'utente è costretto a sceglierne dalla mappa. Per accedere alla funzione di scelta del punto si clicca sul pulsante \emph{Map} il quale mostra apre la mappa centrata sulla città in cui ci troviamo e tramite un tocco sullo schermo permette di scegliere il punto di interesse (Fig ~\ref{fig:map-chooser}).
+
+Una volta scelto centrata la nostra area di interesse si procede scegliendo il raggio di ricerca. Di default è impostato a 6 e al massimo si può impostare a 15, di più non avrebbe senso visto che in linea di massima si sposta il punto di interesse.
+
+La barra che permette di scegliere la quantità di energia ha come dimensione massima la capacità della batteria. Nell'immagine in Fig. ~\ref{fig:reservation} abbiamo una batteria con capacità 40kWh e una quantità di energia residua di 12kWh, questo si capisce dal colore rosso del numero a destra della barra che indica che stiamo tentando di acquistare 0kWh. Spostando la barra verso destra andremo a indicare fino a che punto volgiamo ricaricare la batteria, il numero a destra a questo punto diventa nero. Non si può procedere finché non si acquista almeno 1kWh. 
+Nel caso in cui la capacità e la quantità di carica non siano disponibili allora viene data la possibilità di scegliere qualunque quantità di energia, l'utente viene però messo in guardia del fatto che potrebbe acquistare più energia di quella che può contenere la batteria del veicolo.
+
+L'ultimo parametro da impostare è l'intervallo di tempo in cui siamo disposti a ricaricarci. Di default viene proposto un lasso temporale di 3 ore. È possibile variarlo premendo sui pulsanti nel quale è scritta la data i quali mostreranno un calendario e un selettore di orario. Ovviamente sono stati messi dei controlli che impediscono di mettere orari incoerenti come ora di inizio successiva a quella di fine.
+
+A questo punto possiamo inviare la richiesta premendo l'apposito pulsante in alto a destra.
+
+\subsubsection{Scelta della risposta}
+
+In seguito all'invio della richiesta viene mostrato all'utente un messaggio che invita ad attendere la risposta. Nel caso la richiesta sia fallita allora l'utente viene allertato e rimandato nella schermata di prenotazione con l'invito di cambiare i parametri.
+
+In caso di successo viene mostrata una schermata con tutte le opzioni di ricarica restituite dal servizio cittadino. Come si può vedere in Fig. ~\ref{fig:charge-options} vengono fornite diverse informazioni per ognuna di esse:
+
+\begin{itemize}
+	\item Nome del GCP presso cui avverrà la ricarica.
+	\item Distanza reale dal GCP, calcolata grazie alla libreria UniboGeoTools.
+	\item Orario e prezzo della ricarica.
+	\item Energia stimata per raggiungere la colonnina.
+	\item Dislivello in salita e in discesa.
+\end{itemize}
+
+Le informazioni sul profilo altimetrico ed il contributo energetico vengono mostrate in una schermata a parte accessibile tramite un apposito menu visualizzabile tenendo premuta a lungo un opzione di ricarica (Fig. ~\ref{fig:charge-options-menu}), questo aspetto verrà approfondito in una sezione a parte (~\ref{subsec:altimetry}).
+
+Viene data inoltre la possibilità di eseguire operazioni di ordinamento delle varie ricariche in base ai parametri sopra elencati ovvero: distanza, prezzo, orario, contributo energetico ecc.. Infine volendo si possono guardare le opzioni di ricarica sulla mappa. Premendo su una di esse viene disegnato il percorso necessario ad arrivarci con la particolarità che i tratti in salita sono colorati di rosso, quelli in discesa di verde e infine quelli in pianura di grigio. Le caratteristiche della mappa sono comunque approfondite nella Sez. ~\ref{subsec:map}.
+
+Scegliendo l'opzione di ricarica viene eseguita la parte restante del protocollo, e nel caso in cui sia ancora valida allora verremo mandati alla schermata che presenta le prenotazioni attive per l'utente.
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-charge-request.png}
+		\caption{Inserimento Prenotazione}
+		\label{fig:reservation}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-map-chooser.png}
+		\caption{Scelta di un punto nella mappa}
+		\label{fig:map-chooser}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-charge-options.png}
+		\caption{Visualizzazione opzioni di ricarica}
+		\label{fig:charge-options}
+    \end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-charge-options-menu.png}
+		\caption{Menu opzioni di ricarica}
+		\label{fig:charge-options-menu}
+    \end{subfigure}
+\end{figure}
+
+\subsection{Profilo Altimetrico e Contributo Energetico}\label{subsec:altimetry}
+
+Il profilo altimetrico è una delle feature più innovative introdotte nell'applicazione. Può rivelarsi di fondamentale importanza nelle scelte dell'utente il quale, grazie ad essa, potrà scegliere il percorso migliore al fine di raggiungere la sua destinazione. Come vedremo nella sezione relativa al modello della batteria (\ref{sec:battery}), i veicoli elettrici hanno la possibilità di recuperare energia grazie alla frenata rigenerativa e al recupero in discesa. Questo significa che scegliere una strada con molti tratti in discesa può portare un recupero di energia non indifferente. 
+
+La libreria UniboGeoTools, usata a questo scopo, permette inoltre di fare delle stime sull'energia necessaria a percorre un determinato tratto di strada. Queste informazioni sono mostrate nella schermata \emph{Elevation Profile}:
+
+\begin{itemize}
+	\item \textbf{Path Altimetry Summary}: Informazioni riassuntive sul viaggio che stiamo per intraprendere. Come si può vedere in Fig. ~\ref{fig:altimetry-1}, al di la delle informazioni di destinazione, distanza e peso, viene fornita una stima sull'energia totale che impiegherà il veicolo a raggiungere la destinazione, insieme alle informazioni su quanta discesa, salita e pianura compongo il percorso.
+	\item \textbf{Cumulative Altimetry Offset}: In questo riquadro vengono fornite informazioni sul dislivello che caratterizza il percorso (Fig ~\ref{fig:altimetry-1}).
+	\item \textbf{Average Slope}: Fornisce informazioni sulla pendenza media che caratterizza il percorso. Importante in quanto, come detto prima, una pendenza molto elevata può portare ad elevati consumi oppure a un ricavo di energia (Fig ~\ref{fig:altimetry-1}).
+	\item \textbf{Max Slope}: Fornisce informazioni di massima sulla pendenza del percorso, ovvero la pendenza massimo che troveremo in salita e in discesa (Fig ~\ref{fig:altimetry-2}).
+	\item \textbf{Elevation Dependent Energy Ref}: Informazioni sul contributo energetico impiegato per vincere il dislivello. A tal scopo viene utilizzata l'energia potenziale gravitazionale (Fig ~\ref{fig:altimetry-2}).
+	\item \textbf{Energy Profile for Path Lenght}: Energia impiegata per percorrere il tragitto. Mentre nel caso precedente veniva preso in considerazione unicamente il dislivello qui viene considerata anche la distanza che ci separa dalla destinazione (Fig ~\ref{fig:altimetry-2}).
+	\item \textbf{Altitude Graph}: Grafico che mostra il profilo altimetrico che ci separa dalla destinazione. I tratti in discesa sono in verde mentre quelli in salita in rosso (Fig ~\ref{fig:altimetry-3}).
+\end{itemize} 
+\noindent
+Ulteriori informazioni sul profilo altimetrico vengono date sulla mappa aspetto approfondito nella Sez. ~\ref{subsec:map}.
+
+
+\subsection{Mappa}\label{subsec:map}
+
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-map.png}
+		\caption{Mappa con Profilo Altimetrico}
+		\label{fig:map-altimetry}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-altimetry-1.png}
+		\caption{Scelta di un punto nella mappa}
+		\label{fig:altimetry-1}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-altimetry-2.png}
+		\caption{Visualizzazione opzioni di ricarica}
+		\label{fig:altimetry-2}
+    \end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{assets/mobile-app-altimetry-3.png}
+		\caption{Menu opzioni di ricarica}
+		\label{fig:altimetry-3}
+    \end{subfigure}
+\end{figure}
+
 \section{Activities}

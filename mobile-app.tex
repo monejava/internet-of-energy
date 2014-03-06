@@ -8,10 +8,6 @@ A questo si è aggiunta la possibilità di analizzare il profilo altimetrico che
 
 La piattaforma di sviluppo scelta è \emph{Android} vista la sua grandissima diffusione e versatilità.
 
-\section{Funzionalità}
-
-
-
 \section{Architettura}
 
 La piattaforma scelta per lo sviluppo è Android dalla versione \emph{4.0.3} in su. Questo perché vanta maggiori performance e un interfaccia utente più gradevole è facile da programmare. La libreria di base per interfacciarsi con il SIB è quella esposta nella sezione ~\ref{subsec:ioe-lib}.
@@ -73,14 +69,6 @@ La funzionalità del Blue\&{}Me più importante ai nostri scopi è la possibilit
 
 L'interazione con il Blue\&{}Me è di tipo push ovvero ogniqualvolta che la centralina della macchina si accorge che un dato è variato (secondo una determinata soglia) allora lo ``scrive'' sull'interfaccia Bluetooth. Il che implica che se dall'altra parte ci deve essere un applicazione che dedica un processo alla sola lettura delle informazioni che arrivano dal Blue\&{}Me. Fiat, nella libreria fornita, mette a disposizione un Service Andorid adatto allo scopo.
 
-\subsection{Operazioni Asincrone}
-
-Tutte le operazioni che prevedono l'utilizzo della rete, quindi potenzialmente lunghe, sono eseguite all'interno di un \code{AsyncTask} ovvero una classe messa a disposizione dalla libreria di base di Android che permette di eseguire operazioni asincrone e contemporaneamente aggiornare l'interfaccia grafica. Questo da un lato permette di avere un applicazione fluida in quanto l'interfaccia non rimane bloccata in attesa dei risultati e dall'altro evita il verificarsi di errori dovuti al fatto che Android non permette di modificare l'interfaccia da un thread diverso da quello destinato al disegno di quest'ultima.
-
-La maggior parte delle operazioni effettuate tramite rete, quindi nel nostro caso scambio di dati con i SIB, reperisce liste di elementi (veicoli, utenti, prenotazioni ecc..) che vengono mostrate all'interno di un apposita tipologia di Activity di Android le \code{ListActivity}.
-
-Al fine di semplificare la programmazione delle Activity che contengono liste i quali elementi sono reperiti tramite la rete, ho creato la classe \code{ListLoaderTask<T>} che ne facilita il caricamento asincrono.
-
 \subsection{Profilo Altimetrico e Contributo Energetico}
 
 Grazie allo sviluppo di un apposita libreria, UniboGeoTools (App. ~\ref{app:unibo-geo-tools}) l'applicazione è in grado di prelevare i dati relativi al profilo altimetrico che separa l'utente da una determinata destinazione e quindi fare uno studio sul contributo energetico necessario a vincere il dislivello. Le informazioni riguardo al consumo energetico sono approssimative ma danno comunque un indicazione valida all'utente il quale se vede che l'energia necessaria a vincere il dislivello è maggiore di quella contenuta nella batteria allora saprà per certo che in quel determinato punto non ci potrà arrivare.
@@ -91,7 +79,6 @@ La libreria UniboGeoTools possiede anche funzioni utili a trovare il percorso, i
 \section{Modalità di esecuzione}
 
 L'applicazione al fine di adattarsi ai diversi scenari possibili offre molteplici modalità di esecuzione, questo per adattarsi a tutti gli scenari possibili. La scelta della modalità di esecuzione avviene nella schermata iniziale come si può vedere in figura ~\ref{fig:main-activity}
-
 
 \begin{figure}
 	\centering
@@ -120,28 +107,6 @@ L'applicazione al fine di adattarsi ai diversi scenari possibili offre molteplic
 \subsection{Simulazione}
 
 Questa modalità permette di prendere il controllo di un veicolo contenuto nel simulatore, il quale deve essere avviato con un apposito parametro che causa la scrittura dei dati relativi ai veicoli sul \emph{Dash SIB}. Questo implica che una volta premuto sul pulsante \emph{Connect} (Fig. ~\ref{fig:main-activity}), bisogna scegliere "Luciano Bononi" in quanto è l'utente di default usato dalle macchine del simulatore (Fig. ~\ref{fig:select-user}). Da qui in poi l'applicazione non ha molte differenze rispetto alla modalità di esecuzione con Blue\&{}Me se non che le azioni intraprese avranno ripercussioni sul simulatore e non sul mondo reale.
-
-%\begin{figure}[H]
-%        \centering
-%        \begin{subfigure}[H]{0.3\textwidth}
-%                \adjincludegraphics[width=\textwidth,trim={0 {0.5\height} 0 0},clip]{assets/mobile-app-select-user.png}
-%                \caption{Selezione Utente.}
-%                \label{fig:select-user}
-%        \end{subfigure}%
-%        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-%          %(or a blank line to force the subfigure onto a new line)
-%        \begin{subfigure}[H]{0.3\textwidth}
-%                \adjincludegraphics[width=\textwidth,trim={0 {0.5\height} 0 0},clip]{assets/mobile-app-main-menu.png}
-%                \caption{Menu principale senza nessun veicolo selezionato}
-%                \label{fig:main-menu}
-%        \end{subfigure}
-%        \begin{subfigure}[H]{0.3\textwidth}
-%                \adjincludegraphics[width=\textwidth,trim={0 {0.5\height} 0 0},clip]{assets/mobile-app-select-veh.png}
-%                \caption{Selezione veicolo}
-%                \label{fig:select-veh}
-%        \end{subfigure}
-%        \caption{Schermate Applicazione Mobile}
-%\end{figure}
 
 \subsection{Con Blue\&{}Me}
 
@@ -348,4 +313,19 @@ Un funzionalità molto importante è quella delle notifiche che avvisano l'utent
     \end{subfigure}
 \end{figure}
 
-\section{Activities}
+\section{Implementazione}
+
+
+\subsection{Implementazione}
+
+\subsection{Operazioni Asincrone}
+
+Tutte le operazioni che prevedono l'utilizzo della rete, quindi potenzialmente lunghe, sono eseguite all'interno di un \code{AsyncTask} ovvero una classe messa a disposizione dalla libreria di base di Android che permette di eseguire operazioni asincrone e contemporaneamente aggiornare l'interfaccia grafica. Questo da un lato permette di avere un applicazione fluida in quanto l'interfaccia non rimane bloccata in attesa dei risultati e dall'altro evita il verificarsi di errori dovuti al fatto che Android non permette di modificare l'interfaccia da un thread diverso da quello destinato al disegno di quest'ultima.
+
+La maggior parte delle operazioni effettuate tramite rete, quindi nel nostro caso scambio di dati con i SIB, reperisce liste di elementi (veicoli, utenti, prenotazioni ecc..) che vengono mostrate all'interno di un apposita tipologia di Activity di Android le \code{ListActivity}.
+
+Al fine di semplificare la programmazione delle Activity che contengono liste i quali elementi sono reperiti tramite la rete, ho creato la classe \code{ListLoaderTask<T>} che ne facilita il caricamento asincrono.
+
+\subsection{Activities}
+
+\subsection{Servizi}

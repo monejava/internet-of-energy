@@ -111,4 +111,29 @@
 	%\captionsetup{options=code}
 }{\endminipage}
 
+\lstnewenvironment{cpp}[1][] {
+	\noindent\minipage{\linewidth}%
+	\lstset{language=C++,
+			basicstyle=\ttfamily\footnotesize,
+			keywordstyle=\color{javapurple}\bfseries,
+			stringstyle=\color{javared},
+			commentstyle=\color{javagreen},
+			morecomment=[s][\color{javadocblue}]{/**}{*/},
+			showspaces=false,
+			showstringspaces=false
+            basicstyle=\ttfamily\footnotesize,
+            numbers=left,
+            tabsize=2,
+            numberstyle=\tiny\color{black},
+            backgroundcolor=\color{lightgray},
+            breaklines=true,
+            breakatwhitespace=true,
+            stepnumber=1,
+			firstnumber=1,
+			captionpos=bc,
+            #1
+          }
+	%\captionsetup{options=code}
+}{\endminipage}
+
 %http://jevopi.blogspot.it/2010/03/nicely-formatted-listings-in-latex-with.html

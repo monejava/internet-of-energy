@@ -1,10 +1,10 @@
 \chapter{Piattaforma di Simulazione}\label{chap:sim}
 
-La piattaforma di simulazione è uno strumento di fondamentale importanza al fine di validare l'infrastruttura software proposta. Risulta inoltre essere un valido strumento per valutare l'impatto dell'introduzione della mobilità elettrica veicolare all'interno di un determinato contesto, grazie ad esso si può prevedere quanti veicoli sarà in grado di supportare la smart-grid, quante colonnine saranno necessarie e che potenza dovranno avere. Risulta quindi uno strumento fondamentale sia sotto il punto di vista dell'amministrazione pubblica/cittadina, che può prevedere un piano urbanistico sostenibile, sia dal punto di vista dei gestori della rete elettrica, i quali potranno valutare la richiesta energetica di tale scenario ed eventualmente prevedere investimenti in quella direzione.
+La piattaforma di simulazione è uno strumento di fondamentale importanza al fine di validare l'infrastruttura software proposta. Risulta inoltre essere un valido strumento per valutare l'impatto dell'introduzione della mobilità elettrica veicolare all'interno di un determinato contesto, grazie ad esso si può prevedere quanti veicoli sarà in grado di supportare la grid, quante colonnine saranno necessarie e che potenza dovranno avere. Risulta quindi uno strumento fondamentale sia sotto il punto di vista dell'amministrazione pubblica/cittadina, che può prevedere un piano urbanistico sostenibile, sia dal punto di vista dei gestori della rete elettrica, i quali potranno valutare la richiesta energetica di tale scenario ed eventualmente prevedere investimenti in quella direzione.
 
 \section{Architettura}
 
-Al fine di poter simulare gli innumerevoli aspetti legati all'Electrical Mobility sono state usate diversi simulatori/tecnologie in simbiosi. In questa sezione verranno introdotte con una breve descrizione. Nelle sezioni successive verranno analizzate dettagliatamente mettendone alla luce gli aspetti utili al nostro fine.
+Al fine di poter simulare gli innumerevoli aspetti legati all'Electrical Mobility sono stati usati diversi simulatori/tecnologie in simbiosi. In questa sezione verranno introdotte brevemente al fine di introdurre al resto della trattazione.
 
 \subsection{SUMO}\label{sebsec:sumo}
 
@@ -14,7 +14,6 @@ SUMO permette di avviare la simulazione in due modalità:
 
 \begin{itemize}
 	\item \textbf{Visuale}: La modalità visuale permette di avere un riscontro visuale l'andamento della simulazione tramite un interfaccia che mostra la mappa della rete/città con vista dall'alto. Vengono mostrati tutti i veicoli ed è possibile accedere a tutti i parametri della simulazione. Vengono mostrati inoltre i semafori agli incroci, la segnaletica delle strade e, nel caso siano stati caricati, gli edifici della città. Tutto questo ovviamente impatta notevolmente sulle performance ma, al di la del gradevole effetto visivo, è utile per vedere come evolve la simulazione. Nel nostro caso, ad esempio, è servito per assicurarsi che i veicoli si fermassero alle colonnine, oppure per valutare la quantità di traffico generata in seguito all'inserimento di un determinato numero di veicoli. Molto utile è stato anche in fase di Demo per mostrare il funzionamento del nostro simulatore.
-		
 	\item \textbf{Testuale}: Con la modalità testuale vengono stampati nel terminale i messaggi di Warning ed Error nel terminale e se richiesto anche qualche messaggio di debug in più che indica gli step di avanzamento della simulazione. Dopo aver constatato che la simulazione si comporta come ci si aspetta tramite la modalità visuale si passa allora a questa modalità che ha performance assai maggiori. È quindi particolarmente indicata per le simulazioni di lunga durata.
 \end{itemize}
 
@@ -47,20 +46,214 @@ Anche OMNeT++ mette a disposizione due modalità di esecuzione della simulazione
 
 Un grande punto di forza di OMNeT++ sono gli strumenti messi a disposizione per l'analisi dei dati generati dalle simulazioni, che permettono di applicare, in tempo reale, trasformazioni e aggregazioni tra i set di dati e, in fine, visualizzare i risultati con varie tipologie di grafici: a barre, a linee, istogrammi e molti altri.
 
-\subsection{Veins}\label{veins}
-Veins è un framework OpenSource per la simulazione di reti veicolari IVC (Inter-Vehicular Communication). Utilizza OMNeT++ e SUMO in simbiosi. Si appoggia su MiXiM, un framework per OMNeT++, che implementa modelli per reti wireless fisse e mobili (reti di sensori wireless, reti ad hoc, reercorso, colore, velocità, accelerazione, parcheggio ecc..ti veicolari ecc.). La comunicazione con SUMO avviene tramite TRaCI. Ogni volta che nella simulazione in SUMO viene aggiunto un veicolo Veins crea dinamicamente un corrispondente modulo OMNeT++ che permette di controllarlo sotto ogni aspetto (ercorso, colore, velocità, accelerazione, parcheggio ecc..).
+Ci sono due tipi di dato che si possono registrare in OMNeT++ i vettori e gli scalari, ne caso dei vettori si hanno i dati sul piano cartesiano, con il tempo come ascissa e il dato come ordinata, mentre nel caso degli scalari viene registrato un solamente un dato.
 
-Il nostro simulatore consiste in un modulo di Veins, il quale è stato opportunamente modificato al fine di avere un ambiente che contiene solo i componenti strettamente necessari allo scopo in quanto le performance sono determinanti al fine di poter avere dei risultati in tempi utili. Infatti sono stati rimossi da Veins i moduli necessari alla comunicazione wireless (nic80211 e ARP), il modulo per la gestione degli ostacoli (obstacles) che era utilizzato per la gestione dello shadowing delle reti wireless
+\subsection{Veins}\label{subsec:veins}
 
+Veins è un framework OpenSource per la simulazione di reti veicolari IVC (Inter-Vehicular Communication). Utilizza OMNeT++ e SUMO in simbiosi. Si appoggia su MiXiM, un framework per OMNeT++, che implementa modelli per reti wireless fisse e mobili (reti di sensori wireless, reti ad hoc, reti veicolari ecc.). La comunicazione con SUMO avviene tramite TRaCI. Ogni volta che nella simulazione in SUMO viene aggiunto un veicolo Veins crea dinamicamente un corrispondente modulo OMNeT++ che permette di controllarlo sotto ogni aspetto (percorso, colore, velocità, accelerazione, parcheggio ecc..).
+
+Il simulatore consiste in un modulo di Veins, il quale è stato opportunamente modificato al fine di avere un ambiente che contiene solo i componenti strettamente necessari allo scopo in quanto le performance sono determinanti al fine di poter avere dei risultati in tempi utili. Infatti sono stati rimossi da Veins i moduli necessari alla comunicazione wireless (nic80211 e ARP), il modulo per la gestione degli ostacoli (obstacles) che era utilizzato per la gestione dello shadowing delle reti wireless
+
+\subsubsection{Il funzionamento di Veins}\label{subsubsec:veins-func}
+
+Veins è il ponte tra OMNeT++ e SUMO e la comunicazione tra i due avviene tramite TraCI. In realtà "in mezzo" ai due simulatori si trova uno script python, \emph{sumo-launchd.py}, che sta in ascolto sulla prima porta libera che trova, in attesa che venga avviato Veins. Quando Veins viene avviato si connette a questo script il quale lancia SUMO, a questo punto inizia la sincronizzazione tra i due simulatori che avviene tramite "staffetta" come mostrato in Fig. ~\ref{fig:veins-state-machine}. Per garantire l'esecuzione sincrona a intervalli definiti Veins inserisce in un buffer tutti i comandi da inviare a SUMO (Fig.  ~\ref{fig:veins-sequence-diagram}). Ad ogni passo temporale, i comandi contenuti nel buffer vengono inviati. Ciò innesca l'avanzamento del corrispondente passo temporale nella simulazione del traffico stradale. Al termine dello step temporale di simulazione del traffico stradale, SUMO invia una serie di comandi con lo stato e la posizione di tutti i veicoli istanziati in risposta a Veins. Dopo l'elaborazione di tutti i comandi ricevuti Veins aggiunge i corrispettivi nodi per ogni nuovo veicolo introdotto nella simulazione e rimuove invece i nodi relativi ai veicoli che sono giunti a destinazione. A questo punto la simulazione può avanzare al prossimo step temporale.
+
+\begin{figure}[H]
+        \centering
+        \begin{subfigure}[H]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{assets/veins-state-machine.jpg}
+                \caption{Panoramica dei due simulatori abbinati. Macchina a stati di SUMO e i moduli di Veins.}
+                \label{fig:veins-state-machine}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[H]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{assets/veins-sequence-diagram.jpg}
+                \caption{ Diagramma di sequenza dei messaggi scambiati tra SUMO e Veins. L'esecuzione dei comandi è ritardata fino al successivo passo temporale in SUMO.}
+                \label{fig:veins-sequence-diagram}
+        \end{subfigure}
+        \caption{Architettura Veins}
+\end{figure}
+
+
+\section{Modellazione della Simulazione}
+
+L'intera simulazione viene incapsulata all'interno di una Network. Il Network è lo scenario da simulare, all'interno di esso si definiscono i moduli che compongono la simulazione. Come mostrato in Fig \ref{fig:module-scenario} sono sostanzialmente 4 i moduli che compongono la nostra simulazione:
+
+\begin{itemize}
+	\item \textbf{world}: È un modulo di tipo \code{BaseWorldUtility}, fornito da MiXiM, che rappresenta l'area che circoscrive lo scenario simulato. Come configurazione richiede di definire la grandezza dello scenario in metri. La mappa usata in SUMO non può essere più grande delle dimensioni definite in questo modulo.
+	\item \textbf{manager}: È un modulo di tipo \code{TraCIScenarioManagerLaunchd}, fornito da Veins, che mette in comunicazione OMNeT++ con SUMO. Tutte i messaggi inviati a TraCI passano da questo modulo (l'implementazione vera e propria della comunicazione con TraCI avviene nel modulo padre \code{TraCIScenarioManager}). Questo modulo è fondamentale in quanto è quello che crea un modulo OMNeT++ per ogni veicolo di SUMO.
+	\item \textbf{cityService}: Rappresenta la grid, infatti contiene i GCP e gli EVSE. Ricopre anche la funzione di raccoglitore statistiche globali sulle colonnine e i veicoli (Sez: \ref{sec:module-city}).
+	\item \textbf{connectionManager}: Questo modulo si occupa della comunicazione tra moduli ma è inutilizzato. Non l'ho rimosso per questioni di compatibilità con Veins.
+\end{itemize}
+
+Ogni volta che SUMO crea un veicolo Veins si occupa di creare il corrispondente modulo in OMNeT++, il modulo in questione è Car (Fig. \ref{fig:module-car}). Car in realtà è un modulo composto ovvero un contenitore, privo di implementazione, che contiene altri moduli. Di default, conterrebbe tutti i componenti relativi alle comunicazioni wireless in quanto sarebbe il target di Veins, ma io li ho rimossi in quanto non utili, per ora, nel nostro scenario.
+
+Al fine di rendere la simulazione il più possibile attinente alla realtà risulta necessario implementare i modelli di carica e scarica dei veicoli e i modelli comportamentali degli utenti nonché l'implementazione dei moduli di comunicazione con il servizio cittadino. Per svolgere questi compiti è stato necessario arricchire la definizione di Car con 3 nuovi moduli:
+
+\begin{itemize}
+	\item \textbf{TraciMobility}: È un modulo fornito da Veins che mette in comunicazione il veicolo con OMNeT++ tramite TRacI.
+	\item \textbf{CarLogic}: È il modulo principale, in esso è implementata la logica del veicolo. 
+	\item \textbf{Battery}: Implementa il modello di carica e scarica del veicolo.
+	\item \textbf{DriverBehaviour}: In questo modulo sono implementati i comportamenti che l'utente assume dinanzi a determinate scelte.  
+\end{itemize}
+
+Ogni modulo contiene dei parametri che permettono di cambiarne il comportamento, grazie a OMNeT++ diventa semplice lanciare molteplici simulazioni con diversi set di dati. Particolarmente interessante è la possibilità di eseguire la simulazione senza prenotazione per poter confrontare le differenze di occupazione delle colonnine rispetto allo scenario con prenotazione.
+
+\begin{figure}[H]
+        \centering
+		\begin{subfigure}[H]{0.45\textwidth}
+                \includegraphics[width=\textwidth]{assets/module-scenario.jpg}
+                \caption{Modulo scenario}
+                \label{fig:module-car}
+        \end{subfigure}
+        \qquad
+        \begin{subfigure}[H]{0.45\textwidth}
+                \includegraphics[width=\textwidth]{assets/module-car.png}
+                \caption{Modulo Car}
+                \label{fig:module-scenario}
+        \end{subfigure}%
+        \caption{Moduli OMNeT++}
+\end{figure}
+
+\subsection{Ciclo di Vita dei moduli}
+
+Essendo OMNeT++ un simulatore a eventi discreti i moduli, in esso implementati, non fanno nulla finché non viene schedulato un evento. Gli eventi vengono schedulati attraverso messaggi inviati dai moduli stessi. Sostanzialmente si tratta di decidere quando, a chi e cosa mandare.
+Il quando è il tempo di simulazione e quindi deve essere nel futuro o al massimo nel momento attuale di simulazione, a chi è il modulo destinatario e cosa è il messaggio da mandare. OMNeT++ fornisce un un messaggio di base, \code{cSimpleMessage}, ma, come vedremo più avanti, è possibile definirsi messaggi propri più complessi.
+
+All'interno di questa simulazione non avviene molto scambio di messaggi tra i diversi moduli, ragion per cui risulta necessario auto-inviarsi i messaggi al fine di mantenere "vivo" il modulo.
+
+Quando Veins crea un modulo il corrispondente veicolo in SUMO viene aggiornato ogni 0.1 secondi, che è lo step temporale di default. In OMNeT++ invece siamo noi a decidere ogni quanto aggiornare un modulo attraverso il meccanismo degli auto-messaggi. Schedulando i messaggi in modo intelligente si può guadagnare in performance in quanto ci si può inviare il messaggio solo quando è realmente necessario.
+
+Quando un modulo Car viene creato viene chiamata la funzione \code{initialize()}, della quale il programmatore può eseguire l'override, nella quale dopo le opportune inizializzazioni, è necessario auto-schedularsi un messaggio. I messaggi vengono ricevuti dalla funzione \code{handleMessage()} alla quale viene passato un riferimento al messaggio stesso. Da dentro questa funzione si può implementare la logica del modulo. Il modulo continua a vivere finché, il corrispondente veicolo in SUMO, non giunge a destinazione momento in cui Veins, attraverso la classe \code{TraCIScenarioManager}, si accorge che il veicolo non è più nella simulazione e quindi lo elimina anche da OMNeT++ il che causa una chiamata alla funzione di terminazione \code{finish()}.
+
+\subsection{CityService}\label{sec:module-city}
+
+Il modulo CityService simula la grid, al suo avvio carica le informazioni relative ai GCP presenti nello scenario simulato da un file XML. Il file utilizzato è lo stesso del servizio cittadino (Sez. ~\ref{subsubsec:city-init}). Le colonnine caricate vengono trasformate in oggetti C++ al fine di poter essere usate dai veicoli virtuali. 
+
+Questo modulo, attraverso il settaggio di parametri esterni, provvede ad abilitare/disabilitare le prenotazioni, e inoltre decide il tasso di penetrazione di veicoli elettrici nello scenario.
+
+Quelli mostrati di seguito sono i parametri del modulo:
+
+\begin{itemize}
+	\item \code{gcpList}: Percorso del file XML che contiene la definizione dei GCP. Deve essere lo stesso utilizzato dal servizio cittadino reale.
+	\item \code{electricalVehicleFreq}: Questo parametro stabilisce la frequenza con cui viene immesso un veicolo elettrico nella simulazione. È un numero che può variare da 0 a 100 e, più precisamente, indica con quale probabilità il veicolo inserito nella simulazione è elettrico. È necessario ricordare che il numero e la frequenza con cui i veicoli vengono immessi nella simulazione è determinato da SUMO attraverso i suoi file di configurazione. 
+	\item \code{maxElectricalVeh}: Impone un limite superiore al numero di veicoli che possono essere presenti nella simulazione in un determinato istante. Questo significa che se è stato raggiunto il massimo numero di veicoli, e uno di questi lascia la simulazione per un qualunque motivo, allora verrà rimpiazzato da uno nuovo (sempre ammesso che SUMO generi altri veicoli e che la statistica sia favorevole). Se viene impostato a -1 allora non ci sarà nessun limite al numero di veicoli.
+	\item \code{reservationEnabled}: Abilita/Disabilita il protocollo di prenotazione per i veicoli. l fine di ottimizzare le performance lo scambio di dati con il SIB, necessario per le prenotazioni, viene completamente disabilitato quando quest'ultime non sono attive.
+\end{itemize}
+
+Altra importante funzione svolta da questo modulo è la raccolta di statistiche globali sui veicoli elettrici. I dati raccolti sono tutti in formato vettoriale:
+
+\begin{itemize}
+	\item \textbf{chargingVehicles}: In questo vettore viene salvato lo stato di occupazione degli EVSE della città, ogni volta che un veicolo si va a ricaricare aggiunge un unità al vettore e quando finisce la ricarica l'unità viene rimossa. Questo comporta che come ordinata avremo al massimo il numero totale di EVSE presenti nello scenario.
+	\item \textbf{electricalVehicles}: Numero di veicoli elettrici presenti nella simulazione, semplicemente ogni volta che viene aggiunto un veicolo elettrico alla simulazione viene incrementata di un unità il vettore.
+	\item \textbf{vaporizedVehicles}: I veicoli vaporizzati sono quei veicoli che hanno terminato la batteria e quindi vengono letteralmente vaporizzati. Il termine vaporizzati deriva dall'analogo comando di TRacI che permette di rimuovere un veicolo dalla simulazione. 
+	\item \textbf{leavingVehicles}: Questo veicolo tiene traccia dei veicoli che riescono a lasciare normalmente la simulazione ovvero arrivano a destinazione, evento che ne causa la rimozione da parte di SUMO. In realtà uno degli obbiettivi raggiunti è stato proprio quello di dirottare i veicoli che arrivano a destinazione verso una strada casuale. Non è sempre possibile intercettare l'arrivo del veicolo in una determinata strada, questo comporta che qualcuno di essi "sfugga" e venga rimosso dalla simulazione.
+\end{itemize}
+
+
+\subsection{CarLogic}
+
+Il comportamento del veicolo è definito dal modulo CarLogic. Questo modulo implementa tutta la logica relativa alla guida del veicolo. In esso sono contenute le informazioni che ne descrivono la tipologia, l'appartenenza, e alcuni comportamenti di base. I comportamenti più complessi sono delegati al modulo DriverBehviour.
+
+\begin{itemize}
+	\item \textbf{userName}: Nome dell'utente che possiede il veicolo
+	\item \textbf{userId}: Identificativo dell'utente che possiede il veicolo
+	\item \textbf{manufacturer}: Casa produttrice del veicolo
+	\item \textbf{model}: Modello del veicolo
+	\item \textbf{cRoll}: Resistenza attrito gomme su asfalto
+	\item \textbf{cDrag}: 
+	\item \textbf{across}: Sezione frontale del veicolo
+	\item \textbf{rhoAir}: Resistenza dell'aria
+	\item \textbf{weight}: Peso del veicolo
+	\item \textbf{threshold}: Soglia sotto la quale il veicolo si considera scarico e quindi diviene necessario fare una ricarica. Varia da 0 a 1.
+	\item \textbf{minRequestedEnergyKwh}: Quantità minima di energia richiedibile in una richiesta di prenotazione. Questo valore serve nei casi in cui una richiesta non venga accettata dal \emph{City Service}, in tal caso viene diminuita gradualmente la quantità di energia richiesta fino ad arrivare a questa soglia.
+	\item \textbf{writeCarStatusOnSib}: Dice se scrivere le informazioni di stato dei veicoli sul \emph{Dash SIB}. Questo permette di vedere lo stato dei veicoli dall'applicazione mobile. Essendo la scrittura sul SIB un operazione abbastanza onerosa è meglio tenere disattivata questa opzione a meno che non si sia in fase di demo.
+\end{itemize}
+
+
+\subsubsection{Inizializzazione}
+
+In fase di inizializzazione la prima cosa che viene fatta è prendere un riferimento a tutti i moduli necessari, tra i quali il CityService, che  deciderà se il veicolo sarà elettrico o meno. Nel caso in cui sia elettrico allora si procede a reperire tutti i parametri e se è abilitata la prenotazione vengono scritte le informazioni del veicolo sul \emph{Dash SIB}. Viene inoltre mandato un comando a SUMO colora il veicolo di verde, funzionalità molto utile sia in fase di debug che in fase di demo.
+
+Nel caso in cui il veicolo non sia elettrico allora vengono eliminati i relativi moduli da OMNeT++ ma il veicolo rimane in SUMO. Questa funzionalità non era prevista da Veins e quindi è stato necessario modificarlo opportunamente per introdurla. L'eliminazione avviene indirettamente, dal momento che un modulo di Veins non può eliminare se stesso, mandando un messaggio al CityService con la richiesta di eliminazione.
+
+Un problema di SUMO, almeno per quelli che sono i nostri obbiettivi, è che un veicolo una volta giunto alla sua destinazione viene eliminato dalla simulazione. Questo comportamento influisce negativamente sulla simulazione in quanto a noi interessa simulare un periodo di vita dei veicoli lungo abbastanza da poterne studiare diversi cicli di carica e scarica. Per sopperire a questo problema vengono ottenuti, tramite TraCI, gli ID di tutte le strade che compongono il percorso del veicolo e viene preso l'ultimo in modo da poter intercettare l'arrivo del a quest'ultimo e quindi dirottarlo verso un'altra destinazione casuale. Le altre destinazioni vengono scelte da una lista che viene riempita con gli ID elle strade di destinazione, prese dai veicoli stessi, più lunghe di 50 metri. Il controllo sulla lunghezza serve in quanto è più probabile intercettare il momento in cui il veicolo arriva  a destinazione.
+
+A questo punto come ultima operazione viene istanziato un messaggio di tipo \code{CarMessage}, appositamente creato per mantenere lo stato del veicolo attraverso le varie transazioni di stato. I campi del messaggio vengono inizializzati e il messaggio viene schedulato al tempo attuale di simulazione. Come si vede nel List. \ref{lst:omnet-msg} il messaggio viene creato, viene impostato lo stato del veicolo (Sez. \ref{subsubsec:veh-state}), e infine viene schedulato tramite la funzione \code{scheduleAt()} al tempo attuale di simulazione che viene fornito dalla funzione \code{simTime()}. Per schedulare il messaggio dopo 25 secondi sarebbe stato necessario usare \code{simTime() + 25}.
+
+\begin{cpp}[caption={Autoschedulazione Messaggio},label={lst:omnet-msg}]
+carMessage = new CarMessage("CarMessage");
+carMessage->setCarState(CarState::DRIVING);
+[...]
+scheduleAt(simTime(), carMessage);
+\end{cpp}
+
+
+\subsubsection{Gli stati del veicolo}\label{subsubsec:veh-state}
+
+Lo stato del veicolo è definito da un automa a stati finiti come mostrato in Fig. \ref{fig:car-fsmd}. Le transazioni tra gli stati avvengono tramite scambio di messaggi nei quali è definito lo stato successivo. I messaggi arrivano alla funzione \code{handleMessage} la quale controlla se il messaggio arriva dall'esterno oppure se è auto-inviato (\code{msg->isSelfMessage()}). In quest'ultimo caso allora il messaggio viene inoltrato a una funzione chiamata \code{handleSelfMessage()}. All'interno di quest'ultima funzione avviene la scelta di quale hanlder eseguire in base allo stato definito nel messaggio (Lst. lst:self-msg).
+
+\begin{cpp}[caption={Funzione di scelta dello stato}, label={lst:self-msg}]
+void CarLogic::handleSelfMessage(cMessage *msg) {
+	CarMessage* carMsg = check_and_cast<CarMessage *>(msg);
+	
+	switch (carMsg->getCarState()) {
+		case CarState::DRIVING:
+			handleDriving(carMsg);
+			break;
+		[...]
+		case CarState::CHARGING:
+			handleCharging(carMsg);
+			break;
+		default:
+			error("Unknown Car State!");
+			break;
+	}	
+}
+\end{cpp}
+
+Ogni stato del veicolo ha una sua funzione "handler" che ne determina il comportamento. Alla funzione viene passato un riferimento al messaggio che contiene informazioni sullo stato del veicolo. L'handler prima di finire rischedula il messaggio con un nuovo stato, o con lo stesso in alcuni casi. La Fig. \ref{fig:car-fsmd} mostra l'automa a stati finiti che descrive il veicolo. 
+
+\begin{itemize}
+	\item
+\end{itemize}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1.0\textwidth]{assets/car-fsmd.png}
+	\caption{Automa a stati finiti che descrive il veicolo, tutti gli stati possono essere finali.}
+	\label{fig:car-fsmd}
+\end{figure}
+
+\subsection{Battery}\label{sec:battery}
+
+\subsection{DriverBeahviour}
+
+\section{Implementazione}
+
+????
+Esisteva già una versione del simulatore ma era a puro titolo dimostrativo e di demo e soffriva del fatto che era stato sviluppato da diverse persone (me compreso) in tempi molto brevi e con deadline che corrispondendo a demo internazionali si era costretti a rispettare. Questo ha portato ad avere un codice farraginoso e pieno di memory leak. Basti pensare che la prima versione del simulatore allocava RAM esponenzialmente e già dopo 2000 secondi si poteva arrivare ad avere un occupazione di 4GB.
+
+La prima cosa che ho fatto, quando ho capito che la situazione stava diventando ingestibile è stato profilare e rifattorizzare il codice. La profilazione è avvenuta tramite il tool Valgrind grazie al quale sono riuscito ad ottenere un cosumo di memoria lineare, infatti, dove prima venivano occupati 4GB, sono riuscito a raggiungere il traguardo dei 100MB. La rifattorizzazione del codice invece è stata più complessa in quanto diverse mani hanno messo mano con diversi stili di programmazione. 
+
+\subsection{Logging}
+
+\subsection{SibController}
+
+\subsection{GcpController}
+
+\subsubsection{GCP e EVSE}
+
+\subsection{Utility}
 
 \section{L'ambiente di simulazione}
 
-In questa sezione verranno descritti in dettaglio i componenti del simulatore, da noi creati, ovvero i moduli di OMNeT++, gli script per generare i file di configurazione di SUMO e gli script per lanciare le simulazioni batch.
+In questa sezione verranno descritti in dettaglio i componenti necessari a creare un ambiente di simulazione funzionante.
 
 La logica del simulatore è implementata attraverso moduli di OMNeT++. Grazie ad essi sono implementati, i modelli di consumo dei veicoli elettrici, i comportamenti degli degli autisti e la rete di distribuzione elettrica cittadina. L'unico aspetto non implementato è la guida dei veicoli in quanto è gestita da SUMO.
 
 I file di configurazione di SUMO sono generati da script che in base ai parametri specificati possono variare l'intensità del traffico.
-
 
 
 \subsection{Generazione file di Configurazione}
@@ -136,79 +329,3 @@ Siccome Open Street Map include molte informazioni che sono del tutto inutili al
 %netconvert --type-files osm-urban-de.typ.xml --ramps.guess --remove-edges.by-vclass hov,taxi,bus,delivery,transport,lightrail,cityrail,rail_slow, rail_fast,motorcycle,bicycle,pedestrian --geometry.remove --remove-edges.isolated true --tls.join --osm-files "$MAP_FILE" --output.street-names --output.original-names --output-file "$CITY_NAME".net.xml
 %\end{bash}
 
-
- 
-\subsection{Il funzionamento di Veins}
-
-Veins è il ponte tra OMNeT++ e SUMO e la comunicazione tra i due avviene tramite TraCI. In realtà "in mezzo" ai due simulatori si trova uno script python, \emph{sumo-launchd.py}, che sta in ascolto sulla prima porta libera che trova, in attesa che venga avviato Veins. Quando Veins viene avviato si connette a questo script il quale lancia SUMO, a questo punto inizia la sincronizzazione tra i due simulatori che avviene tramite "staffetta" come mostrato in Fig. ~\ref{fig:veins-state-machine}. Per garantire l'esecuzione sincrona a intervalli definiti Veins inserisce in un buffer tutti i comandi da inviare a SUMO (Fig.  ~\ref{fig:veins-sequence-diagram}). Ad ogni passo temporale, i comandi contenuti nel buffer vengono inviati. Ciò innesca l'avanzamento del corrispondente passo temporale nella simulazione del traffico stradale. Al termine dello step temporale di simulazione del traffico stradale, SUMO invia una serie di comandi con lo stato e la posizione di tutti i veicoli istanziati in risposta a Veins. Dopo l'elaborazione di tutti i comandi ricevuti Veins aggiunge i corrispettivi nodi per ogni nuovo veicolo introdotto nella simulazione e rimuove invece i nodi relativi ai veicoli che sono giunti a destinazione. A questo punto la simulazione può avanzare al prossimo step temporale.
-
-\begin{figure}[H]
-        \centering
-        \begin{subfigure}[H]{0.5\textwidth}
-                \includegraphics[width=\textwidth]{assets/veins-state-machine.jpg}
-                \caption{Panoramica dei due simulatori abbinati. Macchina a stati di SUMO e i moduli di Veins.}
-                \label{fig:veins-state-machine}
-        \end{subfigure}%
-        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-          %(or a blank line to force the subfigure onto a new line)
-        \begin{subfigure}[H]{0.5\textwidth}
-                \includegraphics[width=\textwidth]{assets/veins-sequence-diagram.jpg}
-                \caption{ Diagramma di sequenza dei messaggi scambiati tra SUMO e Veins. L'esecuzione dei comandi è ritardata fino al successivo passo temporale in SUMO.}
-                \label{fig:veins-sequence-diagram}
-        \end{subfigure}
-        \caption{Architettura Veins}
-\end{figure}
-
-
-%Questo compito è svolto dalla classe \emph{TraCIScenarioManager} che all'avvio del simulatore instaura la connessione %con SUMO tramite TraCI. 
-
-\section{Il Modello della Batteria}\label{sec:battery}
-
-\section{I Moduli}
-
-\subsubsection{Car}
-
-(Fig: ~\ref{fig:module-car}).
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.5]{assets/module-car.png}
-\caption{Modulo Car}
-\label{fig:module-car}
-\end{figure}
-
-
-\subsection{CarLogic}
-
-CarLogic è il modulo che implementa la logica di ogni veicolo gestito dal simulatore attraverso un automa a stati finiti. 
-
-
-\begin{description}
-  \item[userName]  \hfill \\ 
-      Nome completo dell'utente che possiede il veicolo
-  \item[userId]  \hfill \\
-      Username dl''utente che possiede il veicolo
-  \item[manufacturer]  \hfill \\
-      Fabbricante
-  \item[model]  \hfill \\ 
-      Modello
-  \item[cRoll]  \hfill \\
-      Attrito di qualcosa
-  \item[cDrag]  \hfill \\
-      Attrito di qualcos altro
-  \item[across]  \hfill \\
-      Attrito di qualcos altro ancora
-  \item[rhoAir]  \hfill \\
-      Attrito dell'aria
-  \item[weight]  \hfill \\
-      Peso del veicolo
-  \item[threshold]  \hfill \\
-      Soglia sotto la quale il veicolo richiede la ricarica \ldots
-\end{description}
-
-\subsection{Battery}
-
-\subsection{CityService}
-
-
-\section{parametri no scrittura sb}\label{sec:sim-par}

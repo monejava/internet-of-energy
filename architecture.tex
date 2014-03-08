@@ -232,123 +232,121 @@ Il protocollo di prenotazione iniziale era in stato embrionale e serviva a scopo
 	\item \code{ioe:hasPosition}: la posizione da cui si sta eseguendo la richiesta.
 	\item \code{ioe:hasRequestedEnergy}: la quantità di carica richiesta. 
 	\item \code{ioe:hasRequestingVehicle}: il veicolo che richiede la ricarica.
-	\item \code{ioe:hasChargeResponse}: la risposta che viene fornita dal sistema.
+	\item \code{ioe:hasChargeResponse}: la risposta fornita dal sistema.
 \end{itemize}
 
 \noindent
-In quanto embrionale in seguito ad alcune simulazioni è sorta la necessità di aggiornare il protocollo per risolvere alcune problematiche. \\ 
-Al di la della mancanza del concetto di utente, l'assenza di range nei campi \code{ioe:hasPreferredTime} ed \code{ioe:hasPosition} potevano portare ad ambiguità nella risposta che non avendo alcun limite poteva diventare eccessivamente grande. Questo poteva portare problemi di traffico nel caso di utilizzo di smartphone agganciati alla rete tramite connettività mobile.
+In seguito ad alcune problematiche verificatesi durante le simulazioni è stato necessario aggiornare il protocollo, all'epoca ancora in fase embrionale.
+Al di la della mancanza del concetto di utente, l'assenza di range nei campi \code{ioe:hasPreferredTime} e \code{ioe:hasPosition} poteva portare ad un eccessiva ridondanza delle risposte con conseguenti insostenibilità nei tempi e nelle entità del traffico di dati particolarmente in caso di utilizzo di smartphone agganciati alla rete tramite connettività mobile.
 
 \subsubsection{Il nuovo Protocollo di prenotazione}\label{subsubsec:chargerequest}
 
-In seguito ai problemi messi in luce nel paragrafo precedente (\ref{subsubsec:old-proto}) è stato deciso di sviluppare un nuovo protocollo di prenotazione che prendesse in considerazioni i nuovi requisiti funzionali.
+In seguito ai problemi messi in luce nel paragrafo precedente (\ref{subsubsec:old-proto}) si è deciso di sviluppare un nuovo protocollo di prenotazione che prendesse in considerazione i nuovi requisiti funzionali.
 
 La classe è \code{ioe:ChargeRequest} è stata quindi ridefinita con le seguenti proprietà:
 
 \begin{itemize}
-	\item \code{ioe:hasRequestingUser}: Utente che ha effettuato la ricarica. Malgrado si possa risalire all'utente tramite il veicolo è stato comunque inserita la proprietà al fine di semplificare le query SPARQL.
-	\item \code{ioe:hasSpatialRange}: Area nella quale si vuole eseguire la ricarica. Il punto centrale di quest'area non corrisponde necessariamente con la posizione dell'utente. Come vedremo nella sezione relativa all'applicazione mobile (\ref{chap:mobile-app}) l'area di prenotazione può essere scelta arbitrariamente sulla mappa.
-	\item \code{ioe:hasTimeInterval}: Indica il range temporale all'interno del quale si è disposti ad eseguire la ricarica. Può anche essere molto superiore al tempo necessario per la ricarica nel caso in cui non ci siano particolari preferenze di tempo.
-	\item \code{ioe:hasRequestingVehicle}: Indica il veicolo per cui si richiede la ricarica. Non differisce rispetto al vecchio protocollo.
-	\item \code{ioe:hasRequestedEnergy}: Indica la quantità di carica richiesta. Non differisce rispetto al vecchio protocollo.
+	\item \code{ioe:hasRequestingUser}: utente che richiede la ricarica. Malgrado si possa risalire all'utente tramite il veicolo è stato comunque inserita la proprietà al fine di semplificare le query SPARQL.
+	\item \code{ioe:hasSpatialRange}: area nella quale si vuole eseguire la ricarica. Il punto centrale di quest'area non corrisponde necessariamente con la posizione dell'utente. Come vedremo nella sezione relativa all'applicazione mobile (\ref{chap:mobile-app}) l'area di prenotazione può essere scelta arbitrariamente sulla mappa.
+	\item \code{ioe:hasTimeInterval}: il range temporale all'interno del quale si è disposti ad eseguire la ricarica. Può anche essere molto superiore al tempo necessario per la ricarica nel caso in cui non ci siano particolari requisiti di tempo.
+	\item \code{ioe:hasRequestingVehicle}: il veicolo per cui si richiede la ricarica. Non differisce rispetto al vecchio protocollo.
+	\item \code{ioe:hasRequestedEnergy}: la quantità di carica richiesta. Non differisce rispetto al vecchio protocollo.
 \end{itemize}
 
 \noindent
-Per quanto sia stato migliorato il protocollo è ancora incompleto ed in quanto tale è ancora aperto a migliorie. Ad esempio non è possibile specificare la volontà dell'utente di essere più flessibile per quanto riguarda la quantità di carica richiesta e nemmeno, nel caso fosse richiesto dalla Grid, se fosse disposto a cedere parte della sua carica.
+Per quanto migliorato il protocollo è ancora incompleto ed in quanto tale è ancora suscettibile di ulteriori significative migliorie. Ora ad es. non è possibile specificare la volontà dell'utente di essere più flessibile riguardo alla quantità di carica richiesta e nemmeno, nel caso sia richiesto dalla Grid, se fosse disposto a cedere parte della sua carica.
 \\ \\
-Oltre alla richiesta è stata modificata anche la risposta. Alla classe \code{ioe:ChargeResponse} è stata aggiunta la proprietà \code{ioe:hasRelatedRequest} al fine di semplificare le query SPARQL.
-Anche le opzioni di ricarica contenute nella risposta sono state modificate con lo scopo di farle aderire ai nuovi requisiti funzionali ma anche per semplificare le query SPARQL.
+Oltre alla richiesta è stata modificata anche la risposta. Alla classe \code{ioe: ChargeResponse} è stata aggiunta la proprietà \code{ioe:hasRelatedRequest} per semplificare le query SPARQL. Anche le opzioni di ricarica contenute nella risposta sono state modificate non solo per farle aderire ai nuovi requisiti funzionali ma anche per semplificare le query SPARQL.
 
 Di seguito verranno esposte le proprietà della classe \code{ioe:ChargeOption}. Dalla vecchia definizione è stata rimossa la proprietà \code{ioe:hasChargeProfile}. Le proprietà ereditate dalla vecchia ontologia verranno opportunamente segnalate.
 
 \begin{itemize}
 	\item \code{ioe:optionHasEVSE}: EVSE presso il quale avverrà la ricarica (ereditata).
-	\item \code{ioe:hasTimeInterval}: Specifica il tempo necessario a ricaricarsi calcolato sulla base dell'energia richiesta e la potenza della colonnina. Questa proprietà era presente anche nella vecchia definizione dove i tempi venivano indicati con le date in formato gg/mm/aaaa, attualmente i tempi vengono indicati in millisecondi (passati dalla mezzanotte del 1 Gennaio 1970 UTC) con le proprietà \code{ioe:hasFromTimeMillisec} e \code{ioe:hasToTimeMillisec}.
-	\item \code{ioe:hasRequestingVehicle}: Il veicolo per cui è stata effettuata la richiesta. (ereditata)
-	\item \code{ioe:hasRequestingUser}: L'utente che ha effettuato la richiesta.
-	\item \code{ioe:hasGridConnectionPoint}: Il GCP presso cui avverrà la ricarica. Malgrado vi si possa accedere tramite l'EVSE è stato inserito al fine di semplificare le query SPARQL.
-	\item \code{ioe:hasTotalPrice}: Prezzo totale della ricarica.
-	\item \code{ioe:hasGcpPosition}: Posizione del GCP, anche questa proprietà è stata aggiunta per semplificare le query SPARQL.
+	\item \code{ioe:hasTimeInterval}: è un istanza della classe \code{ioe:TimeIntervalData}. Specifica il tempo necessario a ricaricarsi calcolato sulla base di energia richiesta e di potenza della potenza colonnina. La proprietà era presente anche nella vecchia definizione con i tempi indicati con le date in formato gg/mm/aaaa sostituita con gli attuali millisecondi (passati dalla mezzanotte del 1 Gennaio 1970 UTC) con le proprietà \code{ioe:hasFromTimeMillisec} e \code{ioe:hasToTimeMillisec}.
+	\item \code{ioe:hasRequestingVehicle}: il veicolo per cui è stata effettuata la richiesta. (ereditata)
+	\item \code{ioe:hasRequestingUser}:l'utente che ha effettuato la richiesta.
+	\item \code{ioe:hasGridConnectionPoint}: il GCP presso cui avverrà la ricarica. Malgrado vi si possa accedere tramite l'EVSE è stato inserito per semplificare le query SPARQL.
+	\item \code{ioe:hasTotalPrice}: prezzo totale della ricarica.
+	\item \code{ioe:hasGcpPosition}: posizione del GCP. Anche questa proprietà è stata aggiunta per semplificare le query SPARQL.
 \end{itemize}
 
 
 \subsubsection{Rimozione informazioni Hardcoded}
 
-Fino alla versione \emph{1.5.11} dell'ontologia le informazioni relative ai GCP erano hardcoded nell'ontologia, scelta che all'inizio del progetto è stata necessaria a causa del poco tempo. Successivamente questo approccio ha si è rivelato fortemente limitante in quanto la modifica dell'ontologia è un operazione abbastanza tediosa e sopratutto è poco flessibile. 
+Fino alla versione 1.5.11 dell'ontologia le informazioni relative ai GCP erano hardcoded nell'ontologia, scelta che all'inizio del progetto è stata dettata del poco tempo. Successivamente questo approccio si è rivelato fortemente limitante poiché la modifica dell'ontologia è un operazione abbastanza tediosa e sopratutto poco flessibile. 
 
-Al fine di risolvere questo problema ho deciso di rimuovere questi dati dall'ontologia e inserirli all'interno di un file XML che viene caricato dal \emph{City Service} (Sez. \ref{subsubsec:city-init}) e dal simulatore (Sez. \ref{chap:sim}) in fase di inizializzazione.
+Per di risolvere questo problema ho deciso di rimuovere questi dati dall'ontologia e inserirli all'interno di un file XML che viene caricato dal \emph{City Service} (Sez. \ref{subsubsec:city-init}) e dal simulatore (Sez. \ref{chap:sim}) in fase di inizializzazione.
 
-Grazie a questo approccio è diventato relativamente semplice impostare uno scenario del tutto diverso da quello previsto dal progetto.
+Grazie a questo approccio è diventato relativamente semplice impostare uno scenario del tutto diverso da quello previsto inizialmente dal progetto.
 
 \section{I Semantic Information Broker}
 
-I SIB sono alla base dell'infrastruttura semantica che caratterizza questo progetto. I componenti del sistema (dal servizio cittadino, allo smartphone, all'EVSE ecc..) comunicano e rendono permanenti le informazioni grazie ad essi. L'architettura rimane sostanzialmente invariata da quella presentata da Federico Montori (\cite{montori2012}) nel suo progetto di tesi. Verrà comunque esposta al fine di comprendere il resto della trattazione e verranno evidenziate le variazioni apportate alla soluzione iniziale.
+I SIB sono alla base dell'infrastruttura semantica che caratterizza il progetto. I componenti del sistema (dal servizio cittadino, allo smartphone, all'EVSE ecc..) comunicano e rendono permanenti le informazioni grazie ad essi. L'architettura rimane sostanzialmente invariata da quella presentata da Federico Montori (\cite{montori2012}) nel suo progetto di tesi. Verrà comunque esposta al fine di comprendere il resto della trattazione e verranno evidenziate le variazioni apportate alla soluzione iniziale.
 
 L'architettura proposta prevede 2 SIB: il \emph{City SIB} e il \emph{Dash SIB}.
 
 \subsection{City SIB}\label{subsec:city-sib}
 
-Il \emph{City SIB} è il SIB cittadino. Al suo interno vengono immagazzinate tutte le informazioni utili a caratterizzare uno scenario di mobilità elettrica veicolare. Viene inoltre utilizzato come interfaccia di scambio dati tra il \emph{City Service} e gli agenti esterni, infatti è qui che vengono scritti i messaggi che compongono i protocolli i quali vengono cancellati una volta terminati. L'area di copertura di tale SIB e di conseguenza del \emph{City Service} è definita dalla classe dell'ontologia \code{ioe:Zone} anche se attualmente non viene utilizzata in quanto gli scenari proposti prendono in considerazione una città alla volta.
+Il \emph{City SIB} è il SIB cittadino. Al suo interno vengono immagazzinate tutte le informazioni utili a caratterizzare uno scenario di mobilità elettrica veicolare. Si usa inoltre come interfaccia di scambio dati tra il \emph{City Service} e gli agenti esterni. È infatti nel emph{City SIB} che vengono scritti i messaggi che compongono i protocolli i quali vengono cancellati una volta terminati. L'area di copertura di tale SIB e di conseguenza del \emph{City Service} è definita dalla classe dell'ontologia \code{ioe:Zone} anche se attualmente non viene utilizzata poiché gli scenari proposti prendono in considerazione una città alla volta.
 
-Al fine di poter rispondere alle richieste di prenotazione degli utenti il \emph{City Service} contiene le informazioni su tutte le colonnine della zona che ricopre. Inoltre possiede le informazioni relative agli utenti e a i veicoli da essi posseduti. Non contiene le informazioni relative alla batteria che sono contenute nella \emph{Dash SIB} (\ref{subsec:dash-sib}). Nell'architettura proposta nel progetto precedente a questo gli utenti non esistevano (\ref{subsubsec:person}) e le informazioni relative ai veicoli si trovavano esclusivamente nella \emph{Dash SIB}.
+Per di poter rispondere alle richieste di prenotazione degli utenti il \emph{City Service} contiene le informazioni relative a tutte le colonnine della zona che ricopre. Possiede inoltre le informazioni relative agli utenti e ai veicoli di competenza. Non contiene le informazioni relative alla batteria, contenute nel \emph{Dash SIB} (\ref{subsec:dash-sib}). Nell'architettura proposta nel progetto precedente gli utenti non erano previsti (\ref{subsubsec:person}) per cui le informazioni relative ai veicoli si trovavano esclusivamente nella \emph{Dash SIB}.
 
-L'inizializzazione del \emph{City SIB}, contrariamente a quanto avveniva prima, viene eseguita dal servizio cittadino stesso, inoltre il servizio cittadino si occupa di caricare le informazioni dei GCP, caricate da un file XML, e di inserirle nel SIB (Sez. \ref{subsubsec:city-init}).
-
+L'inizializzazione del \emph{City SIB}, contrariamente a quanto avveniva in precedenza, viene eseguita dal servizio cittadino che inoltre il servizio cittadino si occupa di caricare le informazioni dei GCP da un file XML e di inserirle nel SIB (Sez. \ref{subsubsec:city-init}).
 
 \subsection{Dash SIB}\label{subsec:dash-sib}
 
-Il \emph{Dash SIB} è  un SIB che dovrebbe essere integrato a bordo di ogni veicolo. Il suo scopo è tenere costantemente traccia dei parametri che caratterizzano posizione, stato della batteria e tutti gli altri parametri variabili che caratterizzano un veicolo. Al fine di collegare questi dati a un veicolo la tripla che descrive un istanza di \code{ioe:Vehicle} viene ripetuta anche su questa SIB. 
+Il \emph{Dash SIB} è  un SIB che dovrebbe essere integrato a bordo di ogni veicolo. Il suo scopo è tenere costantemente traccia dei parametri che caratterizzano posizione, stato della batteria e tutti gli altri parametri variabili che caratterizzano un veicolo. Per collegare questi dati a un veicolo la tripla che descrive un istanza di \code{ioe:Vehicle} viene ripetuta anche su questo SIB. 
 
-Inizialmente si pensava che questo SIB sarebbe stato eliminato in un contesto reale in quanto i dati in esso contenuti sarebbero stati presi direttamente dal veicolo. È stato invece deciso di mantenerlo per poterlo usare come interfaccia comune per l'interrogazione dei dati. Ovvero le applicazioni che utilizzano i dati del veicolo, come ad esempio l'applicazione mobile, dovrebbero essere agnostiche dalla sorgente di dati (es: Veicolo Reale, Veicolo Simulato). Compito del programmatore è scrivere un adattatore che scrive i dati in provenienti dalle varie fonti sul \textsc{Dash SIB}. Come vedremo più avanti (Cap. \ref{chap:sim}, \ref{chap:mobile-app}) grazie a questa tecnica è possibile controllare dal telefonino un veicolo presente nel simulatore tenendone monitorati tutti i parametri. I veicoli del simulatore scrivono tutti sullo stesso \emph{Dash SIB} in quanto sarebbe computazionalmente proibitivo e del tutto inutile fare altrimenti.
+Inizialmente si pensava che questo SIB sarebbe stato eliminato in un contesto reale in quanto i dati in esso contenuti sarebbero stati letti direttamente dal veicolo. Si è invece deciso di mantenerlo con la funzione di interfaccia comune per l'interrogazione dei dati. Ovvero le applicazioni che utilizzano i dati del veicolo, come ad esempio l'applicazione mobile, dovrebbero essere indifferenti alla sorgente dei dati (es: Veicolo Reale, Veicolo Simulato). Compito del programmatore è implementare un adattatore che scrive i dati in provenienti dalle varie fonti sul \emph{Dash SIB}. Come vedremo più avanti (Cap. \ref{chap:mobile-app} e \ref{chap:sim}) grazie a questa tecnica si può controllare dallo smartphone un veicolo presente nel simulatore tenendone monitorati tutti i parametri. I veicoli del simulatore scrivono tutti sullo stesso \emph{Dash SIB} in quanto sarebbe computazionalmente proibitivo e del tutto inutile fare altrimenti.
 
-Siccome attualmente non esistono veicoli che contengono un SIB esiste in fase di test su veicolo reale (App. \ref{app:crf}) è stato necessario portare un computer a bordo che contenesse il \textsc{Dash SIB} dal quale l'applicazione mobile attingeva per prelevare i dati.
+Poiché attualmente non esistono veicoli dotati di un SIB, in fase di test su veicolo reale (App. \ref{app:crf}) è stato necessario dotarsi di un computer a bordo che contenesse il \emph{Dash SIB} dal quale l'applicazione mobile prelevava i dati.
 
 \section{La libreria IoE}\label{subsec:ioe-lib}
 
-Questa libreria implementa la logica applicativa ovvero il nucleo operativo del nostro strato di servizi. È la base per qualunque applicazione che intenda in interfacciarsi con il sistema in modo semplice ed efficace. Viene infatti sfruttata sia dal \emph{City Service} che dall'applicazione mobile, da me sviluppati, è inoltre utilizzata da un visualizzatore di ricariche, nato da un progetto parallelo al mio, del quale sviluppo si è occupata una ragazza di Ingegneria.
+Implementa la logica applicativa ovvero il nucleo operativo del nostro strato di servizi. È la base per qualunque applicazione che intenda interfacciarsi con il sistema in modo semplice ed efficace. Viene infatti sfruttata sia dal \emph{City Service} che dall'applicazione mobile, da me sviluppati. Viene inoltre utilizzata da un visualizzatore di ricariche, nato da un progetto parallelo a questo, del cui sviluppo si è occupata una studentessa di Ingegneria.
 
 \subsection{Connessione al SIB}
 
-La connessione al \emph{SIB} viene eseguita da una libreria Java (JavaKPI), sviluppata da ARCES, che implementa il protocollo SSAP. Ho creato un wrapper di questa libreria che ne semplifica l'utilizzo e aggiunge alcune funzionalità. Essa si trova nel package \code{it.unibo.ioe.sib}.
+La connessione al \emph{SIB} è implementata da una libreria Java (JavaKPI), sviluppata da ARCES, che fa uso del protocollo SSAP. Ho creato un wrapper di questa libreria che ne semplifica l'utilizzo e aggiunge alcune funzionalità: si trova nel package \code{it.unibo.ioe.sib}.
 
 \subsubsection{RdfTriple}
-La libreria JavaKPI rappresenta le triple RDF come vettore di Stringhe di 5 elementi (\code{Vector<String>}): soggetto, predicato, oggetto, tipo soggetto, tipo oggetto. 
-Per semplificare la gestione delle triple RDF, che sono l'entità di base su cui si basa il SIB, ho creato una classe \code{RdfTriple} che possiede gli attributi \code{subject},\code{predicate}, \code{object}, \code{subjectType}, \code{objectType} e i corrispettivi \code{getter} e \code{setter}.
 
+La libreria JavaKPI rappresenta le triple RDF come vettore di Stringhe di 5 elementi (\code{Vector<String>}): soggetto, predicato, oggetto, tipo soggetto, tipo oggetto (dove con tipo si intende o un URI, ovvero un'altra istanza di classe dell'ontologia, oppure un letterale ovvero un dato diretto). 
+Per semplificare la gestione delle triple RDF, che sono l'entità di base del SIB, ho creato la classe \code{RdfTriple} che possiede gli attributi \code{subject}, \code{predicate}, \code{object}, \code{subjectType}, \code{objectType} e i corrispettivi \code{getter} e \code{setter}.
 
 \subsubsection{KpConnector}
 
-La maggior parte delle operazioni che si possono eseguire con la libreria JavaKPI richiedono due passaggi: l'invio del comando, e il parsing della risposta. Questo perché ogni operazione di interazione con il SIB avviene tramite messaggi XML, conformi al protocollo SSAP. La libreria genera automaticamente il messaggio da inviare alla SIB ma lascia al programmatore l'onere di effettuare il parsing della risposta. Ho quindi mappato tutte le operazioni di interazione con la SIB all'interno della classe \code{KpConnector}.
+La maggior parte delle operazioni che si possono eseguire con la libreria JavaKPI richiedono due passaggi: l'invio del comando e il parsing della risposta. Questo perché ogni operazione di interazione con il SIB avviene tramite messaggi XML conformi al protocollo SSAP. La libreria genera automaticamente il messaggio da inviare alla SIB ma lascia al programmatore l'onere di effettuare il parsing della risposta. Ho quindi mappato tutte le operazioni di interazione con la SIB all'interno della classe \code{KpConnector}.
 
-La classe \code{KpConnector} svolge le operazioni di parsing anche sui messaggi di risposta. Al posto dei vettori di stringhe ho utilizzato istanze della classe \code{RdfTriple}. Mentre dove venivano usate liste di triple (es: inserimento multiplo di triple, risultati di query SPARQL) ho sostituito con liste di oggeti di tipo \code{RdfTriple} (\code{List<RdfTriple>}). La classe che si occupa di convertire i tipi di dato usati dalla libreria \code{JavaKPI} ai tipi usati dal wrapper da me creato è \code{RdfParser}.
+La classe \code{KpConnector} svolge le operazioni di parsing anche sui messaggi di risposta. Anzichè i vettori di stringhe ho utilizzato istanze della classe \code{RdfTriple}. Inoltre ho sostituito le liste di triple (es: inserimento multiplo di triple, risultati di query SPARQL implementati con \code{Vector<Vector<String>>}) con liste di oggetti di tipo \code{RdfTriple} (\code{List<RdfTriple>}). \code{RdfParser} è la classe che converte i tipi di dato usati dalla libreria \code{JavaKPI} nei tipi usati dal wrapper che ho implementato.
 
 \subsubsection{KpFactory}
 
-La classe \code{KpConnector} necessita di indirizzo, porta e nome del SIB a cui ci si vuole connettere, questo perché il suo utilizzo deve essere il più generico possibile. Nel nostro caso però le connessioni avvengono sempre verso gli stessi due SIB (CITY e DASH), ho quindi creato una classe factory (\code{KpFactory}) che, conoscendo i parametri di connessione necessari, crea due istanze di \code{KpConnector}, una per il CITY SIB e una per il DASH SIB, e restituisce sempre quello evitando quindi la creazione di istanze di oggetti inutili. Essendo la libreria \code{JavaKPI} non thread-safe viene comunque data la possibilità di creare istanze in modo veloce nel caso si lavori in ambienti multi-thread. Questo aspetto verrà approfondito più avanti dove vedremo come, tramite la tecnica dei pool di oggetti, possiamo risparmiare il tempo necessario a creare nuove istanze.
+La classe \code{KpConnector} necessita di indirizzo, porta e nome del SIB a cui ci si vuole connettere ai fini dell'utilizzo più generico possibile. Nel nostro caso però le connessioni avvengono sempre verso gli stessi due SIB (\emph{City} e \emph{Dash}), quindi ho creato una classe factory (\code{KpFactory}) che, noti i parametri di connessione necessari, crea due istanze di \code{KpConnector}, una per il \emph{City SIB} e una per il \emph{Dash SIB}. Quando è necessario connettersi ai SIB il factory restituisce gli oggetti precedentemente creati evitando quindi la creazione di istanze di oggetti inutili. Non essendo la libreria JavaKPI \emph{thread-safe} viene comunque data la possibilità di creare nuove istanze nel caso si lavori in ambienti multi-thread. Questo aspetto verrà approfondito più avanti dove vedremo come, tramite la tecnica dei pool di oggetti, si può risparmiare il tempo necessario a creare nuove istanze.
 
 %http://sourceforge.net/projects/smartm3-javakpi/
 
 \subsection{Entities}
 
-Ogni classe dell'ontologia è stata mappata con una rispettiva classe Java (Entity) nel package \code{it.unibo.ioe.entity} . Per questa scelta architetturale mi sono ispirato all'ORM (Object Relational Mapping) che è una tecnica di programmazione che favorisce l'integrazione di sistemi software aderenti al paradigma della programmazione orientata agli oggetti con sistemi RDBMS (Relational database management system). %http://it.wikipedia.org/wiki/Object-relational_mapping
+Ogni classe dell'ontologia è stata mappata con una rispettiva classe Java (Entity) nel package \code{it.unibo.ioe.entity}. Per questa scelta architetturale mi sono ispirato all'ORM (Object Relational Mapping), tecnica di programmazione che favorisce l'integrazione di sistemi software aderenti al paradigma della programmazione orientata agli oggetti con sistemi RDBMS (Relational Database Management System). %http://it.wikipedia.org/wiki/Object-relational_mapping
 
 \subsubsection{Mapping} 
 
-Il mapping che ho creato è molto semplice e tiene conto solo delle proprietà strettamente necessarie nello strato di servizi e tralascia alcuni dettagli come l'unità di misura che attualmente, malgrado siano previsti nell'ontologia, vengono dati per scontati a livello applicativo.
-Le proprietà delle classi che hanno come oggetto un letterale sono state mappate con tipi primitivi Java (\code{int},\code{double},\code{String} ecc..). Mentre le proprietà che come oggetto hanno un'altra classe sono rappresentate come attributo che come tipo ha l'Entity
-che corrisponde alla classe. 
+Ho realizzato un mapping molto semplice che tiene conto delle sole proprietà necessarie nello strato di servizi 
+ tralasciando alcuni dettagli, come l'unità di misura, che attualmente, malgrado siano previsti nell'ontologia, vengono dati per scontati a livello applicativo.
+Le proprietà delle classi che hanno come oggetto un letterale sono state mappate con tipi primitivi Java (\code{int},  \code{double}, \code{String} ecc..). Le proprietà che invece come oggetto hanno un'altra classe sono rappresentate come attributo avente come tipo l'Entity che corrisponde alla classe. 
 
-\subsubsection{Serializzazone} 
+\subsubsection{Serializzazione} 
 
-Alcune Entity sono state opportunamente annotate al fine di poter essere serializzate in XML tramite la tecnologia \code{JAXB}. Questo è risultato necessario nel caso dei \emph{GCP} che vengono caricati da un file XML, nella cartella del \emph{City Service}, il quale si occupa poi di inserirli nel SIB. Ogni classe inoltre implementa l'interfaccia \code{java.io.Serializable} al fine di permettere il passaggio delle Entity tra le varie \code{Activity} dell'applicazione mobile.
+Alcune Entity sono state opportunamente annotate per poterle serializzate in XML tramite la tecnologia \code{JAXB}. Questo è risultato necessario nel caso dei GCP che vengono caricati da un file XML dal \emph{City Service} che poi li inserisce nel SIB. Ogni classe inoltre implementa l'interfaccia \code{java.io.Serializable} per consentire il passaggio delle Entity tra le varie \code{Activity} dell'applicazione mobile.
 
 \paragraph{Esempio}
 
-La proprietà dell'ontologia \code{ioe:hasEVSE} ha come dominio \\ \code{ioe:GridConnectionPoint} e come codominio \code{ioe:EVSE}. Inoltre tutte le classi dell'ontologia hanno al proprietà code{vcard:hasName}.
+La proprietà dell'ontologia \code{ioe:hasEVSE} ha come dominio \\ \code{ioe:GridConnectionPoint} e come codominio \code{ioe:EVSE}. Inoltre tutte le classi dell'ontologia hanno al proprietà \code{ioe:hasName}.
 
-Questa situazione viene tradotta nell'Entity:
+Questo si traduce nell'Entity mostrato nel Lst. \ref{lst:entity}
 
-\begin{java}[caption={Entity di esempio},label=lst:entity]
+\begin{java}[caption={Entity di esempio},label={lst:entity}]
 @XmlRootElement(name = "GCP")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GCP implements Serializable {
@@ -364,16 +362,16 @@ public class GCP implements Serializable {
 
 \subsection{Controller}
 
-I \code{Controller} sono le classi delegate ad eseguire le operazioni \code{CRUD} (create, read, delete, update) con il SIB e si trovano nel package \code{it.unibo.ioe.controller}. Ne esiste uno per ogni Entity. Ogni \code{Controller} possiede un istanza di \code{KpConnector} che permette la comunicazione con il SIB. 
+I \code{Controller} sono le classi delegate ad eseguire le operazioni \code{CRUD} (create, read, delete, update) con il SIB e si trovano nel package \code{it.unibo.ioe .controller}. Ne esiste uno per ogni Entity. Ogni \code{Controller} possiede un'istanza di \code{KpConnector} che realizza la comunicazione con il SIB. 
 
 \begin{description}
-	\item \textbf{Lettura} Le operazioni di lettura vengono eseguite tramite una query \code{SPARQL} che preleva dal SIB le informazioni necessarie che poi vengono inserite in una nuova istanza di Entity la quale viene restituita all'utente.
+	\item \textbf{Lettura} Le operazioni di lettura si eseguono con una query SPARQL che preleva dal SIB le informazioni necessarie per poi inserirle in una nuova istanza di Entity la quale viene restituita all'utente.
 
-	\item \textbf{Scrittura} Le operazioni di scrittura ricavano una lista di triple RDF a partire da un istanza di Entity. La lista di triple viene poi convertita in una \code{SPARQL} insert al fine di ridurre i dati inviati al SIB. L'operazione di conversione è eseguita da una funzione di della  classe \code{SibUtil}. Questa tecnica si rivela particolarmente utile quando si utilizza la libreria da un dispositivo mobile connesso a internet tramite rete cellulare (es: EDGE, GPRS, HSDPA ecc\dots). Da notare che tutte le Entity possiedono un campo \code{URI} che viene valorizzato nell'operazione di inserzione con l'URI assegnato all'istanza che si sta per scrivere sul SIB. 
+	\item \textbf{Scrittura} Le operazioni di scrittura ricavano una lista di triple RDF a partire da un istanza di Entity. La lista di triple viene poi convertita in una \emph{SPARQL insert} per ridurre i dati inviati al SIB. L'operazione di conversione è eseguita da una funzione della classe \code{SibUtil}. Questa tecnica si rivela particolarmente utile quando si usa la libreria da un dispositivo mobile connesso a internet tramite rete cellulare (es: EDGE, GPRS, HSDPA ecc\dots). Si noti che tutte le Entity possiedono un campo \code{URI} che viene valorizzato nell'operazione di inserzione con l'URI assegnato all'istanza che si sta per scrivere sul SIB. 
 
-	\item \textbf{Aggiornamento} Le operazioni di aggiornamento ricavano i dati aggiornati tramite una query \code{SPARQL} che andranno a sostituire quelli obsoleti all'intenro di un istanza di Entity
+	\item \textbf{Aggiornamento} Le operazioni di aggiornamento ricavano i dati aggiornati tramite una query SPARQL e andranno a sostituire quelli obsoleti all'interno di un istanza di Entity
 
-	\item \textbf{Rimozione} Le operazioni di rimozione lato \emph{City Service} sono eseguite direttamente tramite \code{SPARQL} delete. Mentre le operazioni di rimozione all'esterno (es. applicazione mobile), per motivi di sicurezza, sono eseguite tramite richiesta al servizio cittadino il quale si occupa di effettuare la rimozione vera e propria.
+	\item \textbf{Rimozione} Le operazioni di rimozione lato \emph{City Service} sono eseguite direttamente tramite \emph{SPARQL delete}. Le operazioni di rimozione all'esterno (es. applicazione mobile) per motivi di sicurezza sono invece eseguite tramite richiesta al servizio cittadino il quale si occupa di effettuare la rimozione vera e propria.
 \end{description}
 
 

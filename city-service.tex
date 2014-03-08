@@ -1,65 +1,62 @@
 \chapter{Servizio Cittadino}
 
-Il servizio cittadino (\emph{City Service}) è il cuore dell'architettura software e, al fine di supportare le interazioni tra gli EV e la Smart Grid. Lo scambio di informazioni avviene tramite un SIB cittadino e la struttura dei messaggi è definita all'interno dell'Ontologia. 
+Il servizio cittadino (\emph{City Service} o CS) è il cuore dell'architettura software e supporta le interazioni tra gli EV e la Smart Grid. Lo scambio di informazioni avviene tramite il \emph{City SIB} con la struttura dei messaggi definita all'interno dell'Ontologia. 
 
 \section{Architettura}
 
-Il principio di base con cui ho progettato il \emph{City Service} è la modularità e riusabilità. Ho quindi creato una libreria, \code{ioe_lib}, condivisa tra il servizio cittadino e l'applicazione mobile. Essa fornisce i servizi di base di accesso al \emph{SIB}, nonchè un approccio \emph{Object Oriented} ai dati in essa contenuti. Ho infatti implementato, per ogni classe presente nell'ontologia, una corrispettiva classe Entity Java e un \code{Controller} che incapsula la logica di lettura scrittura e aggiornamento dei dati nella \emph{SIB}. Questa scelta progettuale si rifà ai principi di Ingegneria del Software \emph{High Cohesion} e \emph{Low Coupling} \cite{larcab2005}
+Il CS era già stato implementato da Federico Montori nel progetto precedente. Ho deciso di riscriverlo puntando ad una maggiore modularità e riusabilità. Ho quindi creato libreria di cui ho già trattato in Sez. \ref{subsec:ioe-lib} condivisa tra il servizio cittadino e l'applicazione mobile. La libreria fornisce i servizi di base per l'accesso al SIB con un approccio \emph{Object Oriented} ai dati in essa contenuti. Questa scelta progettuale si rifà ai principi di Ingegneria del Software \emph{High Cohesion} e \emph{Low Coupling} \cite{larcab2005}
 
 \section{La comunicazione con il City Service}\label{sec:protocol}
 
-In questa sezione analizzeremo in dettaglio come avviene la comunicazione da e verso il servizio cittadino. Per ogni operazione esiste un protocollo basato su scambi di messaggi la quale struttura è definita attraverso classi dell'ontologia. Attualmente le uniche operazioni supportate sono la richiesta di prenotazione e la richiesta di ritiro di prenotazione.
+In questa sezione si analizzano in dettaglio le modalità di comunicazione da e verso il servizio cittadino. Per ogni operazione esiste un protocollo basato su scambio di messaggi la cui struttura è definita mediante classi dell'ontologia. Attualmente le uniche operazioni supportate sono la richiesta di prenotazione e la richiesta di ritiro di prenotazione.
 
-Lo scambio dei messaggi è implementato tramite il meccanismo delle \code{Subscription} messo a disposizione dal SIB. Questo comporta che i messaggi vengono scritti sul \emph{SIB} cittadino il quale manda una notifica al \emph{KP} che era sottoscritto a quella particolare modifica. Questo rende il protocollo di comunicazione asincrono.
-
+Lo scambio dei messaggi è implementato tramite il meccanismo delle Subscription messo a disposizione dal SIB. Questo comporta che i messaggi si scrivano sul SIB cittadino che manda una notifica al KP sottoscritto a quella particolare modifica. Ne consegue un protocollo di comunicazione asincrono.
 
 \subsection{Protocollo di richiesta di prenotazione}
 
-Qui verranno descritti tutti i passaggi necessari al completamento del protocollo di Richiesta di Prenotazione, in particolare quali messaggi vengono scambiati. Il fine della Prenotazione è avere la certezza che quando andremo a caricarci troveremo l'EVSE libero. Come già detto in precedenza, i tempi di ricarica per i veicoli elettrici possono essere molto lunghi. È quindi necessario dare all'utente la sicurezza che potrà ricaricare il suo veicolo senza il rischio di terminare la batteria.
+Descriverò i passaggi necessari al completamento del protocollo di richiesta di prenotazione con particolare attenzione ai messaggi vengono scambiati. Il fine della prenotazione è la certezza di trovare l'EVSE libero quando andremo a caricarci. Come già detto in precedenza, i tempi di ricarica per i veicoli elettrici possono essere molto lunghi. È quindi necessario dare all'utente la certezza che potrà ricaricare il suo veicolo senza il rischio di terminare la carica della batteria.
 
 \begin{enumerate}[label=\textbf{\arabic*}]
-	\item \textbf{Richiesta di Prenotazione}: Quando l'utente necessita di fare una ricarica inserisce una richiesta nel SIB. La richiesta è descritta dalla classe dell'ontologia \code{ioe:ChargeRequest}.
-	\item \textbf{Risposta da parte del City Service}: Il servizio cittadino è sottoscritto all'inserimento di nuove istanze di \code{ioe:ChargeRequest}. Quindi, quando viene inserita la richiesta, arriva una notifica che ne contiene l'URI dal quale si possono ricavare tutti i parametri che la compongono. A questo punto viene creata una lista di opzioni di ricarica conformi alla richiesta dell'utente compatibilmente con la disponibilità degli EVSE. Le opzioni di ricarica sono classi di tipo \code{ioe:ChargeOption} e vengono inserite dentro a una classe di tipo \code{ioe:ChargeResponse}.
-	\item \label{item:confirmByUser} \textbf{Conferma da parte dell'utente}: L'utente che è sottoscritto all'inserimento di nuove istanze della classe  \code{ioe:ChargeResponse} viene notificato quando il \emph{City Service} inserisce la risposta. Le opzioni di ricarica vengono analizzate dall'utente il quale sceglie quella che più si addice alle sue esigenze. La scelta viene notificata al sistema tramite inserimento di una tripla così formata: \code{[ioe:chargeOptURI ioe:confirmByUser "true"]} presupponendo che \code{ioe:chargeOptURI} sia un istanza di \code{ioe:ChargeOption}.
-	\item \textbf{Conferma da parte del City Service)}: Il servizio cittadino è iscritto all'inserimento di triple che come predicato hanno \code{ioe:confirmByUser} e quindi verifica se l'opzione selezionata è ancora disponibile in tal caso inserisce una tripla siffatta:
-	\\ \code{[ioe:chargeOptURI ioe:confirmBySystem "true"]}. 
-	\item \textbf{Acknowledgment da parte dell'utente}: L'utente riceve la notifica della conferma da parte di \emph{City Service}. Se l'opzione è confermata allora invia una tripla di Acknowledgment \code{[ioe:userURI ioe:ackByUser "true"]}. Altrimenti può provare con un altra opzione e il protocollo riprende dal punto ~\ref{item:confirmByUser}
-	\item \textbf{Creazione Prenotazione}: Quando il \emph{City Service} riceve l'acknowledgment dall'utente "blocca" l'EVSE nella finestra di tempo richiesta creando un istanza della classe {ioe:Reservation}. Inoltre cancella dal SIB tutte le triple necessarie allo svolgimento del protocollo che  , una volta terminato, diventano inutili.
+	\item \textbf{Richiesta di Prenotazione}: quando l'utente necessita di fare una ricarica inserisce una richiesta nel SIB. La richiesta è descritta dalla classe dell'ontologia \code{ioe:ChargeRequest}.
+	\item \textbf{Risposta da parte del City Service}: il servizio cittadino è sottoscritto all'inserimento di nuove istanze di \code{ioe:ChargeRequest}. Quindi quando si inserisce la richiesta, il CS riceve una notifica che ne contiene l'URI dal quale può ricavare i parametri che la compongono. A questo punto viene creata una lista di opzioni di ricarica conformi alla richiesta dell'utente compatibilmente con la disponibilità degli EVSE. Le opzioni di ricarica sono classi di tipo \code{ioe:ChargeOption} e vengono inserite dentro a una classe di tipo \code{ioe:ChargeResponse}.
+	\item \label{item:confirmByUser} \textbf{Conferma da parte dell'utente}: L'utente che è sottoscritto all'inserimento di nuove istanze della classe \code{ioe:ChargeResponse} viene avvisato dal SIB quando il CS inserisce la risposta. Le opzioni di ricarica vengono analizzate dall'utente che sceglierà quella più consona alle sue esigenze. La scelta viene notificata al sistema tramite inserimento di una tripla così formata: \code{[ioe:chargeOptURI ioe:confirmByUser "true"]} presupponendo che \code{ioe:chargeOptURI} sia un istanza di \\ \code{ioe:ChargeOption}.
+	\item \textbf{Conferma da parte del City Service}: Il servizio cittadino, iscritto all'inserimento di triple aventi come predicato \code{ioe:confirmByUser}, verifica se l'opzione selezionata è ancora disponibile e in tal caso inserisce la tripla:\code{[ioe:chargeOptURI ioe:confirmBySystem "true"]}. 
+	\item \textbf{Acknowledgment da parte dell'utente}: L'utente riceve la notifica della conferma da parte di CS. Se l'opzione è confermata il CS invia una tripla di Acknowledgment \code{[ioe:userURI ioe:ackByUser "true"]}. Altrimenti può provare con un altra opzione e il protocollo riprende dal punto ~\ref{item:confirmByUser}.
+	\item \textbf{Creazione Prenotazione}: Il CS, ricevuto l'acknowledgment dall'utente, ``blocca'' l'EVSE nella finestra di tempo richiesta creando un istanza della classe \code{ioe:Reservation}. Inoltre cancella dal SIB tutte le triple necessarie allo svolgimento del protocollo che, una volta terminato, diventano inutili.
 \end{enumerate}
 
 \section{Il Protocollo di rimozione di una prenotazione}
 
-Una volta completata la procedura di prenotazione l'EVSE è diventa inagibile nell'orario richiesto dall'utente. Nel caso in cui un utente voglia ritirare la prenotazione deve mandare una richiesta al \emph{City Service}. Attualmente il servizio cittadino rimuove semplicemente dal SIB i dati relativi alla prenotazione rendendo nuovamente disponibile la ricarica. In futuro il servizio potrà stabilire, in base a regole dettate dai gestori della rete elettrica, se accettare o meno la richiesta ed eventualmente accreditare una penale all'utente.
+Una volta completata la procedura di prenotazione l'EVSE diventa inagibile nella finestra di tempo richiesta dall'utente. Per ritirare la prenotazione l'utente deve inviare una richiesta al CS. Attualmente il servizio cittadino rimuove semplicemente dal SIB i dati relativi alla prenotazione rendendo nuovamente disponibile la ricarica. In futuro il servizio potrà stabilire, in base a regole dettate dai gestori della rete elettrica, se accettare o meno la richiesta ed eventualmente accreditare una penale all'utente.
 
-Il Protocollo si basa su cambio di messaggi proprio come nel caso precedente.
+Come nel caso precedente il protocollo si basa su cambio di messaggi.
 
 \begin{enumerate}
-	\item \textbf{Richiesta ritiro Prenotazione}: L'utente inserisce nel SIB cittadino un istanza della classe \code{ioe:ReservationRetire} 
-	\item \textbf{Ritiro della Prenotazione}: Il \emph{City Service}, che ovviamente era sottoscritto alla creazione di nuove istanze di \code{ioe:ReservationRetire}, provvede a rimuovere dal SIB le triple relative alla Prenotazione.
-	\item \textbf{Notifica avvenuta cancellazione}: Attualmente l'utente come unico modo per sapere dell'avvenuta cancellazione deve sottoscriversi ai cambiamenti dell'URI della Prenotazione che sta cancellando.
+	\item \textbf{Richiesta ritiro Prenotazione}: l'utente inserisce nel SIB cittadino un istanza della classe \code{ioe:ReservationRetire} 
+	\item \textbf{Ritiro della Prenotazione}: il CS, ovviamente era sottoscritto alla creazione di nuove istanze di \code{ioe:ReservationRetire}, provvede a rimuovere dal SIB le triple relative alla Prenotazione.
+	\item \textbf{Notifica avvenuta cancellazione}: attualmente l'utente per accertarsi dell'avvenuta cancellazione deve sottoscriversi ai cambiamenti relativi all'URI della prenotazione che sta cancellando.
 \end{enumerate}
 
 \section{Implementazione}\label{sec:impl}
 
-In questa sezione discuteremo i dettagli implementativi del \emph{City Service}, dalle tecnologie usate alle scelte Architetturali. Principalmente il serbizio cittadino deve essere altamente performante in quanto, una vota a regime, dovrebbe poter soddisfare le richieste di centinaia di utenti se non migliaia. Contemporaneamente bisogna preoccuparsi del fatto che l'alto parallelismo non intacchi l'integrità dei dati residenti sul SIB cittadino evitando, ad esempio, che due persone che fanno una prenotazione nello stesso momento, nello stesso EVSE, alla stessa ora non riescano entrambe a completare la procedura di prenotazione. 
+In questa sezione discuteremo i dettagli implementativi del \emph{City Service}, dalle tecnologie usate alle scelte architetturali. Principalmente il servizio cittadino deve essere altamente performante in quanto, una vota a regime, deve essere in grado di soddisfare le richieste di centinaia se non migliaia di utenti. Contemporaneamente bisogna controllare che l'elevato parallelismo di thread gestiti dal CS non intacchi l'integrità dei dati residenti sul SIB cittadino per evitare ad esempio che due persone che prenotano nello stesso momento e nello stesso EVSE riescano entrambe a completare la procedura di prenotazione. 
 
-Il servizio è scritto interamente in Java il che lo rende multi piattaforma, facile da debuggare, e sopratutto permette di usare utilità estremamente versatili riguardanti il multi-threading messe a disposizione dal linguaggio. Inoltre permette di accedere alla moltitudine di librerie scritte per questo linguaggio per i più disparati propositi. Tra queste troviamo (log4j), un robusto quanto versatile sistema di logging, che permette di tenere costantemente sotto controllo l'esecuzione del servizio con vari gradi di granularità del log.
+Il servizio è scritto interamente in Java. Questo lo rende multi piattaforma, facile da \emph{debuggare} e sopratutto consente l'uso di utilità estremamente versatili riguardo al multi-threading rese disponibili dal linguaggio. Inoltre permette di accedere alla moltitudine di librerie scritte per le più disparate necessità. Tra queste troviamo \emph{log4j}, un robusto quanto versatile sistema di logging che permette di tenere costantemente sotto controllo l'esecuzione del servizio con vari gradi di granularità del log.
 
-Al fine di rendere il servizio più performante possibile sono state adottate tecniche di programmazione quali: pool di oggetti, pool di thread, e caching delle risorse.
-
+Per rendere il servizio più performante possibile si sono adottate tecniche di programmazione quali: pool di oggetti, pool di thread, e caching delle risorse.
 
 \subsection{Pool Di Oggetti}
 
-Per effettuare le connessioni al SIB cittadino è necessario istanziare oggetti di tipo \code{KpConnector}, inoltre, per effettuare il parsing delle risposte alle sottoscrizioni sono necessari oggetti di tipo \code{SSAP_XMLTools} che sono forniti dalla libreria \code{JavaKPI}. Come è stato detto nella sezione ~\ref{sec:impl} il \emph{City Service} deve supportare connessioni multiple simultanee, ognuna delle quali dialoga con il SIB. Dal momento che la libreria {JavaKPI} non è thread-safe e nemmeno il wrapper che ho creato io lo è, è necessario istanziare un oggetto \code{KpConnector} per ogni connessione insieme a uno di tipo \code{SSAP_XMLTools} per parsare i risultati delle sottoscrizioni.
+Per effettuare le connessioni al SIB cittadino è necessario istanziare oggetti di tipo \code{KpConnector}. Inoltre per effettuare il parsing delle risposte alle sottoscrizioni sono necessari oggetti di tipo \code{SSAP_XMLTools} forniti dalla libreria JavaKPI. Come anticipato nella Sez. \ref{sec:impl} il CS deve supportare connessioni multiple simultanee, ognuna delle quali dialogante con il SIB. Dal momento che ne la libreria JavaKPI ne wrapper da me creato sono thread-safe, è necessario istanziare un oggetto \code{KpConnector} per ogni connessione insieme a uno di tipo \code{SSAP_XMLTools} per \emph{parsare} i risultati delle sottoscrizioni.
 
-Per evitare che all'avvio di ogni connessione venisse creato un oggetto \code{KpConnector}, che comunque è un oggetto "pesante", ho deciso di usare la tecnica dei pool di oggetti. La tecnica consiste nel creare un numero sufficienti di oggetti all'inizio dell'applicazione e quando si necessita di usarne uno lo si chiede al pool il quale lo fornisce al tempo di una chiamata a metodo. Una volta terminato di utilizzare l'oggetto lo si restituisce al pool il quale poi potrà a sua volta cederlo ad un altro richiedente.
-In questo modo si evita che ogni volta che viene fatta una richiesta al \emph{City Service} ci sia il delay necessario a instanziare una connessione con il SIB.
+Per evitare che all'avvio di ogni connessione venisse creato un oggetto \code{KpConnector}, operazione assai onerosa, ho optato per la tecnica dei pool di oggetti. Questa consiste nel creare un numero sufficiente di istanziare oggetti all'inizio dell'applicazione e quando ne serve uno lo si chiede al pool che lo fornisce nel tempo di una \emph{chiamata a metodo}. Terminato l'uso dell'oggetto lo si restituisce al pool che lo renderà disponibile ad un altro richiedente.
+Cosi si evita il delay necessario a instanziare una connessione con il SIB ogni volta che si esegue una richiesta al CS.
 
-C'è da dire che vista le ottimizzazioni delle moderne \emph{Java Virtual Machine} e del \emph{Garbage Collector} per quanto riguarda gli oggetti con breve durata questa tecnica può rischiare di abbassare le performance anziché aumentarle \cite{torok2011}. Rimane comunque vantaggiosa nel caso di oggetti la quale creazione può essere abbastanza onerosa come per le connessioni ai database o alla rete.
+Aggiungo che, viste le ottimizzazioni delle moderne \emph{Java Virtual Machine} e dei \emph{Garbage Collector} per quanto riguarda gli oggetti con breve durata, questa tecnica può rischiare di abbassare le performance anziché aumentarle \cite{torok2011}. Resta comunque vantaggiosa nel caso di oggetti la cui creazione potrebbe risultare abbastanza onerosa come nel caso delle connessioni ai database o alla rete.
 
-Il cuore di questo sistema è la classe \code{ObjectPool<T>} (\cite{objectpool}) che troviamo nel package \code{it.unibo.cityservice.pool} che rappresenta un pool di oggeti di tipo \code{T}. Questa classe contiene un metodo astratto \code{createObject()} che va implementato nelle sottoclassi mettendoci dentro la logica di creazione dell'oggetto di cui volgiamo creare il pool.
+Il cuore di questo sistema è la classe \code{ObjectPool<T>} (\cite{objectpool}) che troviamo nel package \code{it.unibo.cityservice.pool} che rappresenta un pool di oggeti di tipo \code{T}. Questa classe contiene un metodo astratto, \code{createObject()}, che va implementato nelle sottoclassi con la logica di creazione dell'oggetto di cui vogliamo creare il pool.
 
-Nel mio caso ho creato \code{XmlToolsPool} e \code{CitySibPool} e a titolo esemplificativo mostrerò l'implementazione del primo:
+Nel mio caso ho creato \code{XmlToolsPool} e \code{CitySibPool} e a titolo esemplificativo mostrerò l'implementazione del primo nel Lst. \ref{lst:objectPool}:
 
 \begin{java}[caption={Implementazione di ObjectPool},label={lst:objectPool}]
 public class XmlToolsPool extends ObjectPool<SSAP_XMLTools>{
@@ -76,11 +73,11 @@ public class XmlToolsPool extends ObjectPool<SSAP_XMLTools>{
 \end{java}
 
 \noindent
-Come si può vedere è molto semplice creare un pool per un determinato tipo di dato. Una volta creato il pool, per interagire con esso, si usano i seguenti metodi:
+Evidenzio la semplicità di creazione di un pool per un determinato tipo di dato. Creato il pool, per interagire con esso, si usano i seguenti metodi:
 
 \begin{itemize}
-	\item \code{public T borrowObject()}: che preleva un oggetto dal pool.
-	\item \code{public void returnObject(T object)}: che restituisce un oggetto al pool.
+	\item \code{public T borrowObject()}: preleva un oggetto dal pool.
+	\item \code{public void returnObject(T object)}: restituisce un oggetto al pool.
 \end{itemize}
 
 \subsection{Pool Di Thread}

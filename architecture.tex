@@ -15,7 +15,7 @@ La piattaforma implementa il disaccoppiamento tra produttori e consumatori di in
 
 Il Semantic Web è un framework sviluppato dal World Wide Web Consortium per consentire la condivisione e il riutilizzo dei dati attraverso  applicazioni, aziende e comunità eterogenee.
 
-La figura ~\ref{fig:smart-m3} mostra il funzionamento dell'architettura M3. Il ``legacy gate'' è un interfaccia con il mondo esterno e possono coesisterne molteplici istanze in un architettura M3.
+La figura \ref{fig:smart-m3} mostra il funzionamento dell'architettura M3. Il ``legacy gate'' è un interfaccia con il mondo esterno e possono coesisterne molteplici istanze in un architettura M3.
 
 \begin{figure}[H]
 	\centering
@@ -28,13 +28,13 @@ La figura ~\ref{fig:smart-m3} mostra il funzionamento dell'architettura M3. Il `
 
 Il \emph{Semantic Information Broker} (SIB) è l'entità responsabile della conservazione e della gestione delle informazioni condivise nell'architettura M3. Gli agenti Software che si scambiano le informazioni vengono chiamati \emph{Knowledge Processors} (KP). L'accesso alla SIB da parte dei KP avviene attraverso lo \emph{Smart Space Access Protocol}  (SSAP) basato su messaggi XML scambiati attraverso socket TCP/IP. Vengono fornite API che implementano il protocollo SSAP in diversi linguaggi.
 
-Il SIB è un architettura a 5 livelli (\cite{smart2010}) come mostrato in figura ~\ref{fig:sib-architecture}:
+Il SIB è un architettura a 5 livelli (\cite{smart2010}) come mostrato in figura \ref{fig:sib-architecture}:
 
 \begin{enumerate}
 	\item \textbf{Transport}: Gestisce una o più comunicazioni di rete a livello di trasporto, permettendo al SIB di comunicare con diverse reti e architetture. Il livello di trasporto è collegato a quello sottostante tramite il DBus, rendendo possibile l'aggiunta e la rimozione di connettori a runtime.
 	\item \label{enum:handling}\textbf{Operation Handling}: Gestisce le diverse operazioni del protocollo SSAP ognuna delle quali viene eseguita in un thread dedicato. Malgrado l'uso intensivo di thread possa degradare le performance,  è stata ritenuta determinante la chiarezza di codice che ne consegue.
-	\item \label{enum:graph}\textbf{Graph Operations}: Gestisce le operazioni di inserimento, rimozione e query dal database RDF come richiesto dal livello ~\ref{enum:handling}. Viene eseguito all'interno di un singolo thread che schedula ed esegue le richieste provenienti dai thread che gestiscono le operazioni SSAP la cui comunicazione avviene tramite code asincrone.
-	\item \textbf{Triple Operations}: Gestisce le operazioni SPARQL, WQL e le query basate su pattern-matching di triple RDF. Attualmente è implementato tramite Piglet, un database RDF che si appoggia ad SQL lite per la persistenza delle informazioni. Lo strato può essere tranquillamente cambiato a patto che si scriva il codice necessario ad interfacciare le operazioni a livello di grafo (~\ref{enum:graph}) con l'interfaccia fornita dal nuovo store RDF.
+	\item \label{enum:graph}\textbf{Graph Operations}: Gestisce le operazioni di inserimento, rimozione e query dal database RDF come richiesto dal livello \ref{enum:handling}. Viene eseguito all'interno di un singolo thread che schedula ed esegue le richieste provenienti dai thread che gestiscono le operazioni SSAP la cui comunicazione avviene tramite code asincrone.
+	\item \textbf{Triple Operations}: Gestisce le operazioni SPARQL, WQL e le query basate su pattern-matching di triple RDF. Attualmente è implementato tramite Piglet, un database RDF che si appoggia ad SQL lite per la persistenza delle informazioni. Lo strato può essere tranquillamente cambiato a patto che si scriva il codice necessario ad interfacciare le operazioni a livello di grafo (\ref{enum:graph}) con l'interfaccia fornita dal nuovo store RDF.
 	\item \textbf{Persistent storage}: Assicura la persistenza dei dati.
 \end{enumerate}
 
@@ -42,7 +42,7 @@ Il SIB è un architettura a 5 livelli (\cite{smart2010}) come mostrato in figura
 
 I Knowledge Processor (KP) sono le parti attive dell'architettura Smart-M3. Un KP interagisce con il SIB non direttamente tramite il protocollo SSAP ma tramite le Knowledge Processor Interface (KPI) ovvero le librerie che lo implementano. Queste possono trovarsi a qualunque livello di astrazione ed essere scritte in qualunque linguaggio. Le funzioni messe a disposizione dal KPI in genere sono speculari alle operazioni del protocollo SSAP.
 
-I KP sono le entità che forniscono, modificano e richiedono le informazioni le informazioni contenute nello smart-space. L'architettura dei KP è mostrata in figura ~\ref{fig:kp-architecture}.
+I KP sono le entità che forniscono, modificano e richiedono le informazioni le informazioni contenute nello smart-space. L'architettura dei KP è mostrata in figura \ref{fig:kp-architecture}.
 
 \begin{figure}[H]
         \centering
@@ -69,7 +69,7 @@ Mentre RDF fornisce il modello di dati standard per la rappresentazione delle in
 
 \subsection{Sottoscrizioni}
 
-Un aspetto fondamentale di questa tecnologia è il meccanismo delle sottoscrizioni grazie al quale è possibile ricevere notifiche al variare di set di triple. Le sottoscrizioni sono determinanti nella nostra architettura perché, come vedremo più avanti (Sez. ~\ref{sec:protocol}), sono alla base dei protocolli di scambio dati tra i componenti del sistema.
+Un aspetto fondamentale di questa tecnologia è il meccanismo delle sottoscrizioni grazie al quale è possibile ricevere notifiche al variare di set di triple. Le sottoscrizioni sono determinanti nella nostra architettura perché, come vedremo più avanti (Sez. \ref{sec:protocol}), sono alla base dei protocolli di scambio dati tra i componenti del sistema.
 
 \subsection{SPARQL}
 
@@ -132,7 +132,7 @@ Una classe può essere sottoclasse di un'altra classe, ereditando le caratterist
 
 Nel modello di dati utilizzato in questo progetto si è cercato di tenere disaccoppiato il concetto di dato dalle altre entità fisiche. Ne consegue che tutte le entità fisiche sono sottoclassi dirette di \code{owl:Thing}, mentre le classi destinate a rappresentare i dati sono sottoclassi di \code{ioe:Data} che a sua volta è sottoclasse di \code{owl:Thing}.
 
-Nel resto di questo documento userò il prefisso \code{ioe:} come abbreviazione di \emph{http://www.m3.com/2012/05/m3/ioe-ontology.owl\#} il namespace scelto per l'ontologia. In generale userò questo prefisso per distinguere le classi dell'ontologia dalle classi Java che come vedremo nella sezione ~\ref{subsec:ioe-lib} hanno lo stesso nome essendo mapping diretto di quest'ultime.
+Nel resto di questo documento userò il prefisso \code{ioe:} come abbreviazione di \emph{http://www.m3.com/2012/05/m3/ioe-ontology.owl\#} il namespace scelto per l'ontologia. In generale userò questo prefisso per distinguere le classi dell'ontologia dalle classi Java che come vedremo nella sezione \ref{subsec:ioe-lib} hanno lo stesso nome essendo mapping diretto di quest'ultime.
 
 \subsection{Sottoclassi di owl:Thing}\label{subsec:thing}
 
@@ -140,105 +140,99 @@ Come già accennato tutte le entità fisiche del nostro modello ontologico sono 
 
 \begin{description}
 	\item \code{ioe:Person}: rappresenta il concetto di persona. Ad ogni persona possono essere associati diversi veicoli (\code{ioe:Vehicle}), diverse richieste di ricarica (\code{ioe:Reservation}) nonché la storia delle ricariche effettuate (\code{ioe:Recharge}). Il concetto di persona viene usato ai fini dell'autenticazione e in un futuro potrà essere determinante ai fini della fatturazione che il provider energetico eseguirà a fronte delle ricariche.
-	\item \code{ioe:Vehicle}: rappresenta il concetto di Veicolo Elettrico. Poiché i veicoli NON elettrici sono irrilevanti al fine di questa trattazione è stata usata direttamente questa classe allo scopo. Ad ogni veicolo sono ovviamente associati i dati della batteria (\code{ioe:BatteryData}) che verranno trattati nella sezione relativa alle sottoclassi di \code{ioe:Data} (~\ref{subsec:ioe-data});
-	\item \code{ioe:Zone}: Rappresenta l'area di copertura del \emph{City Service}. Essa è definita da un rettangolo formato dall'angolo nord-ovest e dall'angolo sud-est. 
-	\item \code{ioe:GridConnectionPoint}: Il \emph{Grid Connection Pointer} (\code{ioe:GCP}) è la stazione di ricarica. Esso contiene almeno un EVSE che invece rappresenta la colonnina dove ci si ricarica effettivamente. Il rapporto tra un GCP e gli EVSE è lo stesso che intercorre tra una stazione di rifornimento e le pompe di benzina. 
-	\item \code{ioe:EVSE}: Il \emph{Electrical Vehicle Supply Equipment} è il punto in cui il veicolo si connette alla rete elettrica. Una volta connesso può sia ricaricare la sua batteria che cedere energia alla smart-grid. Un EVSE ha diversi connettori (\code{ioe:Connector}) per adattarsi ai vari tipi di presa posseduti dai veicoli elettrici. Inoltre, ogni EVSE, ha una lista di prenotazioni associate.
-	\item \code{ioe:ChargeProfile}: È l'insieme dei parametri che caratterizzano il profilo energetico di un EVSE in un determinato istante. I parametri attualmente sono: potenza, orario di validità del profilo stesso e prezzo per unità di energia (in genere 1 kWh). Ovviamente può essere attivo un solo \code{ioe:ChargeProfile} alla volta e il variare di quest'ultimi può essere determinato da fasce orarie proprio come avviene per l'energia elettrica casalinga.
-	\item \code{ioe:Connector}: È il connettore di ricarica ovvero il punto i contatto tra l'EVSE e l'EV. Ogni EVSE può avere diversi connettori al fine di poter essere compatibile con il maggior numero di veicoli possibile. Malgrado negli usa si stia cercando di introdurre uno standard a riguardo ormai esistono diversi tipi di connettori. 
-	\item \code{ioe:ChargeRequest}: Richiesta di ricarica. Viene istanziata quando un utente necessita di creare una prenotazione e al suo interno sono contenuti tutti i parametri necessari a descriverla. Fa parte del protocollo di richiesta di prenotazione discusso nella sezione ~\ref{sec:protocol}. Mentre un approfondimento sulla sua struttura è trattato nella sezione ~\ref{subsubsec:chargerequest}.
-	\item \code{ioe:ChargeResponse}: È la risposta fornita dal servizio cittadino a seguito della richiesta di prenotazione. Al suo interno contiene un riferimento alla richiesta (\code{ioe:ChargeRequest}) da cui è stata generata e una lista di opzioni di ricarica che aderiscono alla richiesta dell'utente (\code{ioe:ChargeOption}).
-	\item \code{ioe:ChargeOption}: Fa parte della risposta(\code{ioe:ChargeResponse}) che il servizio cittadino da all'utente in seguito a una richiesta di prenotazione (\code{ioe:ChargeRequest}). Contiene i parametri di ricarica come EVSE, orario e prezzo. 
-	\item \code{ioe:Currency}: Rappresenta una valuta relativa a un prezzo. Alcune sue istanze sono state inserte direttamente nell'ontologia (\code{ioe:Euro}, \code{ioe:Dollar} ecc..);
-	\item \code{ioe:Reservation}: Se il protocollo di richiesta di prenotazione va a buon fine verrà creata un istanza di questa classe che indica che l'EVSE a cui è associata è occupato per un determinato periodo di tempo. 
-	\item \code{ioe:ReservationList}: Lista di prenotazioni associate ad un EVSE. Ogni EVSE può avere un unica lista di prenotazioni associata.
-	\item \code{ioe:ReservationRetire}: Classe che denota la volontà dell'utente di ritirare una prenotazione.
-	\item \code{ioe:Recharge}: Quando un utente, in seguito a una prenotazione, termina di ricaricarsi, inserita questa entità ad esso associato. Denota l'avvenuta ricarica è può essere utile per tener traccia dell'attività dell'utente nonché per fare statistiche.
-	\item \code{ioe:UnityOfMeasure}: Rappresenta l'unità di misura per i dati del progetto. Deve esserne associata una ad ogni sottoclasse di \code{ioe:Data}. Attualmente sono hardcoded all'interno dell'ontologia (\code{ioe:Watt}, \code{ioe:Volt} ecc..) 	
-	\item \code{ioe:Data}: Questa classe rappresenta il concetto di dato misurabile e ogni sua sottoclasse sarà caratterizzata da un valore e da un unità di misura.
+	\item \code{ioe:Vehicle}: rappresenta il concetto di Veicolo Elettrico. I veicoli NON elettrici sono infatti irrilevanti al fine di questa trattazione. Ad ogni veicolo sono ovviamente associati i dati della batteria (\code{ioe:BatteryData}) che verranno trattati nella sezione relativa alle sottoclassi di \code{ioe:Data} (\ref{subsec:ioe-data});
+	\item \code{ioe:Zone}: rappresenta l'area di copertura del \emph{City Service}. È definita da un rettangolo individuato dagli angoli nord-ovest e sud-est. 
+	\item \code{ioe:GridConnectionPoint}: il \emph{Grid Connection Pointer} (\code{ioe:GCP}) è la stazione di ricarica. Contiene almeno un EVSE, rappresentazione della colonnina dove avviene la ricarica effettiva. Il rapporto tra un GCP e gli EVSE è lo stesso che intercorre tra una stazione di rifornimento e le pompe di benzina. 
+	\item \code{ioe:EVSE}: Il \emph{Electrical Vehicle Supply Equipment} è il punto in cui il veicolo si connette alla rete elettrica. Una volta connesso può sia ricaricare la sua batteria che cedere energia alla Grid. Un EVSE ha diversi connettori (\code{ioe:Connector}) per adattarsi ai vari tipi di presa in dotazione ai veicoli elettrici. Inoltre ogni EVSE dispone di una lista di prenotazioni associate.
+	\item \code{ioe:ChargeProfile}: è l'insieme dei parametri che caratterizzano il profilo energetico di un EVSE in un determinato istante. I parametri attualmente sono: potenza, orario di validità del profilo stesso e prezzo per unità di energia (in genere 1 kWh). Può essere attivo un solo \code{ioe:ChargeProfile} alla volta, variabile opzionalmente in base a fasce orarie analogamente a quanto avviene per l'energia elettrica casalinga.
+	\item \code{ioe:Connector}: è il connettore di ricarica ovvero il tramite tra l'EVSE e l'EV. Ogni EVSE può avere diversi connettori per la massima compatibilità col maggior numero di veicoli possibile. Malgrado negli USA si stia cercando di introdurre uno standard, esistono ormai diversi tipi di connettori. 
+	\item \code{ioe:ChargeRequest}: Richiesta di ricarica. Viene istanziata quando un utente deve creare una prenotazione. Al suo interno sono contenuti tutti i parametri necessari a descriverla. Fa parte del protocollo di richiesta di prenotazione discusso nella Sez. \ref{sec:protocol}. Un approfondimento sulla sua struttura è trattato nella Sez. \ref{subsubsec:chargerequest}.
+	\item \code{ioe:ChargeResponse}: è la risposta fornita dal servizio cittadino a seguito della richiesta di prenotazione. Al suo interno contiene un riferimento alla richiesta (\code{ioe:ChargeRequest}) da cui è stata generata e una lista di opzioni di ricarica conformi alla richiesta dell'utente (\code{ioe:ChargeOption}).
+	\item \code{ioe:ChargeOption}: Fa parte della risposta(\code{ioe:ChargeResponse}) che il servizio cittadino da all'utente in seguito a una richiesta di prenotazione (\code{ioe:ChargeRequest}). Contiene i parametri di ricarica quali EVSE, orario e prezzo. 
+	\item \code{ioe:Currency}: rappresenta la divisa monetaria relativa a un prezzo. Alcune sue istanze sono state inserite direttamente nell'ontologia (\code{ioe:Euro}, \code{ioe:Dollar} ecc..);
+	\item \code{ioe:Reservation}: viene creata un istanza di questa classe se il protocollo di richiesta di prenotazione va a buon fine. Indica che l'EVSE a cui è associata è impegnato per un certo lasso di tempo. 
+	\item \code{ioe:ReservationList}: lista di prenotazioni associate ad un EVSE. Ogni EVSE può avere un unica lista di prenotazioni associata.
+	\item \code{ioe:ReservationRetire}: classe che denota la volontà dell'utente di ritirare una prenotazione.
+	\item \code{ioe:Recharge}: quando un veicolo, in seguito a una prenotazione, termina di ricaricarsi, viene inserita questa entità ad esso associata. Sancisce l'avvenuta ricarica è può essere utile per tener traccia dell'attività dell'utente nonché per fare statistiche.
+	\item \code{ioe:UnityOfMeasure}: rappresenta l'unità di misura dei dati del progetto. Deve esserne associata una ad ogni sottoclasse di \code{ioe:Data}. Attualmente sono \emph{hardcoded} all'interno dell'ontologia (\code{ioe:Watt},\\ \code{ioe:Volt} ecc..) 	
+	\item \code{ioe:Data}: rappresenta il concetto di dato misurabile e ogni sua sottoclasse è caratterizzata da un valore e da un unità di misura.
 \end{description}
 
 \subsection{Sottoclassi di ioe:Data}\label{subsec:ioe-data}
 
-In questa sezione viene mostrata una lista di tutte le tipologie di dato utilizzate in questo progetto. Esse sono tutte sottoclassi di \code{ioe:Data} e sono caratterizzate da un valore e da unità di misura \code{ioe:UnityOfMeasure}. Le unità di misure che vengono elencate nel seguente elenco sono quelle utilizzate nell'ambito di questo progetto niente vieta di cambiarle.
+La sezione descrive la lista delle tipologie di dati usate nel progetto. Sono tutte sottoclassi di \code{ioe:Data} caratterizzate da un valore e da unità di misura \code{ioe:UnityOfMeasure}. Le unità di misura associate ai dai mostrati nel seguito sono quelle utilizzate nell'ambito di questo progetto ma nulla vieta di cambiarle.
 
 \begin{description}
-	\item \textbf{BatteryData}: In questa classe sono raggruppati tutti i dati relativi allo stato della batteria di un veicolo (ChargeData, VoltageData, PowerData, CurrentData, TempertureData)
-	\item \textbf{ChargeData}: Rappresenta la quantità di carica, l'unità di misurata usata è il kilowattora (kWh).
-	\item \textbf{VoltageData}: Rappresenta la tensione elettrica, l'unità di misurata usata è il volt (V).
-	\item \textbf{PowerData}: Rappresenta la potenza elettrica, l'unità di misurata usata è il kilowatt (kW). 
-	\item \textbf{CurrentData}: Rappresenta l'intensità di corrente, l'unità di misurata usata è l'ampere (A). Usato sia per indicare la corrente in uscita che quella in entrata, come ad esempio i cicli di carica e scarica della batteria.
-	\item \textbf{TempertureData}: Rappresenta la temperatura, l'unità di misurata usata è il grado celsius (\textcelsius). Attualmente non è considerato nei nostri modelli.
-	\item \textbf{LocationData}: Rappresenta i dati geografici dell'entità a cui si riferisce. In realtà non viene mai utilizzato ma viene usata direttamente la sua sottoclasse GPSData.
-	\item \textbf{GPSData}: Rappresenta le coordinate GPS ovvero latitudine e longitudine, l'unità di misura non 
-	\item \textbf{SpatialRangeData}: Rappresenta uno spazio geografico determinato da un punto GPS e un raggio intorno ad esso, l'unità di misurata usata è il metro (m).
-	\item \textbf{PriceData}: Rappresenta le informazioni relative a un prezzo ad esso è associata una valuta (sezione ~\ref{subsec:thing})
-	\item \textbf{TimeIntervalData}: Rappresenta un intervallo di tempo compreso tra due date. Originariamente veniva usato con le date nella forma gg/mm/aa, attualmente invece vengono indicati gli intervalli in millisecondi.
+	\item \code{ioe:BatteryData}: raggruppa i dati relativi allo stato della batteria di un veicolo (\code{ioe:ChargeData}, \code{ioe:VoltageData}, \code{ioe:PowerData}, \code{ioe:CurrentData}, \code{ioe:TempertureData})
+	\item \code{ioe:ChargeData}: rappresenta la quantità di carica misurata in Kilowattora (kWh).
+	\item \code{ioe:VoltageData}: rappresenta la tensione elettrica misurata in Volt (V).
+	\item \code{ioe:PowerData}: rappresenta la potenza elettrica misurata in Kilowatt (kW). 
+	\item \code{ioe:CurrentData}: rappresenta l'intensità di corrente misurata in Ampere (A). Indica sia la corrente in uscita che quella in entrata, come ad esempio i cicli di carica e scarica della batteria.
+	\item \code{ioe:TempertureData}: rappresenta la temperatura misurata in Gradi Celsius (\textcelsius). Attualmente non è considerata nei nostri modelli.
+	\item \code{ioe:LocationData}: rappresenta i dati geografici dell'entità a cui si riferisce (es: posizione del veicolo). In realtà nel progetto è sostituita dall'uso diretto della sua sottoclasse \code{ioe:GPSData}.
+	\item \code{ioe:GPSData}: rappresenta le coordinate GPS ovvero latitudine e longitudine misurate in Gradi Angolari.
+	\item \code{ioe:SpatialRangeData}: Rappresenta uno spazio geografico determinato da un punto GPS e da un raggio intorno ad esso. Si misura in Metri (m).
+	\item \code{ioe:PriceData}: Rappresenta le informazioni relative a un prezzo qui è associata una divisa monetaria (sezione \ref{subsec:thing})
+	\item \code{ioe:TimeIntervalData}: Rappresenta un intervallo che originariamente era compreso tra due date nella forma gg/mm/aaaa mentre attualmente si misura in Millisecondi (ms).
 \end{description}
 
 \subsection{Modifiche apportate all'ontologia}
 
-La versione dell'ontologia su cui ho iniziato a lavorare era la \emph{1.5.4} dalla quale sono seguiti 10 successivi rilasci fino ad arrivare alla versione attuale \emph{1.6.2}. Le modifiche più importanti sono state quelle relative al supporto di un nuovo protocollo di prenotazione delle ricariche, inoltre sono state operate operazioni di refactoring e di correzione di errori.
+La versione dell'ontologia su cui ho iniziato a lavorare era la 1.5.4 alla quale sono seguiti 10 successivi rilasci fino all'attuale release 1.6.2. Le modifiche più importanti hanno riguardato il supporto di un nuovo protocollo di prenotazione delle ricariche oltre a operazioni varie operazioni di refactoring e correzione di incongruenze.
 
 \subsubsection{Il concetto di Utente}\label{subsubsec:person}
 
 Inizialmente il concetto di utente non era previsto nell'ontologia in quanto non trovava nessuna applicazione pratica.
-L'entità che interagiva con la smart-grid era il veicolo e non l'utente. Questo approccio presenta i suoi limiti nel caso in cui un utente possieda più veicoli e voglia monitorare le ricariche effettuate o le prenotazioni pendenti con un unica soluzione. Inoltre, anche dal punto di vista dei fornitori di corrente elettrica, può essere utile avere una visione a livello di utente in modo da semplificare le operazioni di fatturazione. 
-Successivamente è stata introdotta la necessità di autenticare gli utenti al fine di poter cifrare le comunicazioni con l SIB. 
+L'entità che interagiva con la Grid era il veicolo e non l'utente. Questo approccio evidenzia i suoi limiti nel caso in cui un utente possieda più veicoli e voglia monitorarne contemporaneamente le ricariche effettuate o le prenotazioni pendenti. Inoltre anche dal punto di vista dei fornitori di corrente elettrica può essere utile una visione a livello di utente per semplificare le operazioni di fatturazione. Successivamente è stata introdotta la necessità di autenticare gli utenti per poter cifrare le comunicazioni con il SIB. 
 
-È stata quindi introdotta la classe \code{ioe:Person}. Seppur esistano già delle ontologie con delle classi che rappresentano questo concetto è stato ritenuto più semplice crearne uno nostro. Sviluppi futiri potrebbero legare questo concetto a uno già esistente in modo da rendere più semplice l'interoperabilità tra sistemi diversi. La classe presenta le seguenti proprietà:
+È stata quindi introdotta la classe \code{ioe:Person}. Seppur esistano già delle ontologie con classi che rappresentative di questo concetto, si è ritenuto più semplice crearne uno nostro. Sviluppi futuri potrebbero legare questo concetto ad uno già esistente per rendere più semplice l'interoperabilità tra sistemi diversi. La classe presenta le seguenti proprietà:
 
 \begin{itemize}
-	\item \code{ioe:hasName}: Nome e cognome dell'utente in formato stringa. Attualmente è irrilevante avere una separazione dei due. 
-	\item \code{ioe:hasUserIdentifier}: Codice che identifica univocamente l'utente.
-	\item \code{ioe:hasVehicle}: Questa proprietà associa a un utente uno o più veicoli.
+	\item \code{ioe:hasName}: Nome e Cognome dell'utente in formato stringa. Attualmente è irrilevante avere una separazione dei due. 
+	\item \code{ioe:hasUserIdentifier}: codice che identifica univocamente l'utente.
+	\item \code{ioe:hasVehicle}: proprietà associa a un utente uno o più veicoli.
 \end{itemize}
 
 \noindent
-Come si può vedere attualmente l'utente è modellato in modo molto primitivo, sono state infatti incluse solo le proprietà strettamente necessarie al nostro dominio di interesse. 
+Come si può vedere attualmente l'utente è modellato in modo molto primitivo. Sono state infatti incluse solo le proprietà strettamente necessarie al nostro ambito di interesse. 
 
 \subsubsection{Il concetto di Veicolo}\label{subsubsec:vehicle}
 
-Nel vecchio modello ontologico il concetto di veicolo, in quanto non essenziale, non veniva particolarmente enfatizzato. Nella ultime versioni dell'ontologia ho aggiunto alcune proprietà al veicolo per venire incontro all'esigenza di poter distinguere la provenienza dei veicoli stessi. Infatti i veicoli vengono inseriti nel SIB dal simulatore e possono anche essere reali come nel caso del Fiat Daily provato al CRF (App. ~\ref{app:crf}).
+Nel vecchio modello ontologico il concetto di veicolo, in quanto non essenziale, non veniva particolarmente enfatizzato. Nella ultime versioni dell'ontologia ho aggiunto al veicolo alcune proprietà per soddisfare all'esigenza di distinguere le diverse possibili provenienze dei veicoli. Infatti i veicoli vengono inseriti nel SIB dal simulatore e possono anche essere reali come nel caso del Fiat Daily provato al CRF (App. \ref{app:crf}).
 
 Il veicolo è attualmente definito dalle seguenti proprietà:
 
 \begin{itemize}
 	\item \code{ioe:hasManufacturer}: Casa automobilistica che produce il veicolo.
-	\item \code{ioe:hasModel}: Modello del veicolo.
-	\item \code{ioe:hasGPSData}: Questa proprietà punta ad un istanza di \code{ioe:GPSData} che a sua volta contiene le informazioni di latitudine e longitudine.
-	\item \code{ioe:hasBatteryData}: Questa proprietà punta ad un istanza di \code{ioe:BatteryData} che contiene tutti i dati della batteria.
-	\item \code{ioe:hasIdentificationData}: Identificativo del veicolo, attualmente non viene usato e per semplificazione al suo posto viene usata la proprietà \code{ioe:hasName}.
+	\item \code{ioe:hasModel}: mdello del veicolo.
+	\item \code{ioe:hasGPSData}: la proprietà punta ad un istanza di \code{ioe:GPSData} che a sua volta contiene le informazioni di latitudine e longitudine.
+	\item \code{ioe:hasBatteryData}: la proprietà punta ad un istanza di \\ \code{ioe:BatteryData} contenente i dati della batteria.
+	\item \code{ioe:hasIdentificationData}: identificativo del veicolo attualmente non utilizzato a favore della più semplice proprietà \code{ioe:hasName}.
 \end{itemize}
-
-Precedentemente 
-
 
 \subsubsection{Il concetto di Ricarica}
 
-Nella prime versioni dell'ontologia non esisteva nulla che indicasse il concetto di "ricarica avvenuta" molto utile al fine di far statistiche sia lato utente (es: quanto si è speso in un mese per ricaricare il veicolo) sia lato smart-grid (es: Quanta energia è stata erogata, quali sono stati gli introiti). Questo perché i tempi previsti dalla prenotazione possono differire sensibilmente da quelli reali, basti pensare a una persona che arriva in ritardo a ricaricarsi o lascia la colonnina in anticipo. 
+Nella prime versioni dell'ontologia non esisteva nulla che indicasse il concetto di ``ricarica avvenuta'', molto utile per le statistiche lato utente (es: quanto si è speso in un mese per ricaricare il veicolo) e lato Grid (es: quanta energia è stata erogata e quali sono stati gli introiti). Questo perché i tempi previsti dalla prenotazione possono differire sensibilmente da quelli reali: basti pensare a una persona che arriva in ritardo a ricaricare il veicolo o che lascia la colonnina in anticipo. 
 
-%\paragraph{Coordinamento con AICIA} È stato inoltre necessario dimostrare l'interoperabilità con un altro partner di IoE ovvero AICIA. Questo al fine di dimostrare il buon lavoro di partnership tra i membri di IoE 
-
-È stata quindi introdotta la classe \code{ioe:Recharge}, da notare che le proprietà di seguito elencate sono state accordate con un altro partner del progetto IoE ovvero la spagnola AICIA al fine di eseguire un demo congiunta dove si dimostrava l'interoperabilità tra la nostra piattaforma e quella sviluppata da loro.
+È stata quindi introdotta la classe \code{ioe:Recharge}. Si noti che le proprietà di seguito elencate sono state decise di comune accordo con un altro partner del progetto IoE, la spagnola AICIA, allo scopo di eseguire una demo congiunta in cui dimostrare l'interoperabilità tra la nostra piattaforma e quella sviluppata da loro.
 
 \begin{itemize}
-	\item \code{ioe:hasDate}: Data e ora in cui è avvenuta la ricarica.
-	\item \code{ioe:hasUser}: Utente che ha effettuato la ricarica, qui si nota la necessità di inserire la classe \code{ioe:Person} (~\ref{subsubsec:person}).
-	\item \code{ioe:hasRechargeTime}: Il tempo necessario ad eseguire la ricarica.
-	\item \code{ioe:hasConsumption}: La quantità di corrente impiegata per effettuare la ricarica.
+	\item \code{ioe:hasDate}: data e ora in cui è avvenuta la ricarica.
+	\item \code{ioe:hasUser}: utente che ha effettuato la ricarica, da cui si evidenzia la necessità di inserire la classe \code{ioe:Person} (\ref{subsubsec:person}).
+	\item \code{ioe:hasRechargeTime}: il tempo necessario ad effettuare la ricarica.
+	\item \code{ioe:hasConsumption}: la quantità di corrente impiegata per effettuare la ricarica.
 \end{itemize}
 
 \subsubsection{Il Vecchio Protocollo di Prenotazione}\label{subsubsec:old-proto}
 
-Il protocollo di prenotazione iniziale era in stato embrionale e serviva a scopo esemplificativo per dimostrare la fattibilità della cosa. I parametri previsti per la richiesta di richiesta, ovvero come proprietà della classe \code{ioe:ChargeRequest} erano:
+Il protocollo di prenotazione iniziale era in stato embrionale e serviva a scopo esemplificativo per dimostrare la fattibilità del progetto. I parametri previsti per la richiesta di ricarica, ovvero le proprietà della classe \code{ioe:ChargeRequest} erano:
 
 \begin{itemize}
-	\item \code{ioe:hasPreferredTime}: Indica la data in cui l'utente vorrebbe effettuare la ricarica.
-	\item \code{ioe:hasPosition}: Indica la posizione da cui si sta eseguendo la richiesta.
-	\item \code{ioe:hasRequestedEnergy}: Indica la quantità di carica richiesta. 
-	\item \code{ioe:hasRequestingVehicle}: Indica il veicolo che richiede la ricarica.
-	\item \code{ioe:hasChargeResponse}: Indica la risposta che viene fornita dal sistema.
+	\item \code{ioe:hasPreferredTime}: la data in cui l'utente desidera effettuare la ricarica.
+	\item \code{ioe:hasPosition}: la posizione da cui si sta eseguendo la richiesta.
+	\item \code{ioe:hasRequestedEnergy}: la quantità di carica richiesta. 
+	\item \code{ioe:hasRequestingVehicle}: il veicolo che richiede la ricarica.
+	\item \code{ioe:hasChargeResponse}: la risposta che viene fornita dal sistema.
 \end{itemize}
 
 \noindent
@@ -247,20 +241,20 @@ Al di la della mancanza del concetto di utente, l'assenza di range nei campi \co
 
 \subsubsection{Il nuovo Protocollo di prenotazione}\label{subsubsec:chargerequest}
 
-In seguito ai problemi messi in luce nel paragrafo precedente (~\ref{subsubsec:old-proto}) è stato deciso di sviluppare un nuovo protocollo di prenotazione che prendesse in considerazioni i nuovi requisiti funzionali.
+In seguito ai problemi messi in luce nel paragrafo precedente (\ref{subsubsec:old-proto}) è stato deciso di sviluppare un nuovo protocollo di prenotazione che prendesse in considerazioni i nuovi requisiti funzionali.
 
 La classe è \code{ioe:ChargeRequest} è stata quindi ridefinita con le seguenti proprietà:
 
 \begin{itemize}
 	\item \code{ioe:hasRequestingUser}: Utente che ha effettuato la ricarica. Malgrado si possa risalire all'utente tramite il veicolo è stato comunque inserita la proprietà al fine di semplificare le query SPARQL.
-	\item \code{ioe:hasSpatialRange}: Area nella quale si vuole eseguire la ricarica. Il punto centrale di quest'area non corrisponde necessariamente con la posizione dell'utente. Come vedremo nella sezione relativa all'applicazione mobile (~\ref{chap:mobile-app}) l'area di prenotazione può essere scelta arbitrariamente sulla mappa.
+	\item \code{ioe:hasSpatialRange}: Area nella quale si vuole eseguire la ricarica. Il punto centrale di quest'area non corrisponde necessariamente con la posizione dell'utente. Come vedremo nella sezione relativa all'applicazione mobile (\ref{chap:mobile-app}) l'area di prenotazione può essere scelta arbitrariamente sulla mappa.
 	\item \code{ioe:hasTimeInterval}: Indica il range temporale all'interno del quale si è disposti ad eseguire la ricarica. Può anche essere molto superiore al tempo necessario per la ricarica nel caso in cui non ci siano particolari preferenze di tempo.
 	\item \code{ioe:hasRequestingVehicle}: Indica il veicolo per cui si richiede la ricarica. Non differisce rispetto al vecchio protocollo.
 	\item \code{ioe:hasRequestedEnergy}: Indica la quantità di carica richiesta. Non differisce rispetto al vecchio protocollo.
 \end{itemize}
 
 \noindent
-Per quanto sia stato migliorato il protocollo è ancora incompleto ed in quanto tale è ancora aperto a migliorie. Ad esempio non è possibile specificare la volontà dell'utente di essere più flessibile per quanto riguarda la quantità di carica richiesta e nemmeno, nel caso fosse richiesto dalla smart-grid, se fosse disposto a cedere parte della sua carica.
+Per quanto sia stato migliorato il protocollo è ancora incompleto ed in quanto tale è ancora aperto a migliorie. Ad esempio non è possibile specificare la volontà dell'utente di essere più flessibile per quanto riguarda la quantità di carica richiesta e nemmeno, nel caso fosse richiesto dalla Grid, se fosse disposto a cedere parte della sua carica.
 \\ \\
 Oltre alla richiesta è stata modificata anche la risposta. Alla classe \code{ioe:ChargeResponse} è stata aggiunta la proprietà \code{ioe:hasRelatedRequest} al fine di semplificare le query SPARQL.
 Anche le opzioni di ricarica contenute nella risposta sono state modificate con lo scopo di farle aderire ai nuovi requisiti funzionali ma anche per semplificare le query SPARQL.
@@ -282,7 +276,7 @@ Di seguito verranno esposte le proprietà della classe \code{ioe:ChargeOption}. 
 
 Fino alla versione \emph{1.5.11} dell'ontologia le informazioni relative ai GCP erano hardcoded nell'ontologia, scelta che all'inizio del progetto è stata necessaria a causa del poco tempo. Successivamente questo approccio ha si è rivelato fortemente limitante in quanto la modifica dell'ontologia è un operazione abbastanza tediosa e sopratutto è poco flessibile. 
 
-Al fine di risolvere questo problema ho deciso di rimuovere questi dati dall'ontologia e inserirli all'interno di un file XML che viene caricato dal \emph{City Service} (Sez. ~\ref{subsubsec:city-init}) e dal simulatore (Sez. ~\ref{chap:sim}) in fase di inizializzazione.
+Al fine di risolvere questo problema ho deciso di rimuovere questi dati dall'ontologia e inserirli all'interno di un file XML che viene caricato dal \emph{City Service} (Sez. \ref{subsubsec:city-init}) e dal simulatore (Sez. \ref{chap:sim}) in fase di inizializzazione.
 
 Grazie a questo approccio è diventato relativamente semplice impostare uno scenario del tutto diverso da quello previsto dal progetto.
 
@@ -296,18 +290,18 @@ L'architettura proposta prevede 2 SIB: il \emph{City SIB} e il \emph{Dash SIB}.
 
 Il \emph{City SIB} è il SIB cittadino. Al suo interno vengono immagazzinate tutte le informazioni utili a caratterizzare uno scenario di mobilità elettrica veicolare. Viene inoltre utilizzato come interfaccia di scambio dati tra il \emph{City Service} e gli agenti esterni, infatti è qui che vengono scritti i messaggi che compongono i protocolli i quali vengono cancellati una volta terminati. L'area di copertura di tale SIB e di conseguenza del \emph{City Service} è definita dalla classe dell'ontologia \code{ioe:Zone} anche se attualmente non viene utilizzata in quanto gli scenari proposti prendono in considerazione una città alla volta.
 
-Al fine di poter rispondere alle richieste di prenotazione degli utenti il \emph{City Service} contiene le informazioni su tutte le colonnine della zona che ricopre. Inoltre possiede le informazioni relative agli utenti e a i veicoli da essi posseduti. Non contiene le informazioni relative alla batteria che sono contenute nella \emph{Dash SIB} (~\ref{subsec:dash-sib}). Nell'architettura proposta nel progetto precedente a questo gli utenti non esistevano (~\ref{subsubsec:person}) e le informazioni relative ai veicoli si trovavano esclusivamente nella \emph{Dash SIB}.
+Al fine di poter rispondere alle richieste di prenotazione degli utenti il \emph{City Service} contiene le informazioni su tutte le colonnine della zona che ricopre. Inoltre possiede le informazioni relative agli utenti e a i veicoli da essi posseduti. Non contiene le informazioni relative alla batteria che sono contenute nella \emph{Dash SIB} (\ref{subsec:dash-sib}). Nell'architettura proposta nel progetto precedente a questo gli utenti non esistevano (\ref{subsubsec:person}) e le informazioni relative ai veicoli si trovavano esclusivamente nella \emph{Dash SIB}.
 
-L'inizializzazione del \emph{City SIB}, contrariamente a quanto avveniva prima, viene eseguita dal servizio cittadino stesso, inoltre il servizio cittadino si occupa di caricare le informazioni dei GCP, caricate da un file XML, e di inserirle nel SIB (Sez. ~\ref{subsubsec:city-init}).
+L'inizializzazione del \emph{City SIB}, contrariamente a quanto avveniva prima, viene eseguita dal servizio cittadino stesso, inoltre il servizio cittadino si occupa di caricare le informazioni dei GCP, caricate da un file XML, e di inserirle nel SIB (Sez. \ref{subsubsec:city-init}).
 
 
 \subsection{Dash SIB}\label{subsec:dash-sib}
 
 Il \emph{Dash SIB} è  un SIB che dovrebbe essere integrato a bordo di ogni veicolo. Il suo scopo è tenere costantemente traccia dei parametri che caratterizzano posizione, stato della batteria e tutti gli altri parametri variabili che caratterizzano un veicolo. Al fine di collegare questi dati a un veicolo la tripla che descrive un istanza di \code{ioe:Vehicle} viene ripetuta anche su questa SIB. 
 
-Inizialmente si pensava che questo SIB sarebbe stato eliminato in un contesto reale in quanto i dati in esso contenuti sarebbero stati presi direttamente dal veicolo. È stato invece deciso di mantenerlo per poterlo usare come interfaccia comune per l'interrogazione dei dati. Ovvero le applicazioni che utilizzano i dati del veicolo, come ad esempio l'applicazione mobile, dovrebbero essere agnostiche dalla sorgente di dati (es: Veicolo Reale, Veicolo Simulato). Compito del programmatore è scrivere un adattatore che scrive i dati in provenienti dalle varie fonti sul \textsc{Dash SIB}. Come vedremo più avanti (Cap. ~\ref{chap:sim}, ~\ref{chap:mobile-app}) grazie a questa tecnica è possibile controllare dal telefonino un veicolo presente nel simulatore tenendone monitorati tutti i parametri. I veicoli del simulatore scrivono tutti sullo stesso \emph{Dash SIB} in quanto sarebbe computazionalmente proibitivo e del tutto inutile fare altrimenti.
+Inizialmente si pensava che questo SIB sarebbe stato eliminato in un contesto reale in quanto i dati in esso contenuti sarebbero stati presi direttamente dal veicolo. È stato invece deciso di mantenerlo per poterlo usare come interfaccia comune per l'interrogazione dei dati. Ovvero le applicazioni che utilizzano i dati del veicolo, come ad esempio l'applicazione mobile, dovrebbero essere agnostiche dalla sorgente di dati (es: Veicolo Reale, Veicolo Simulato). Compito del programmatore è scrivere un adattatore che scrive i dati in provenienti dalle varie fonti sul \textsc{Dash SIB}. Come vedremo più avanti (Cap. \ref{chap:sim}, \ref{chap:mobile-app}) grazie a questa tecnica è possibile controllare dal telefonino un veicolo presente nel simulatore tenendone monitorati tutti i parametri. I veicoli del simulatore scrivono tutti sullo stesso \emph{Dash SIB} in quanto sarebbe computazionalmente proibitivo e del tutto inutile fare altrimenti.
 
-Siccome attualmente non esistono veicoli che contengono un SIB esiste in fase di test su veicolo reale (App. ~\ref{app:crf}) è stato necessario portare un computer a bordo che contenesse il \textsc{Dash SIB} dal quale l'applicazione mobile attingeva per prelevare i dati.
+Siccome attualmente non esistono veicoli che contengono un SIB esiste in fase di test su veicolo reale (App. \ref{app:crf}) è stato necessario portare un computer a bordo che contenesse il \textsc{Dash SIB} dal quale l'applicazione mobile attingeva per prelevare i dati.
 
 \section{La libreria IoE}\label{subsec:ioe-lib}
 

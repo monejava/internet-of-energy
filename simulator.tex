@@ -116,7 +116,7 @@ Ogni modulo contiene dei parametri che permettono di cambiarne il comportamento,
         \caption{Moduli OMNeT++}
 \end{figure}
 
-\subsection{Ciclo di Vita dei moduli}
+\subsection{Ciclo di Vita dei moduli}\label{subsec:lifecycle}
 
 Essendo OMNeT++ un simulatore a eventi discreti i moduli, in esso implementati, non fanno nulla finché non viene schedulato un evento. Gli eventi vengono schedulati attraverso messaggi inviati dai moduli stessi. Sostanzialmente si tratta di decidere quando, a chi e cosa mandare.
 Il quando è il tempo di simulazione e quindi deve essere nel futuro o al massimo nel momento attuale di simulazione, a chi è il modulo destinatario e cosa è il messaggio da mandare. OMNeT++ fornisce un un messaggio di base, \code{cSimpleMessage}, ma, come vedremo più avanti, è possibile definirsi messaggi propri più complessi.
@@ -157,16 +157,16 @@ Altra importante funzione svolta da questo modulo è la raccolta di statistiche 
 Il comportamento del veicolo è definito dal modulo CarLogic. Questo modulo implementa tutta la logica relativa alla guida del veicolo. In esso sono contenute le informazioni che ne descrivono la tipologia, l'appartenenza, e alcuni comportamenti di base. I comportamenti più complessi sono delegati al modulo DriverBehviour.
 
 \begin{itemize}
-	\item \textbf{userName}: Nome dell'utente che possiede il veicolo
-	\item \textbf{userId}: Identificativo dell'utente che possiede il veicolo
-	\item \textbf{manufacturer}: Casa produttrice del veicolo
-	\item \textbf{model}: Modello del veicolo
-	\item \textbf{cRoll}: Resistenza attrito gomme su asfalto
-	\item \textbf{cDrag}: 
-	\item \textbf{across}: Sezione frontale del veicolo
-	\item \textbf{rhoAir}: Resistenza dell'aria
-	\item \textbf{weight}: Peso del veicolo
-	\item \textbf{threshold}: Soglia sotto la quale il veicolo si considera scarico e quindi diviene necessario fare una ricarica. Varia da 0 a 1.
+	\item \code{userName}: Nome dell'utente che possiede il veicolo
+	\item \code{userId}: Identificativo dell'utente che possiede il veicolo
+	\item \code{manufacturer}: Casa produttrice del veicolo
+	\item \code{model}: Modello del veicolo
+	\item \code{cRoll}: Resistenza attrito gomme su asfalto
+	\item \code{cDrag}: 
+	\item \code{across}: Sezione frontale del veicolo
+	\item \code{rhoAir}: Resistenza dell'aria
+	\item \code{weight}: Peso del veicolo
+	\item \code{threshold}: Soglia sotto la quale il veicolo si considera scarico e quindi diviene necessario fare una ricarica. Varia da 0 a 1.
 	\item \textbf{minRequestedEnergyKwh}: Quantità minima di energia richiedibile in una richiesta di prenotazione. Questo valore serve nei casi in cui una richiesta non venga accettata dal \emph{City Service}, in tal caso viene diminuita gradualmente la quantità di energia richiesta fino ad arrivare a questa soglia.
 	\item \textbf{writeCarStatusOnSib}: Dice se scrivere le informazioni di stato dei veicoli sul \emph{Dash SIB}. Questo permette di vedere lo stato dei veicoli dall'applicazione mobile. Essendo la scrittura sul SIB un operazione abbastanza onerosa è meglio tenere disattivata questa opzione a meno che non si sia in fase di demo.
 \end{itemize}
@@ -174,7 +174,7 @@ Il comportamento del veicolo è definito dal modulo CarLogic. Questo modulo impl
 
 \subsubsection{Inizializzazione}
 
-In fase di inizializzazione la prima cosa che viene fatta è prendere un riferimento a tutti i moduli necessari, tra i quali il CityService, che  deciderà se il veicolo sarà elettrico o meno. Nel caso in cui sia elettrico allora si procede a reperire tutti i parametri e se è abilitata la prenotazione vengono scritte le informazioni del veicolo sul \emph{Dash SIB}. Viene inoltre mandato un comando a SUMO colora il veicolo di verde, funzionalità molto utile sia in fase di debug che in fase di demo.
+In fase di inizializzazione la prima cosa che viene fatta è prendere un riferimento a tutti i moduli necessari, tra i quali il CityService, che  deciderà se il veicolo sarà elettrico o meno. Nel caso in cui sia elettrico allora si procede a reperire tutti i parametri e, se è abilitata la prenotazione, vengono scritte le informazioni del veicolo sul \emph{Dash SIB}. Viene inoltre mandato un comando a SUMO colora il veicolo di verde, funzionalità molto utile sia in fase di debug che in fase di demo.
 
 Nel caso in cui il veicolo non sia elettrico allora vengono eliminati i relativi moduli da OMNeT++ ma il veicolo rimane in SUMO. Questa funzionalità non era prevista da Veins e quindi è stato necessario modificarlo opportunamente per introdurla. L'eliminazione avviene indirettamente, dal momento che un modulo di Veins non può eliminare se stesso, mandando un messaggio al CityService con la richiesta di eliminazione.
 
@@ -215,9 +215,17 @@ void CarLogic::handleSelfMessage(cMessage *msg) {
 
 Ogni stato del veicolo ha una sua funzione "handler" che ne determina il comportamento. Alla funzione viene passato un riferimento al messaggio che contiene informazioni sullo stato del veicolo. L'handler prima di finire rischedula il messaggio con un nuovo stato, o con lo stesso in alcuni casi. La Fig. \ref{fig:car-fsmd} mostra l'automa a stati finiti che descrive il veicolo. 
 
-\begin{itemize}
-	\item
-\end{itemize}
+I possibili stati del veicolo sono definiti nell'enumerazione \code{CarState}. Sarà quindi presente, ad esempio, la funzione \code{handleDriving} associata allo stato \code{CarState::DRIVING}, e così via per tutti gli stati del veicolo.
+
+\begin{description}
+	\item \label{state:driving} \code{DRIVING}: Quando il veicolo si trova in questo stato significa che si sta dirigendo verso la sua destinazione. Ogni volta che viene eseguito fa un controllo sullo stato di carica della batteria e se questa è inferiore alla soglia stabilita dal parametro \code{threshold} allora il veicolo si considera scarico e quindi riuslta necessario dirigesi a una colonnina. A questo punto si presentano due casistiche:
+	\begin{itemize}
+		\item{Con Prenotazione}: Se la simulazione è stata eseguita con le prenotazioni attive allora il veicolo deve eseguire il protocollo di prenotazione. Vengono quindi create le triple necessarie a istanziare una richiesta di prenotazione e inserite nel SIB. Se la richiesta va a buon fine allora si imposta come stato successivo \code{WAITING_RESPONSE}, altrimenti viene rischedulato questo stato nel quale verra reiterata la richiesta.
+		\item{Senza Prenotazione}: ewgarw
+	\end{itemize}
+\end{description}
+	
+
 
 \begin{figure}
 	\centering

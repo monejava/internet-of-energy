@@ -156,17 +156,19 @@ Altra importante funzione svolta da questo modulo è la raccolta di statistiche 
 
 Il comportamento del veicolo è definito dal modulo CarLogic. Questo modulo implementa tutta la logica relativa alla guida del veicolo. In esso sono contenute le informazioni che ne descrivono la tipologia, l'appartenenza, e alcuni comportamenti di base. I comportamenti più complessi sono delegati al modulo DriverBehviour.
 
+\subsubsection{I parametri}
+
 \begin{itemize}
 	\item \code{userName}: Nome dell'utente che possiede il veicolo
 	\item \code{userId}: Identificativo dell'utente che possiede il veicolo
 	\item \code{manufacturer}: Casa produttrice del veicolo
-	\item \code{model}: Modello del veicolo
-	\item \code{cRoll}: Resistenza attrito gomme su asfalto
-	\item \code{cDrag}: 
+	\item \code{model}: modello del veicolo
+	\item \code{cRoll}: coefficiente resistenza attrito gomme su asfalto
+	\item \code{cDrag}: coefficiente di forma che indica la levigatezza del veicolo
+	\item \code{rhoAir}: coefficiente di resistenza del dll'aria
 	\item \code{across}: Sezione frontale del veicolo
-	\item \code{rhoAir}: Resistenza dell'aria
-	\item \code{weight}: Peso del veicolo
-	\item \code{threshold}: Soglia sotto la quale il veicolo si considera scarico e quindi diviene necessario fare una ricarica. Varia da 0 a 1.
+	\item \code{weight}: peso del veicolo
+	\item \code{threshold}: soglia sotto la quale il veicolo si considera scarico e quindi diviene necessario fare una ricarica. Varia da 0 a 1.
 	\item \textbf{minRequestedEnergyKwh}: Quantità minima di energia richiedibile in una richiesta di prenotazione. Questo valore serve nei casi in cui una richiesta non venga accettata dal \emph{City Service}, in tal caso viene diminuita gradualmente la quantità di energia richiesta fino ad arrivare a questa soglia.
 	\item \textbf{writeCarStatusOnSib}: Dice se scrivere le informazioni di stato dei veicoli sul \emph{Dash SIB}. Questo permette di vedere lo stato dei veicoli dall'applicazione mobile. Essendo la scrittura sul SIB un operazione abbastanza onerosa è meglio tenere disattivata questa opzione a meno che non si sia in fase di demo.
 \end{itemize}
@@ -236,6 +238,9 @@ Dal momento che l'implementazione C delle KPI, le librerie che si interfacciano 
 	\item \code{WAITING_EVSE}: questo stato rappresenta l'attesa presso un EVSE. Non viene schedulato nessun messaggio poiché è compito del veicolo attualmente in carica ``risvegliare'' il veicolo in attesa. Lo stato successivo al ``risveglio'' è \code{CHARGING}
 	\item \code{CHARGING}: Rappresenta la carica lo stato di carica di un veicolo. Si rimane in questo stato finché la carica non è completa oppure, nel caso di prenotazione attiva, fino al raggiungimento del tempo di fine ricarica.
 \end{description}
+
+
+Al termine del ciclo di vita del modulo si provvede all'eliminazione dei dati relativi al veicolo dal SIB.
 	
 \begin{figure}
 	\centering
@@ -246,7 +251,140 @@ Dal momento che l'implementazione C delle KPI, le librerie che si interfacciano 
 
 \subsection{Battery}\label{sec:battery}
 
+Il modulo \code{Battery} fornisce il modello di consumo energetico del veicolo. Non è esatto parlare di modello della batteria dal momento che le equazioni usate sono relative al lavoro e non strettamente legate all'elettrotecnica poiché troppo complesse da simulare con il poco tempo a disposizione. Il modello implementato rimane abbastanza fedele alla realtà in virtù del fatto che è stato validato con dati sperimentali raccolti durante la visita al CRF.
+
+Determinante al fine di modellare e validare il consumo è stato il lavoro di Alfredo D'Elia prima e Marco di Nicola (\cite{dinicola2014}) dopo. Il modello attualmente tiene conto della pendenza della strada grazie alla quale si può calcolare l'energia richiesta in salita e quella guadagnata in discesa. A questo si aggiunge la ricarica dovuta alla frenata rigenerativa.
+
+Il ciclo di vita del modulo batteria è determinato dall'auto-invio di messaggi la quale schedulazione è indipendente da quella del modulo \code{CarLogic}.
+
+Questo modulo può assumere due stati: \code{CHARGING} e \code{DISCHARGING} definiti nell'enumerazione \code{BatteryState}. Le relative funzioni handler sono \code{handleDischarge} e \code{handleCharge}. Lo stato della batteria viene modificato da \code{CarLogic}. Quando si arriva a una colonnina si imposta lo stato \code{CHARGING}. Viene inoltre passato a \code{Battery} un riferimento all'EVSE corrispondete il quale fornisce le informazioni sulla potenza della colonnina e quindi del tempo necessario a caricarsi. Al termine della ricarica \code{CarLogic} imposta lo stato del modulo batteria in \code{DISCHARGING} e dirige il veicolo verso una destinazione casuale.
+
+Il modulo \code{Battery} ha anche la funzione di eliminare il veicolo dalla simulazione quando si esaurisce la carica della batteria.
+
+\subsubsection{I parametri}
+
+Vengono mostrati i parametri che caratterizzano il modulo batteria. I valori di default sono relativi al Fiat Daily in quanto, avendo a disposizione i dati sperimentali, hanno permesso di validare al meglio i dati generati dalla simulazione.
+
+\begin{itemize}
+	\item \textbf{manufacturer}: costruttore della batteria, di default impostato a Simens in quanto partner del progetto IoE;
+	\item \textbf{engineEfficense}: efficienza della gestione energetica del motore, varia tra 0 e 1.
+	\item \textbf{socPerc} =  carica iniziale del veicolo, varia da 0 a 1, dove indica una quantità di carica pari alla capacità della batteria;
+    \item \textbf{capacity} = capacità della batteria misurata in Kilowattora (kWh);
+    \item \textbf{maxVoltage} = voltaggio massimo erogato misurato in Volt (V);
+    \item \textbf{voltage} = voltaggio attualmente erogato  in Volt (V);
+    \item \textbf{stateOfHealth} = stato di vita della batteria, varia tra 0 e 1. Attualmente non considerato nel modello;
+    \item \textbf{maxCurrentIn} = massima intensità di corrente in entrata misurata in Ampere (A);
+    \item \textbf{maxCurrentOut} = massima intensità di corrente in uscita misurata in Ampere (A);
+    \item \textbf{nominalTempearture} = massima temperatura a cui può lavorare il motore misurata in Gradi Celsius (\textcelsius). Attualmente non considerata nel modello.
+    \item \textbf{recordVectors} = Indica se registrare o meno le statistiche sulla batteria. Questi dati tendono a far crescere molto la dimensione dei file che li contengono;
+    \item \textbf{regenerativeBrakingEfficiency} = efficienza della frenata rigenerativa;
+\end{itemize}
+
+\subsubsection{Consumo del veicolo}
+
+Il modello di consumo è implementato nella funzione \code{handleDischarge()}. I dati necessari al calcolo sono: 
+
+\begin{itemize}
+	\item \textbf{Velocità attuale}: fornita da Veins che ne tiene bufferizzato il valore senza eseguire comandi tramite TraCI. A volte, quando il veicolo è fermo, Veins ricorda il valore della velocità precedente alla fermata provocando un consumo della batteria anche a veicolo parcheggiato. Risulta quindi necessario verificare manualmente che il veicolo non sia parcheggiato.
+	\item \textbf{Accelerazione}: siccome non fornita attraverso TraCI è necessario calcolarla come differenza tra la velocità attuale e quella registrata nell'ultima chiamata a \code{handleDischarge()} diviso il tempo simulato trascorso.
+	\item \textbf{Angolo di inclinazione stradale}: l'angolo di inclinazione stradale ($\alpha$) è fornito dalla funzione \code{getInclinationRad()} che lo ricava a partire da 2 punti nel piano tridimensionale ricavati tramite la funzione \code{getLatLonAlt()} di \code{CarLogic} attraverso una doppia chiamata a SUMO. La prima necessaria ad ottenere la nostra posizione sulla strada corrente, la seconda ad effettuare una conversione di quest'ultima in latitudine, longitudine, altitudine. Fortuna vuole che questa feature è stata recentemente introdotta in SUMO.
+	\item \textbf{La quantità di carica}: dal momento che i calcoli restituiscono risultati in kWh è necessario convertire la quantità di carica espressa in percentuale in kWh con la formula: $soc_{Kwh} = soc_{\%} \cdot capacity$.
+\end{itemize}
+
+Le funzioni necessarie a calcolare distanza e inclinazione a partire da punti in 3 dimensioni sono state parzialmente ereditate dalla librerie UniboGeoTools e si trovano nel file \code{Util.cc}. Si noti che la distanza viene calcolata attraverso applicazione di proiezione ortogonale (\code{getEquirectangular ApproximationDistance()}) che non è la formula più precisa per la distanza tra due punti espressi in coordinate latitudine/longitudine. Ma viste le brevi distanze in gioco, quindi il ridotto errore che ne deriva, e la maggiore velocità di esecuzione, si è optato per il suo utilizzo al posto di formule più precise come la formula dell'emisenoverso.
+
+Sono considerate tre forme diverse di dispendio energetico nello spostamento del veicolo:
+
+\begin{itemize}
+	\item \textbf{$L_m$}: lavoro compiuto dal motore per far muovere il veicolo.
+	\item \textbf{$L_g$}: lavoro necessario a superare l'attrito delle gomme sull'asfalto.
+	\item \textbf{$L_a$}: lavoro necessario a superare la resistenza dell'aria.
+\end{itemize}
+
+\noindent
+Considerando:
+
+\begin{center}
+	$\boxed{m \cdot a = F - m \cdot g \cdot \sin{\alpha} }$
+\end{center}
+
+\noindent
+La forza necessaria a spostare il veicolo tenendo conto della pendenza è:
+
+\begin{center}
+	$\boxed{F = m \cdot (a + g) \cdot \sin{\alpha} }$
+\end{center}
+
+\noindent
+Ne segue che il lavoro necessario a spostare il veicolo è:
+
+\begin{center}
+	$\boxed{L_m = \frac{1}{engineEfficiency} \cdot \Delta t \cdot F \cdot \frac{V + V_{old}}{2}}$
+\end{center}
+
+\noindent
+La massa del veicolo ($m$) è data dai parametri del modulo \code{CarLogic}, precedentemente introdotti. L'efficenza del motore è definita tra i parametri del modulo \code{Battery}.
+\\
+\noindent
+Il lavoro $L_g$, necessario a vincere l'attrito delle gomme sull'asfalto, è dato da:
+
+\begin{center}
+$\boxed{L_g = \frac{1}{engineEfficiency} \cdot \Delta t \cdot (m \cdot g \cdot \cos{\alpha} \cdot cRoll) \cdot \frac{V + V_{old}}{2}}$
+\end{center}
+
+\noindent
+$cRoll$, introdotto in \code{CarLogic}, è l'attrito delle gomme sull'asfalto.
+\\
+\noindent
+Infine il lavoro necessario a vincere la resistenza dell'aria è:
+
+\begin{center}
+	$\boxed{L_a = \frac{1}{engineEfficiency} \cdot \Delta t \cdot \frac{(\rho_{air} \cdot cDrag \cdot across)}{2} \cdot 	(\frac{V + V_{old}}{2})^3}$
+\end{center}
+
+\noindent
+Ne consegue che il consumo energetico totale, espresso in kWh, sia dato da:
+
+\begin{center}
+	$\boxed{energyConsumption = \frac{L_m + L_g + L_a}{3600000}}$
+\end{center}
+
+\noindent
+che viene sottratto alla quantità di carica in kWh precedentemente calcolata che viene ritrasformata in percentuale.
+
+\subsubsection{Frenata Rigenerativa}
+
+Il freno rigenerativo è un particolare tipo di freno che recupera energia utile estraendola da una quota di quella che, normalmente, si dissipa in aria (calore) durante il rallentamento del veicolo (diminuzione di energia cinetica). Nel nostro sistema la frenata è determinata da accelerazione negativa. In questo caso $L_m$, che andrebbe a contribuire all'energia consumata dal veicolo, non viene considerato e al suo posto viene considerata l'energia cinetica prodotta nella decelerazione del veicolo in Joule (J):
+
+\begin{center}
+	$\boxed{E_{kin} = \frac{1}{2} \cdot m \cdot (V^2 - V_{old}^2) \cdot \eta_{rig}}$
+\end{center}
+
+$\eta_{rig}$ è la percentuale di energia recuperabile da quella prodotta indicata con il parametro di \code{Battery} \code{regenerativeBrakingEfficiency}. Questo dipende dell'efficienza del meccanismo di frenata/rigenerazione che ha un un limite teorico del 30\% (valore di default)  prodotto da recenti studi del IDSC (Institute for Dynamic Systems and Control) svizzero.
+
+Determinante, al fine di raggiungere questo risultato, è stato il contributo di Marco Di Nicola.
+
+\subsubsection{Ricarica del veicolo}
+
+Il modello di ricarica è implementato nella funzione \code{handleCharge()}. Per determinare la carica è necessario avere le informazioni sull'EVSE al quale si è attaccati. Un istanza di un oggetto che rappresenta l'EVSE viene passato al modulo \code{Battery} dal modulo \code{CarLogic}.
+
+Viene presa la potenza della colonnina espressa in kW  ($power_{kW}$) e a ogni iterazione il guadagno energetico viene calcolato nel seguente modo:
+
+\begin{center}
+	$\boxed{soc_{kWh} =  soc_{kWh} + (power_{Kw} \cdot \Delta t) \cdot 3600}$
+\end{center}
+
+\noindent
+Quando la carica raggiunge la capacità della batteria il processo viene interrotto e il veicolo lascia la colonnina.
+
+
 \subsection{DriverBeahviour}
+
+Il modulo \code{DriverBeahviour} si occupa di modellare alcuni comportamenti dell'autista del veicolo. Attualmente non è particolarmente evoluto in quanto essendo stato introdotto dopo \code{CarLogic} parta della logica è implementata in quest'ultimo.
+
+\subsubsection{I parametri}
+
+
 
 \section{Implementazione}
 

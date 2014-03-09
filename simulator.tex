@@ -192,7 +192,7 @@ scheduleAt(simTime(), carMessage);
 
 \subsubsection{Gli stati del veicolo}\label{subsubsec:veh-state}
 
-Lo stato del veicolo è definito da un automa a stati finiti come mostrato in Fig. \ref{fig:car-fsmd}. Le transazioni tra gli stati avvengono tramite scambio di messaggi nei quali è definito lo stato successivo. I messaggi arrivano alla funzione \code{handleMessage} la quale controlla se il messaggio arriva dall'esterno oppure se è auto-inviato (\code{msg->isSelfMessage()}). In quest'ultimo caso allora il messaggio viene inoltrato a una funzione chiamata \code{handleSelfMessage()}. All'interno di quest'ultima funzione avviene la scelta di quale hanlder eseguire in base allo stato definito nel messaggio (Lst. lst:self-msg).
+Lo stato del veicolo è definito da un automa a stati finiti come mostrato in Fig. \ref{fig:car-fsmd}. Le transazioni tra gli stati avvengono tramite scambio di messaggi nei quali è definito lo stato successivo. I messaggi arrivano alla funzione \code{handleMessage} la quale controlla se il messaggio arriva dall'esterno oppure se è auto-inviato (\code{msg->isSelfMessage()}). In quest'ultimo caso allora il messaggio viene inoltrato a una funzione chiamata \code{handleSelfMessage()}. All'interno di quest'ultima funzione avviene la scelta di quale hanlder eseguire in base allo stato definito nel messaggio (Lst. \ref{lst:self-msg}).
 
 \begin{cpp}[caption={Funzione di scelta dello stato}, label={lst:self-msg}]
 void CarLogic::handleSelfMessage(cMessage *msg) {
@@ -217,22 +217,26 @@ Ogni stato del veicolo ha una sua funzione "handler" che ne determina il comport
 
 I possibili stati del veicolo sono definiti nell'enumerazione \code{CarState}. Sarà quindi presente, ad esempio, la funzione \code{handleDriving} associata allo stato \code{CarState::DRIVING}, e così via per tutti gli stati del veicolo.
 
+Dal momento che l'implementazione C delle KPI, le librerie che si interfacciano con il SIB tramite il protocollo SSAP (Sez. \ref{sec:smart-m3}), non supporta le sottoscrizioni, che sono alla base della comunicazione con il CS, risulta necessario fare il ``polling'' a intervalli regolare per ricavare le risposte. A questo compito sono stati riservati due stati del veicolo \code{WAITING_RESPONSE} e \code{WAITING_CONFIRM}. 
+
 \begin{description}
 	\item \label{state:driving} \code{DRIVING}: Quando il veicolo si trova in questo stato significa che si sta dirigendo verso la sua destinazione. Ogni volta che viene eseguito fa un controllo sullo stato di carica della batteria e se questa è inferiore alla soglia stabilita dal parametro \code{threshold} allora il veicolo si considera scarico e quindi riuslta necessario dirigesi a una colonnina. A questo punto si presentano due casistiche:
 	\begin{itemize}
 		\item{Con Prenotazione}: se la simulazione è stata eseguita con le prenotazioni attive allora il veicolo deve eseguire il protocollo di prenotazione. Vengono quindi create le triple necessarie a istanziare una richiesta di prenotazione e inserite nel SIB. Se la richiesta va a buon fine allora si imposta come stato successivo \code{WAITING_RESPONSE}, altrimenti viene rischedulato questo e reiterata la richiesta.
-		\item{Senza Prenotazione}: Se la simulazione è stata eseguita senza prenotazione allora viene scelto casualmente un GCP tra i 3 più vicini e il veicolo dirige direttamente verso quello.
+		\item{Senza Prenotazione}: Se la simulazione è stata eseguita senza prenotazione allora viene scelto casualmente un GCP tra i 3 più vicini e il veicolo dirige direttamente verso quello passando nello stato \code{GO_TO_RECHARGE}.
 	\end{itemize}
-	\item \code{WAITING_RESPONSE}: rappresenta lo stato di attesa della risposta da parte del CS. Siccome 
-	\item \code{WAITING_CONFIRM}:
-	\item \code{PARKING}:
-	\item \code{GO_TO_RECHARGE}:
-	\item \code{WAITING_EVSE}:
-	\item \code{CHARGING}:
+	\item \code{WAITING_RESPONSE}: il veicolo interroga il SIB in cerca della risposta da parte del CS. La ricerca è eseguita tramite query SPARQL. Se fallisce, oppure restituisce un risultato vuoto (non sono disponibili opzioni di ricarica conformi alla richiesta), il veicolo torna in stato \code{DRIVING} dove la richiesta viene reiterata diminuendo l'energia richiesta e aumentando il lasso di tempo in cui si è disposti a caricarsi. Se la query restituisce una risposta allora vengono analizzate le opzioni di ricarica in essa contenute e, in base al comportamento definito in \code{DriverBehaviour}, ne viene scelta una. Lo stato successivo sarà  \code{WAITING_CONFIRM}
+	\item \code{WAITING_CONFIRM}: il veicolo interroga il SIB in cerca della conferma da parte del CS. Analogamente a quanto succede nello stato precedente se la ricerca fallisce ho ha esito negativo si ritorna in stato \code{DRIVING}. In caso di successo è impostata come destinazione la strada del GCP dove avverrà la ricarica. Se il tempo che manca alla ricarica è maggiore di un quarto d'ora allora il veicolo passa in stato \code{PARKING} in attesa dell'orario della ricarica, questo comportamento serve ad evidenziare il fatto che un utente che dispone della prenotazione è meno ansioso rispetto a uno che invece deve girare tutti i GCP della città fino a che non trova un EVSE libero. Se il tempo che manca alla ricarica è minore di un quarto d'ora allora il veicolo si dirige verso al GCP passando in stato \code{GO_TO_RECHARGE}
+	\item \code{PARKING}: il veicolo si parcheggia nella prima strada disponibile in attesa del tempo necessario alla ricarica. Lo stato successivo viene definito nello stato precedente a questo. Attualmente il solo stato che porta a \code{PARKING} è \code{WAITING_CONFIRM} e come stato successivo imposta \code{GO_TO_RECHARGE}.
+	\item \code{GO_TO_RECHARGE}: il veicolo si dirige verso il GCP. Controlla periodicamente la strada in cui si trova e quando arriva in quella del GCP  si ferma. A questo punto si presentano due casistiche:
+	\begin{itemize}
+		\item{Con Prenotazione}: Se la colonnina è occupata allora il veicolo, che evidentemente è arrivato in anticipo, si mette in coda in attesa del suo turno passando nello stato \code{WAITING_FOR_EVSE} altrimenti inizia la ricarica e si passa in stato \code{CHARGING}.
+		\item{Senza Prenotazione}: Si controlla se ci sono degli EVSE liberi e in tal caso inizia la ricarica passando in stato \code{CHARGING}. In assenza di EVSE allora si interroga il modulo \code{DriverBehaviour} che stabilisce se fermarsi ad aspettare il veicolo che si sta caricando attualmente passando nello stato \code{WAITING_FOR_EVSE}. In caso contrario si sceglie casualmente un GCP tra i tre più vicini che non siano già stati visitati e ci si dirige verso di esso passando nello stato \code{GO_TO_RECHARGE}. 
+	\end{itemize}
+	\item \code{WAITING_EVSE}: questo stato rappresenta l'attesa presso un EVSE. Non viene schedulato nessun messaggio poiché è compito del veicolo attualmente in carica ``risvegliare'' il veicolo in attesa. Lo stato successivo al ``risveglio'' è \code{CHARGING}
+	\item \code{CHARGING}: Rappresenta la carica lo stato di carica di un veicolo. Si rimane in questo stato finché la carica non è completa oppure, nel caso di prenotazione attiva, fino al raggiungimento del tempo di fine ricarica.
 \end{description}
 	
-
-
 \begin{figure}
 	\centering
 	\includegraphics[width=1.0\textwidth]{assets/car-fsmd.png}

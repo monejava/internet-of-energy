@@ -56,7 +56,7 @@ Aggiungo che, viste le ottimizzazioni delle moderne \emph{Java Virtual Machine} 
 
 Il cuore di questo sistema è la classe \code{ObjectPool<T>} (\cite{objectpool}) che troviamo nel package \code{it.unibo.cityservice.pool} che rappresenta un pool di oggeti di tipo \code{T}. Questa classe contiene un metodo astratto, \code{createObject()}, che va implementato nelle sottoclassi con la logica di creazione dell'oggetto di cui vogliamo creare il pool.
 
-Nel mio caso ho creato \code{XmlToolsPool} e \code{CitySibPool} e a titolo esemplificativo mostrerò l'implementazione del primo nel Lst. \ref{lst:objectPool}:
+Nel mio caso ho creato \code{XmlToolsPool} e \code{CitySibPool} e a titolo esemplificativo mostrerò l'implementazione del primo nel List. \ref{lst:objectPool}:
 
 \begin{java}[caption={Implementazione di ObjectPool},label={lst:objectPool}]
 public class XmlToolsPool extends ObjectPool<SSAP_XMLTools>{
@@ -82,12 +82,12 @@ Evidenzio la semplicità di creazione di un pool per un determinato tipo di dato
 
 \subsection{Pool Di Thread}
 
-Adesso che abbiamo visto come è che cos'è il meccanismo dei pool degli oggetti e perchè è stato utilizzato vediamo invece di capire cosa sono i pool di thread e quali problematiche vanno a risolvere.
-La creazione di thread può creare problemi in termini di performance (in quanto la creazione e distruzione di questo oggetti è abbastanza onerosa), di controllare il numero del numero dei thread creati e infine di scalabilità (\cite{vetti2008}).
+Analizzeremo ora più in dettaglio i pool di thread e le problematiche che questi risolvere.
+L'uso di thread può creare problemi in termini di performance in quanto la creazione e distruzione di questo oggetti è abbastanza onerosa. Risulta inoltre critico il controllo del numero dei thread creati ai fini della scalabilità (\cite{vetti2008}).
 
-Pertanto è necessario ricorrere alle classi del package \code{java.util.concurrent} che implementano l'interfaccia \code{Executor}. In questo caso sono state poi utilizzate istanze dell'interfaccia \code{ExecutorService} che mette a disposizioni metodi volti a controllare il ciclo di vita del pool stesso.
+È quindi necessario ricorrere alle classi del package \code{java.util.concurrent} che implementano l'interfaccia \code{Executor}. In questo caso sono state utilizzate istanze dell'interfaccia \code{ExecutorService} che mette a disposizione metodi volti a controllare il ciclo di vita del pool.
 
-L'inizializzazione degli \code{ExecutorService} avviene tramite l'invocazione di un metodo statico della classe \code{Executors} che specifica la dimensione del pool che si vuole creare. Quando invece si vuole assegnare un compito ad uno dei thread del pool si usa il metodo \code{execute} che prende in ingresso un istanza dell'interfaccia \code{Runnable}.
+L'inizializzazione degli \code{ExecutorService} avviene tramite l'invocazione di un metodo statico della classe \code{Executors} che specifica la dimensione del pool che si vuole creare. Quando invece si vuole assegnare un compito ad uno dei thread del pool si usa il metodo \code{execute} che prende in ingresso un istanza dell'interfaccia \code{Runnable} (List. \ref{lst:threadPool}).
 
 \begin{java}[caption={Creazione Pool di Thread},label={lst:threadPool}]
 ExecutorService pool = Executors.newFixedThreadPool(30);
@@ -101,73 +101,73 @@ pool.execute(new Runnable() {
 
 \subsection{Il funzionamento del City Service}
  
-Come visto nella sezione ~\ref{sec:protocol} il servizio cittadino deve gestire un gran numero di messaggi a ogni tipologia dei quali corrisponde una sottoscrizione al SIB cittadino. Inoltre per poter rispondere alle richieste degli utenti deve anche avere le informazioni relative a tutti gli EVSE.
+Come visto nella sezione ~\ref{sec:protocol} il servizio cittadino deve gestire un gran numero di messaggi ad ogni tipologia dei quali corrisponde una sottoscrizione al SIB cittadino. Inoltre per poter rispondere alle richieste degli utenti il CS deve disporre delle informazioni relative a tutti gli EVSE.
 
 \subsubsection{Inizializzazione}\label{subsubsec:city-init}
 
-Il \textsc{City Service} all'avvio compie innumerevoli compiti. Contrariamente a quanto avveniva in precedenza, dove i GCP erano codificati nell'ontologia e l'ontologia stessa veniva caricata da un programma esterno, ho deciso di delegare le inizializzazioni al \textsc{City Service} col fine di semplificarne lo sviluppo. Infatti in precedenza ad ogni riavvio del servizio era necessario uccidere manualmente il SIB e riavviarlo per avere una situazione di partenza pulita. Il caricamento dell'ontologia avviene tramite una libreria da me sviluppata, \emph{OntologyLoader}, (App. ~\ref{app:ontology-loader}) che a sua volta si appoggia alle librerie Apache Jena (\cite{jena2011}). In ambito di produzione ovviamente il servizio cittadino non eliminerebbe i dati e nemmeno ricaricherebbe quelli già presenti.
+Il CS all'avvio compie innumerevoli compiti. Contrariamente a quanto avveniva in precedenza, dove i GCP erano codificati nell'ontologia e l'ontologia stessa veniva caricata da un programma esterno, ho scelto di delegare le inizializzazioni al CS col fine di semplificarne lo sviluppo. Infatti in precedenza ad ogni riavvio del servizio era necessario ``killare'' manualmente il SIB e riavviarlo per ottenere una situazione di partenza pulita. Il caricamento dell'ontologia avviene tramite una libreria da me sviluppata, \emph{OntologyLoader}, (App. ~\ref{app:ontology-loader}) che a sua volta si appoggia alle librerie Apache Jena (\cite{jena2011}). In ambito di produzione, ovviamente, il servizio cittadino non eliminerebbe i dati e nemmeno ricaricherebbe quelli già presenti.
 
-Di seguito una lista dettagliata delle operazioni eseguite dal \textsc{City Service} in fase di inizializzazione:
+Di seguito una lista dettagliata delle operazioni eseguite dal CS in fase di inizializzazione:
 
 \begin{itemize}
-	\item \textbf{Lettura file di configurazione}: Cerca il file di configurazione \code{cityservice.properties} dal quale carica le informazioni del SIB cittadino, il nome dell'ontologia, il nome del file contenente i GCP.
-	\item \textbf{Scrittura Ontologia}: L'ontologia viene scritta nel SIB cittadino
-	\item \textbf{Caricamento Informazioni GCP}: Le informazioni di tutte le stazioni di ricarica presenti in città vengono caricate da un file xml. Le stesse informazioni vengono inserite nel SIB al fine di poterle condividee con le altre entità del sistema.
-	\item \textbf{Creazione Pool}: Vengono creati i pool di thred e di oggetti.
-	\item \label{item:subscr} \textbf{Sottoscrizioni}: Ci si sottoscrive alle informazioni su cui si vuole rimanere aggiornate. Sostanzialmente ci si assicura che arrivino le notifiche per i messaggi descritti nella sezione ~\ref{sec:protocol}:
+	\item \textbf{Lettura file di configurazione}: cerca il file di configurazione \\ \code{cityservice.properties} dal quale carica le informazioni del SIB cittadino, il nome dell'ontologia, il nome del file contenente i GCP.
+	\item \textbf{Scrittura Ontologia}: l'ontologia viene scritta nel SIB cittadino.
+	\item \textbf{Caricamento Informazioni GCP}: le informazioni di tutte le stazioni di ricarica presenti in città vengono estratte da un file XML. Le stesse informazioni vengono inserite nel SIB per di poterle condividere con le altre entità del sistema.
+	\item \textbf{Creazione Pool}: vengono creati i pool di thread e di oggetti.
+	\item \label{item:subscr} \textbf{Sottoscrizioni}: il CS si sottoscrive alle informazioni deve rimanere aggiornato. Sostanzialmente ci si assicura che arrivino le notifiche per i messaggi descritti nella sezione ~\ref{sec:protocol}:
 	\begin{enumerate}
 		\item Creazione di nuove istanze di \code{ioe:ChargeRequest}
-		\item Inserimento di triple contenenti come predicato \code{ioe:confirmByUser}
-		\item Inserimento di triple contenenti come predicato \code{ioe:ackByUser}
+		\item Inserimento di triple contenenti il predicato \code{ioe:confirmByUser}
+		\item Inserimento di triple contenenti il predicato \code{ioe:ackByUser}
 		\item Creazione di nuove istanze di \code{ioe:ReservationRetire}
 	\end{enumerate}
 \end{itemize}
 
 \subsubsection{Gestione delle richieste}
 
-Quando ci si sottoscrive a qualcosa nel SIB oltre a definire a cosa ci vogliamo sottoscrivere dobbiamo anche definire un \emph{handler} che verrà eseguito quando avverrà il cambiamento a cui siamo interessati. Come visto sopra, nella sezione ~\ref{sec:protocol}, di sottoscrizioni ne vengono fatte 4, per ognuna di esse viene definito lo stesso \emph{hanlder} il quale lancia un thread istanza della classe \code{RequestDispatcher}. Esso si occupa semplicemente di gestire la richiesta e di eseguire un altro thread, sempre contenuto in un pool, che la soddisfi.
+Quando il CS effettua una sottoscrizione nel SIB, oltre a definire l'oggetto della sottoscrizione, deve definire un \emph{handler} che verrà eseguito all'occorrenza del cambiamento di interesse. Come visto nella sezione ~\ref{sec:protocol} vengono effettuate 4 sottoscrizioni per ognuna delle quali si definisce lo stesso \emph{hanlder} che lancia un thread istanza della classe \code{RequestDispatcher}. Questo si occupa semplicemente di gestire la richiesta e di eseguire un altro thread, anch'esso contenuto in un pool, che la soddisfi.
 
 \paragraph{Sessioni}
 
-Per ottenere un ulteriore incremento di performace è stato introdotto il concetto di sessione. La sessione inizia al quando il \emph{City Service} riceve la richiesta e finisce quando riceve l'acknowledgment. Il fine della sessione è mantenere una cache dei dati che vengono scambiati al fine di risparmiare query SPARQL, che sono assai onerose in termini di performance, e di dare un limite temporale alle sessioni stesse. La classe che si occupa di gestire le sessioni è \code{SessionManager} mentre la sessione è rappresentata dalla classe \code{session}.
+Per ottenere un ulteriore incremento di performace ho introdotto il concetto di sessione. La sessione inizia quando il CS riceve la richiesta e termina quando riceve l'acknowledgment. Scopo della sessione è il mantenimento di una cache dei dati che vengono scambiati per risparmiare query SPARQL, molto onerose in termini di performance, e di dare un limite temporale alle sessioni stesse. La classe che si occupa di gestire le sessioni è \code{SessionManager} mentre la sessione è rappresentata dalla classe \code{Session}.
 
 All'interno della sessione vengono salvate le seguenti informazioni:
 
 \begin{itemize}
-	\item \textbf{chargeRequest}: Un istanza dell'entity \code{ChargeRequest} ricevuta all'utente. 
-	\item \textbf{chargeResponse}: Un istanza dell'entity \code{ChargeResponse} inviata all'utente. 
+	\item \textbf{chargeRequest}: un istanza dell'entity \code{ChargeRequest} ricevuta all'utente. 
+	\item \textbf{chargeResponse}: un istanza dell'entity \code{ChargeResponse} inviata all'utente. 
 	\item \textbf{reservation}: Un istanza dell'entity \code{Reservation} creata in seguito alla conferma dell'utente.
-	\item \textbf{startTime}: Il momento in cui inizia la sessione.
-	\item \textbf{endTime}: Il momento in cui finisce la sessione che corrisponde all'arrivo dell'acknowledgment dell'utente.
+	\item \textbf{startTime}: il momento in cui inizia la sessione.
+	\item \textbf{endTime}: il momento in cui termina la sessione che corrisponde all'arrivo dell'acknowledgment dell'utente.
 \end{itemize}
 
 \noindent
-La classe \code{SessionManager} possiede un timer che a tempo prefissato lancia un thread che controlla le sessioni attive. Se una delle sessioni è attiva da molto tempo senza essere stata chiusa allora significa che probabilmente c'è stato un problema e quindi vengono rimossi dal SIB tutti i dati relativi alla sessione compresa la prenotazione.
+La classe \code{SessionManager} possiede un timer che a tempo prefissato lancia un thread di controllo delle sessioni attive. Una sessione attiva da un tempo eccessivo indica che probabilmente c'è stato un problema: vengono quindi rimossi dal SIB tutti i dati relativi alla sessione, compresa la prenotazione.
 
 \paragraph{Prenotazioni}
 
-La gestione delle prenotazioni, una volta che sono state create e confermate dall'utente, è delegata alla classe \code{ReservationManager}. A suo interno vengono salvate in una cache le istanze di \code{Reservation} create. Quando arriva una nuova richiesta di prenotazione la verifica della disponibilità viene fatta su questa cache anziché sul SIB. Questo sempre al fine di ridurre gli accessi al database e il successivo parsing delle risposte.
-Siccome l'uso di questa classe è altamente parallelo, ovvero possono accedervi molti thread contemporaneamente, viene utilizzata una mappa thread-safe messa a disposizione da java \code{ConcurrentHashMap}. Inoltre le operazioni di verifica di disponibilità delle prenotazioni vengono sono atomiche a livello di EVSE grazie a un lock per ognuno di essi. 
+La gestione delle prenotazioni, una volta che sono state create e confermate dall'utente, è delegata alla classe \code{ReservationManager}. Al suo interno vengono salvate in una cache le istanze di \code{Reservation} create. All'arrivo di una nuova richiesta di prenotazione la verifica della disponibilità viene fatta su questa cache anziché sul SIB per ridurre gli accessi al database e il successivo parsing delle risposte.
+Poiché l'uso di questa classe è altamente concorrente, in quanto possono accedervi molti thread contemporaneamente, viene utilizzata una mappa thread-safe resa disponibile da java \code{ConcurrentHashMap}. Inoltre le operazioni di verifica di disponibilità delle prenotazioni sono atomiche a livello di EVSE grazie a un lock per ognuna di esse. 
 
 \paragraph{Thread}\label{par:thread}
 
-Ci sono cinque classi diverse che implementano l'interfaccia \code{Runnable} ognuna delle quali ha il compito di gestire un determinato aspetto dei protocolli di richiesta. Ovviamente c'è un pool di esecuzione per ognuna di esse.
+Cinque classi diverse implementano l'interfaccia \code{Runnable}. Ognuna delle quali ha il compito di gestire un preciso aspetto dei protocolli di richiesta. Ovviamente c'è un pool di esecuzione per ognuna di esse.
 
 \begin{itemize}
-	\item \code{RequestDispatcher}: È il thread che si occupa di smistare le richieste agli altri esecutori, viene eseguito ogni volta che arriva una notifica da una sottoscrizione. La decisione avviene in base all'id della sottoscrizione che viene assegnato in fase di inizializzazione ed immagazzinato all'interno di variabili globali. Il codice di questo del corpo di questo thread è mostrato nel listato ~\ref{lst:requestDispatcher} dive si nota chiaramente l'utilizzo del pool di oggetti e dei pool di thread nonché del \code{logger}. Questo approccio viene usato anche per gli altri thread con l'aggiunta del reperimento dei \code{KpConnector} dal relativo pool.
-	\item \code{ChargeRequestHandler}: Viene eseguito quando un utente inserisce un istanza istanza di \code{ioe:ChargeRequest} nel SIB. Dalla sottoscrizione ne ricava l'URI e con l'apposito controller \code{ChargeRequestController} la trasforma in un Entity java istanza della classe \code{ChargeRequest}. I passaggi che dalla richiesta elaborano una risposta sono i seguenti:
+	\item \code{RequestDispatcher}: è il thread che si occupa di smistare le richieste agli altri esecutori. Viene eseguito ogni volta che arriva una notifica da una sottoscrizione. La decisione avviene in base all'ID della sottoscrizione assegnato in fase di inizializzazione ed salvato all'interno di variabili globali. Il codice del corpo di questo thread è mostrato nel listato ~\ref{lst:requestDispatcher} dive si nota chiaramente l'utilizzo del pool di oggetti e dei pool di thread nonché del \code{logger}. Questo approccio viene usato anche per gli altri thread con l'aggiunta del reperimento dei \code{KpConnector} dal relativo pool.
+	\item \code{ChargeRequestHandler}: viene eseguito quando un utente inserisce un istanza di \code{ioe:ChargeRequest} nel SIB. ricava l'URI dalla sottoscrizione e con l'apposito controller \code{ChargeRequestController} la trasforma in un Entity Java istanza della classe \code{ChargeRequest}. I passaggi che dalla richiesta elaborano una risposta sono i seguenti:
 	\begin{enumerate}
-		\item Controllo di coerenza sulla richiesta. Se la richiesta non è valida allora viene inviata una risposta vuota. Altrimenti si procede con il resto delle operazioni.
-		\item Viene creata un istanza di \code{Session} gestita dalla classe \code{SessionManager}.
-		\item Scelta dei \emph{GCP} che si trovano nell'area scelta dall'utente tramite la libreria \code{UniboGeoTools}.
-		\item Vengono ciclati tutti gli \emph{EVSE} appartenenti ai \emph{GCP} selezionati.
-		\item Per ogni \emph{EVSE} vengono ricavati gli slot di tempo compatibili con la fascia oraria e la quantità di carica richieste dall'utente.
-		\item Viene generata la risposta istanza dell'Entity \code{ChargeResponse}. Al fine di minimizzare lo scambio di dati attraverso la rete sopratutto per non penalizzare i dispositivi mobili, le richieste vengono filtrate. Vengono inviate le opzioni di ricarica provenienti dai 5 \emph{GCP} più vicini e ne vengono scelte al massimo 2 per ogni \emph{EVSE}
-		\item La risposta viene trasformata inserita nel SIB tramite la classe \\ \code{ChargeResponseController}.
+		\item Controllo di coerenza della richiesta. Se non è valida viene inviata una risposta vuota, altrimenti si procede con il resto delle operazioni.
+		\item Viene creata un istanza di \code{Session} gestita dalla classe \code{Session Manager}.
+		\item Scelta dei GCP che si trovano nell'area scelta dall'utente tramite la libreria \code{UniboGeoTools}.
+		\item Vengono ciclati tutti gli EVSE appartenenti ai GCP selezionati.
+		\item Per ogni EVSE si ricavano gli slot di tempo compatibili con la fascia oraria e la quantità di carica richieste dall'utente.
+		\item Viene generata la risposta istanza dell'Entity \code{ChargeResponse}. Per minimizzare lo scambio di dati attraverso la rete, sopratutto per non penalizzare i dispositivi mobili, le risposte vengono filtrate. Vengono inviate le opzioni di ricarica provenienti dai 5 GCP più vicini e ne vengono scelte al massimo 2 per ogni EVSE.
+		\item La risposta viene trasformata in triple e inserita nel SIB tramite la classe \code{ChargeResponseController}.
 	\end{enumerate}
-	\item \code{ConfirmByUserHandler}: Questo thread viene invocato quando l'utente scaglie un opzione di ricarica e semplicemente controlla che sia ancora disponibile. In tal caso crea la prenotazione in modo che nessun altro possa usare la colonnina nell'orario richiesto. Da notare che l'istanza di \code{ChargeOption} viene presa dalla cache contenuta nella sessione anziché tramite query SPARQL e che l'istanza di \code{Reservation} viene salvata nel gestore di prenotazioni \code{ReservationManager}.
-	\item \code{AckByUserHandler}: Viene invocato quando l'utente conferma l'opzione di ricarica. A questo punto il protocollo può considerarsi terminato e quindi vengono eliminate tutte le informazioni ad esso relative dal SIB e la sessione associata. L'unica informazione che rimane è un istanza di \code{ioe:Reservation} nel SIB.
-	\item \code{RetireReservationHandler}: Si occupa semplicemente di eliminare le istanze di \code{ioe:Reservation} dal SIB e le corrispettive informazioni nella cache contenuta in \code{ReservationManager}.
+	\item \code{ConfirmByUserHandler}: il thread viene invocato quando l'utente sceglie un opzione di ricarica e semplicemente controlla che sia ancora disponibile. In tal caso crea la prenotazione affinché che nessun altro utente possa usare la colonnina nell'orario richiesto. Si noti che l'istanza di \code{ChargeOption} viene reperita dalla cache contenuta nella sessione anziché tramite query SPARQL e che l'istanza di \code{Reservation} viene salvata nel gestore di prenotazioni \code{ReservationManager}.
+	\item \code{AckByUserHandler}: il thread viene invocato quando l'utente conferma l'opzione di ricarica. A questo punto il protocollo può considerarsi terminato e quindi vengono eliminate dal SIB tutte le informazioni che lo riguardano. L'unica informazione che rimane è un istanza di \code{ioe:Reservation} nel SIB.
+	\item \code{RetireReservationHandler}: si occupa semplicemente di eliminare le istanze di \code{ioe:Reservation} dal SIB e le corrispondenti informazioni dalla cache contenuta in \code{ReservationManager}.
 \end{itemize}
 
 \begin{java}[caption={Corpo di RequestDispatcher},label={lst:requestDispatcher}]
@@ -192,7 +192,7 @@ xmlToolsPool.returnObject(xmlTools);
 
 \section{Testing}
 
-Aspetto fondamentale che ha caratterizzato lo sviluppo del \emph{City Service} è stata l'integrazione con test di unità che ne hanno assicurato la continuità di funzionamento durante le fasi di modifica e sviluppo.
+Un aspetto fondamentale nello sviluppo del \emph{City Service} è stato l'integrazione con test di unità che ne hanno assicurato la continuità di funzionamento durante le fasi di modifica e sviluppo.
 
 Il framework utilizzato per eseguire il testing è \code{junit4}, un ottima libreria Java che tramite il meccanismo delle annotazioni permette di scrivere ed eseguire i test i maniera semplice ed efficace.
 
@@ -200,9 +200,9 @@ I test sono stati determinanti non solo per assicurare la stabilità del codice 
 
 \subsection{Test Protocolli}
 
-Per testare i protocolli ho implementato un thread che svolgesse tutte lo operazioni necessarie per completare una richiesta di prenotazione ed il ritiro della stessa. L'incapsulamento della logica del protocollo di richiesta all'interno di un thread permette di fatto l'esecuzione multipla di istanze di quest'ultimo simulando quindi l'interazione di molteplici utenti. La classe delegata a svolgere questo compito è \code{ioe:ChargeProtocolTest} nel packacge \code{it.unibo.ioe.cityservice.chargeprotocol} situato nella cartella di test. All'interno di questa classe si trova una inner-class, \code{ReservationProtocol} che implementa \code{Runnable} rendendo quindi possibile la sua esecuzione all'interno di un thread separato. 
+Per testare i protocolli ho implementato un thread che svolgesse tutte lo operazioni necessarie per completare una richiesta di prenotazione e il suo ritiro. L'incapsulamento della logica del protocollo di richiesta all'interno di un thread permette di fatto l'esecuzione multipla delle sue istanze simulando quindi l'interazione di molteplici utenti. La classe delegata a svolgere questo compito è \code{ChargeProtocolTest} nel packacge \code{it.unibo.ioe.cityservice .chargeprotocol} situato nella cartella di test. All'interno di questa classe si trova una inner-class, \code{ReservationProtocol}, che implementa \code{Runnable} rendendo quindi possibile la sua esecuzione all'interno di un thread separato. 
 
-Per simulare le attese dell'utente è stato usato il meccanismo dei lock. Ogni fase del protocollo ha un suo lock che viene acquisito subito dopo l'invio messaggio (List. ~\ref{lst:request-lock}) e viene rilasciato al momento dell'esecuzione l'handler associato alla sottoscrizione della risposta (List. ~\ref{lst:response-handler}).
+Per simulare le attese dell'utente ho usato il meccanismo dei lock. Ogni fase del protocollo ha un lock dedicato acquisito subito dopo l'invio del messaggio (List. ~\ref{lst:request-lock}) che viene rilasciato al momento dell'esecuzione dell'handler associato alla sottoscrizione della risposta (List. ~\ref{lst:response-handler}).
 
 \begin{java}[caption={Inserimento della \code{CargeRequest} e attesa della risposta},label={lst:request-lock}]
 chargeRequestController.insertChargeRequest(request);
@@ -228,8 +228,9 @@ if (chargeResponseSubId.equals(subscriptionID)) {
 \end{java}
 \\
 \noindent
-L'opzione di ricarica viene scelta casualmente tra quelle fornite, nel caso in cui venisse confermata dal sistema il thread preleva la corrispondente istanza di \code{Reservation} creata e controlla che i parametri in essa contenuti siano coerenti con quelli dell'opzione scelta.\\
-Tutti i dati scambiati dal protocollo vengono testati se uno di essi dovesse fallire causerebbe la terminazione del protocollo stesso. A tal proposito \code{junit} mette a disposizione una serie di funzioni che permettono di fare asserzioni di ogni tipo al fine di validare i dati. Queste funzioni iniziano con il prefisso \code{assert}, un esempio si può vedere nel listato ~\ref{lst:assert}.
+L'opzione di ricarica viene scelta in modo casuale tra quelle fornite. Se viene confermata dal sistema il thread ne preleva la corrispondente istanza di \code{Reservation} creata e controlla che i parametri in essa contenuti siano coerenti con quelli dell'opzione scelta.
+
+Tutti i dati scambiati dal protocollo vengono testati. Se uno di essi fallisse causerebbe l'interruzione del protocollo. A tal fine \code{junit} rende disponibili una serie di funzioni che permettono di fare asserzioni di ogni tipo per la validazione dei dati. Queste funzioni iniziano con il prefisso \code{assert} di cui si vede un esempio nel listato ~\ref{lst:assert}.
 
 \begin{java}[caption={Risposta ricavata a partire dall'uri, test del risultato},label={lst:assert}]
 response = chargeResponseController.findChargeResponse(chargeResponsesUri);
@@ -239,7 +240,7 @@ assertEquals(request.getUri(), response.getChargeRequestUri());
 
 \subsection{Valutazione Performance}
 
-L'esecuzione di molteplici istanze del protocollo di richiesta è stato determinante al fine di testare le performance del sistema in quanto ha permesso di capire quante richieste contemporanee potessero essere servite e quali fossero i colli di bottiglia. È stato infatti scoperto che arrivati a un certo numero di connessioni simultanee il SIB allunga i tempi di risposta fino a far scattare il \code{socket-timeout} della libreria JavaKPI, in quanto, come indicato nella Sez. ~\ref{subsec:sib}, il SIB comunica con l'esterno tramite protocollo \emph{TCP/IP}. Questa scoperta ha portato a trovare un bug che affliggeva il SIB stesso, il quale, una volta interrotta brutalmente la connessione con il socket di JavaKPI, dava seri problemi di memory-leak come si può ben vedere in Fig. ~\ref{fig:sib-memory-leak}. L'immagine l'ho presa dal mio computer e l'ho inviata agli sviluppatori di Smart-M3-B per dimostrare il problema. Si nota chiaramente il momento precedente all'uccisione del SIB in cui erano allocati circa 8GB di Ram e 3Gb di Swap. Il problema è stato risolto e la versione attuale (0.901) ne è esente.
+L'esecuzione di molteplici istanze del protocollo di richiesta è stato determinante per testare le performance del sistema. Ha permesso infatti di capire quante richieste contemporanee potessero essere servite e quali fossero i colli di bottiglia. Ho infatti rilevato che, raggiunto un certo numero di connessioni simultanee, il SIB allungava i tempi di risposta fino a far scattare il \code{socket-timeout} della libreria JavaKPI in quanto, come indicato nella Sez. ~\ref{subsec:sib}, il SIB comunica con l'esterno tramite protocollo TCP/IP. Questo ha portato a trovare un bug che affliggeva il SIB stesso il quale, una volta interrotta brutalmente la connessione con il socket di JavaKPI, dava seri problemi di memory-leak come si può ben vedere in Fig. ~\ref{fig:sib-memory-leak}. Ho preso l'immagine dal mio computer e l'ho inviata agli sviluppatori di Smart-M3-B per evidenziare il problema. Si nota chiaramente che nel momento che precedeva \emph{l'uccisione} del SIB erano allocati circa 8GB di Ram e 3Gb di Swap. Il problema è stato risolto e la versione attuale (0.901) ne è esente.
 
 \begin{figure}[H]
 	\centering
@@ -249,7 +250,7 @@ L'esecuzione di molteplici istanze del protocollo di richiesta è stato determin
 \end{figure}
 
 \noindent
-La scoperta di questo problema ha portato quindi alla necessità di ottimizzare le performance, è stato quindi deciso di limitare il numero di risposte fornite dal servizio cittadino (Par. ~\ref{par:thread}) che causa un ingente traffico di dati da e verso il SIB. Altra ottimizzazione che decisa in seguito a queste scoperte è stata quella di trasformare le operazioni di INSERT di triple in query SPARQL, in quanto, grazie all'uso dei prefissi al posto degli URL interi, si riesce ad ottimizzare notevolmente il volume di dati scambiato, il che porta a notevoli vantaggi durante l'uso nell'applicazione mobile.
+L'insorgere del problema ha richiesto l'ottimizzazione delle performance e ho quindi deciso di limitare il numero di risposte fornite dal servizio cittadino (Par. ~\ref{par:thread}) poiché causava un ingente traffico di dati da e verso il SIB. Un'altra ottimizzazione apportata in seguito al problema è stata la trasformazione di INSERT di triple in query SPARQL: grazie all'uso dei prefissi al posto degli URL interi, si è ottimizzato notevolmente il volume di dati scambiato, con notevoli vantaggi durante l'uso nell'applicazione mobile.
 
 
 

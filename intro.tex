@@ -27,7 +27,7 @@ Internet of Energy è un progetto del framework ARTEMIS che da tre anni si conce
 Gli elementi fondamentali del progetto sono:
 
 \begin{itemize}
-	\item La cosiddetta \emph{smart-grid} ovvero, in sintesi, la connessione delle reti energetiche ad Internet per consentire il controllo intelligente della produzione di energia da fonti rinnovabili, il suo stoccaggio e la sua distribuzione.
+	\item La cosiddetta \emph{smart-grid} ovvero, in sintesi, la connessione delle reti energetiche ad Internet per consentire il controllo intelligente dell'energia prodotta da fonti rinnovabili, il suo stoccaggio e la sua distribuzione.
 	\item La progettazione di veicoli elettrici che, mediante apposite tecnologie e dispositivi hardware e software, aumentino il rendimento dei motori elettrici minimizzando al contempo il consumo dell'energia immagazzinata nelle batterie.
 	\item L'utilizzo di Internet per l'interconnessione tra la smart-grid, i veicoli elettrici e gli utenti al fine di ottimizzare le operazioni di ricarica delle batterie compatibilmente con i vincoli imposti dal traffico cittadino e dal rapporto tra consumo e disponibilità globali di energia. In questo ambito si inserisce il progetto all'origine di questa tesi.
 	\item La definizione di standard volti ad assicurare l'interoperabilità tra gli attori in gioco.
@@ -37,12 +37,12 @@ Gli elementi fondamentali del progetto sono:
 
 L'Università di Bologna, congiuntamente ad ARCES, si propone di sviluppare una piattaforma software con l'obbiettivo di fornire una prima valutazione della compatibilità delle specifiche del progetto IoE con la realtà dello scenario cittadino Bolognese.
 
-Innanzitutto è stato sviluppato un architettura software rivolta a fornire i servizi per l'interazione tra gli utenti e la smart-grid incentrati sull'utilizzo di smartphone. La connessione tra l'utente e la smart-grid è assicurata dal City Service (CS) che si fa carico le richieste di prenotazione di ricariche, che arrivano dagli smartphone, fornendo la lista delle colonnine disponibili che meglio si adattano alle esigenze dell'utente. I dati sono rappresentati mediante un grafo semantico e la loro definizione avviene tramite ontologia. Questo permette ai vari attori in gioco, di natura estremamente eterogenea, di comunicare e processare i dati in modo completamente trasparente. Attraverso l'ontologia vengono definite tutte le informazioni inerenti la smart-grid. La persistenza e la condivisione delle informazioni è assicurata da un repository semantico, il Semantic Information Broker (SIB), parte del progetto Smart-M3. 
+Innanzitutto è stato sviluppata un architettura software volta a fornire i servizi per l'interazione tra gli utenti e la smart-grid mediante tecnologie mobile. La connessione tra l'utente e la smart-grid è assicurata dal City Service (CS) a cui giungono le richieste di prenotazione di ricarica provenienti dagli smartphone, fornendo la lista delle colonnine disponibili che meglio si adattano alle esigenze dell'utente. I dati sono rappresentati mediante un grafo semantico e la loro definizione avviene tramite ontologia. Questo permette ai vari attori in gioco, di natura estremamente eterogenea, di comunicare e processare i dati in modo completamente trasparente. Attraverso l'ontologia vengono definite tutte le informazioni inerenti la smart-grid. La persistenza e la condivisione delle informazioni è assicurata da un repository semantico, il Semantic Information Broker (SIB), parte del progetto Smart-M3 (\cite{smart2013}). 
 
 In secondo luogo è stata creata un'applicazione mobile che permette all'utente di monitorare i parametri della batteria del veicolo e di prenotare slot di tempo presso gli EVSE grazie all'interazione con il CS mediante un SIB dedicato. Il servizio di prenotazione da la possibilità all'utente di trovare l'opzione di ricarica più consona alle sue esigenze.
 
 Infine è stata creata una piattaforma di simulazione integrata che permette di valutare su larga scala
-l'impatto dell'introduzione della mobilità elettrica veicolare nel contesto urbano bolognese. Diversamente ad altri tool gia presenti il nostro framework permette di studiare il comportamento degli EV, con relativo modello di carica e scarica della batteria, insieme all'interazione di essi con la samrt-grid. 
+l'impatto dell'introduzione della mobilità elettrica veicolare nel contesto urbano bolognese. Diversamente da altri tool esistenti il framework proposto permette di studiare il comportamento degli EV, con relativo modello di carica e scarica della batteria unitamente all'interazione di essi con la samrt-grid. 
 
 %\subsection{Artemis}
 

@@ -388,16 +388,19 @@ Il modulo realizza la modellazione di alcuni comportamenti dell'autista del veic
 
 \subsubsection{I parametri}
 
-I parametri di questo modulo consistono in coefficienti statistici che determina la propensione verso un comportamento.
+I parametri di questo modulo sono rappresentati da coefficienti statistici che determinano la propensione dell'autista nei confronti di un certo comportamento.
 
 \begin{itemize}
-	\item \textbf{parkingProbabilitWaitingNoRes}: determina la probabilità di fermarsi ad attendere presso una colonnina che il veicolo attualmente in carica finisca.
-	\item \textbf{parkingProbabilitWaitingRes}: 
-	\item \textbf{maxWaitingTime}
-	\item \textbf{minWaitingTime}
-	\item \textbf{chooseTheNearest}
+	\item \code{parkingProbabilityWaitingNoRes}: indica la propensione a fermarsi presso una colonnina in attesa che termini il veicolo attualmente in carica. Usato in modalità senza prenotazione.
+	\item \code{parkingProbabilityWaitingRes}: indica la propensione a parcheggiare il veicolo in attesa dell'arrivo dell'ora di ricarica. Unsato in modalità con prenotazione.
+	\item \code{maxWaitingTime}: indica il tempo massimo che l'utente, senza prenotazione, è disposto a fermarsi presso la colonnina in attesa che questa si liberi.
+	\item \code{minWaitingTime}: indica il tempo minimo che l'utente, senza prenotazione, è disposto a fermarsi presso la colonnina in attesa che questa si liberi.
+	\item \code{chooseTheNearest}: indica la propensione dell'utente, con prenotazione, a scegliere la stazione di ricarica più vicina geograficamente rispetto a quella più prossima temporalmente (ovvero in termini di attesa di inizio della ricarica)
 \end{itemize}
 
+\subsubsection{Attesa presso l'EVSE}
+
+In assenza di prenotazione l'utente che deve effettuare la ricarica presso un EVSE occupato interroga questo modulo richiedendo se deve fermarsi ad attendere oppure no tramite la funzione \code{waitingForEVSE()}. Questa funzione genera un valore random compreso tra \code{maxWaitingTime} e \code{minWaitingTime} che se maggiore del tempo di attesa presso la colonnina induce l'utente ad attendere il suo turno.
 
 
 \section{Implementazione}

@@ -1,88 +1,64 @@
 \chapter{Introduzione}
 
-\section{Smart Cities}
-Citta intelligenti
-
 \section{Electrical Mobility}
 
 Al giorno d'oggi l'Electrical Mobility (EM) è considerata una degli elementi chiave per ridurre l'inquinamento 
-e al contempo liberarsi dalla dipendenza dai combustibili fossili. Questo sta portando a ingenti investimenti
-da parte di governi e delle industrie automobilistiche. 
-
-Nel breve periodo il mercato legato all'EM è destinato a crescere rapidamente come  
-consuguenza dell'incremento della varietà di Veicoli Elettrici (EVs) introdotti dalle Case Automobilistice. 
-Secondo recenti studi infatti il numero di EVs venduti nel periodo tra il 2010 e il 2012 è aumentato del 200\%.
-Nonostante il crescente interesse nei confronti dell'EM, recenti analisi di mercato dimostrano
-che i benefici ad essa legati saranno tangibili soltanto nel lungo questo è confermato da una ricerca condotta dal 
-U.S. National Energy Technology secondo cui il 70\% delle persone non comprerà un EV a causa 
-dell'incertezza sulla disponibilità delle stazioni di ricarica. A questo si vanno ad aggiungere le
-ben note problematiche riguardanti la capacità, la durata delle batterie e i tempi di ricarica 
-estremamente lunghi (nell'ordine delle decine di minuti).
-
-Da un lato la durata dei tempi di ricarica, la limitata capacità delle batterie e la disposizione
-degli Electric Vehicle Supply Element influsce direttamente sull'esperienza di guida di ogni autista 
-e può avere un impatto decisivo sulla penetrazione di mercato dei veicoli elettrici.
-D'altra parte diversi studi hanno dimostrato che l'impatto sulla rete energetica causato dalla
-ricarica simultanea di molti Veicoli Elettrici può avere ripercussioni negative e si è 
-quindi delineata la necessità di coordinare le attività tra EVs ed EVSEs 
-
-Molti progetti Europei sono stati avviati con lo scopo di limitare queste problematiche. Allo stesso tempo
-bisogna considerare che un uno scenario realistico di EM ci sono diverse parti interessate
-(es: autisti, case automobilistiche, produttori di energia) coinvolte nella gestione dell'EM.
-La ricerca si è mobilitata in direzione dell'Information and Communication Technology (ICT)
-per fornire servizi di supporto all'EM e permettere alle parti interessate di cooperare in modo intelligente.
-Sebbene siano state sviluppate diverse applicazioni su scenari in piccola scala, si è ancora lontani
-dall'ottenere l'interoperabilità tra gli attori in gioco i quali utilizzano diverse tecnologie e dispositivi.
-
-Dato l'elevato costo che avrebbero i test su larga scala, la simulazione costituisce lo strumento più adatto per testare l'efficenza delle suluzioni ICT prima che vengano realmente sviluppate. Al giorno d'oggi sono stati sviluppati alcuni simulatori veicolari che permettono un controllo molto fine a livello di veicolo e similarmante altrettanti modelli di batteria sono stati create al fine di riprodurre in modo realistico le dinamiche di carica e scarica della batteria.
-Tuttavia nessuno di questo strumenti è adatto al fine di studiare le dinamiche assai complesse che si presentano 
-nello scenario dell'EM, come l'impatto degli EV sulla rete elettrca cittadina oppure l'effettiva utilità dell'utilizzo di sistemi di prenotazione delle ricariche. 
-
-Il progetto Internet of Energy (IoE) for Electrical Mobility, fondato dall'Unione Europea e comprendente 40 partner da 10 nazioni Europee, mira a colmare queste lacuna, sviluppando hardware, software e sistemi middleware che forniranno un infrastruttura di comunicazione interpolabile tra le parti in gioco all'interno della (? dire due parole a riguardo smart grid).
-
-Lo scopo di questa tesi, frutto del lavoro congiunto tra UNIBO e ARCES, seguito della tesi di laurea di 
-Federico Montori, è fornire contributi su tre diversi fronti a questo progetto. 
-
-Inanzitutto abbiamo sviluppato un architettura software con lo scopo di fornire servizi per l'interazione
-tra gi EVs ed EM attraverso lo smartphone. Il servizio centrale è il City Service (CS) il quale
-si prende a carico le richieste di ricarica, che arrivano dagli smartphone, fornendo la lista degli EVSEs 
-disponibili che piu si adattano alle esigenze dell'utente. Il modello di dati usato dal servizio si basa
-su un ontologia che rappresenta tutte le informazioni relative alla smart-grid. Le informazioni sono condivise
-attraverso un repository semantico chiamato Semantic Information Broker (SIB), esso garantisce, grazie all'ontologia,
-un interazione uniforme tra i vari componenti del sistema.
-
-In secondo luogo abbiamo creato un'applicazione mobile che permette all'utente di monitorare i parametri
-della batteria del veicolo e di prenotare slot di tempo presso gli EVSE grazie all'interazione con la 
-SIB cittadina. Il servizio di prenotazione da la possibilita di scegliere in base a vari parametri come il prezzo, 
-la distanza, il contributo energetico necessario a raggiungere l'EVSE e il tempo totale di ricarica.
-
-Infine abiamo creato una piattaforma di simulazione integrata che permette di valutare su larga scala
-l'impatto della EM. Diversamente ad altri tool gia presenti il nostro framework permette di studiare 
-il comportamento degli EV, con relativo modello di carica e scariaca della batteria, insieme all'interazione
-di essi con la samrt grid attraverso gli EVSE. A questo proposito sono stati usati doversi tool tra i quali
-SUMO, un ``simulatore di traffico microscopico``, OMNET++, un simulatore a eventi discreti, e infine per 
-far comunicare i due simulatori viene usata l'interfaccia TRACI, messa a disposizione da SUMO, la quale
-comunica con OMNET++ attraverso Veins. Grazie a SUMO riusciamo a modellare l'ambiante urbano, nel nostro 
-caso Bologna e Torino, includendo dati topografici e altimetrici realistici. OMNET++ invece è stato
-utilizzato per implementare i modelli dell'EV, compresa la batteria e il comportamento dell'autista.
+e affrancarsi dalla dipendenza dai combustibili fossili. Questo sta inducendo governi e industrie automobilistiche a investire somme ingenti nei relativi progetti. 
+\\\\
+Si prevede che nel breve periodo il mercato legato all'EM sia destinato a crescere rapidamente come conseguenza dell'incremento della varietà di Veicoli Elettrici (EV) immessi sul mercato dalle Case Automobilistice. Secondo recenti studi infatti il numero di EV venduti nel periodo tra il 2010 e il 2012 è aumentato del 200\%. 
+\\\\
+Nonostante il crescente interesse nei confronti dell'EM, recenti analisi di mercato dimostrano che i benefici ad essa legati diverranno significativi soltanto nel lungo periodo, tesi confermata da una ricerca condotta dal U.S. National Energy Technology (\cite{katmale2011}) secondo la quale il 70\% dei potenziali consumatori non acquisterà un EV a causa dell'incertezza sulla disponibilità delle stazioni di ricarica. A questo si aggiungono le note problematiche riguardanti la capacità e la durata delle batterie nonché i significativi tempi di ricarica eccessivamente lunghi (nell'ordine delle decine di minuti) se comparati con quelli di rifornimento dei veicoli a combustibile fossile.
+\\
+Da un lato la durata dei tempi di ricarica, la limitata capacità delle batterie e la disposizione territoriale degli Electric Vehicle Supply Element (colonnine di ricarica - EVSE) influisce direttamente sull'esperienza di guida di ogni autista e può avere un impatto decisivo sulla penetrazione di mercato dei veicoli elettrici. D'altro canto diversi studi hanno dimostrato che l'impatto critico sulla rete energetica causato dalla ricarica simultanea di un numero significativo di EV. Si è quindi delineata chiaramente la necessità di coordinare efficacemente le necessita di ricarica degli EV con la quantità e la dislocazione territoriale degli EVSE.
+\\\\
+Molti progetti Europei sono stati avviati con lo scopo di limitare queste problematiche. Allo stesso tempo bisogna considerare che un uno scenario realistico di EM coinvolge diverse parti interessate (autisti, case automobilistiche, produttori di energia, traffico cittadino, fattori economici e psicologici ecc\dots). Uno scenario cosi complesso ha mobilitato la ricerca in direzione dell'Information and Communication Technology (ICT) per fornire servizi di supporto all'EM consentendo alle parti interessate di cooperare in modo intelligente e sostenibile.
+Sono state sviluppate finora diverse applicazioni relative a scenari in scala ridotta ma si è ancora lontani dall'ottenere una effettiva interoperabilità tra gli attori in gioco sopratutto per la mancanza di standardizzazione delle tecnologie e dei dispositivi utilizzati.
+\\\\
+Stante l'elevato costo dei test su larga scala, la simulazione rappresenta lo strumento più adatto a testare l'efficacia delle soluzioni ICT prima che vengano realmente implementate. A tutt'oggi sono stati sviluppati sia alcuni simulatori veicolari che permettono un controllo molto fine a livello di singolo veicolo che modelli di batteria atti a simulare realisticamente le dinamiche di carica e scarica. Tuttavia nessuno di questo strumenti è risultato efficace nella soluzione delle complesse dinamiche derivanti dall'impatto degli EV sulla rete elettrica cittadina e dalle incertezze sull'effettiva utilità dell'uso di sistemi di prenotazione delle ricariche. 
+\\\\
+Il progetto Internet of Energy (IoE) for Electrical Mobility, avviato dall'Unione Europea e comprendente 40 partner da 10 nazioni Europee, intende colmare queste lacuna tramite lo sviluppando di hardware, software e sistemi middleware che possano fornire un infrastruttura di comunicazione interoperabile tra le parti in gioco all'interno della cosiddetta grid ovvero il sistema formato dall'insieme delle stazioni di ricarica dislocate strategicamente sul territorio, dalle modalità di prenotazione programmata delle ricariche, dai dispositivi hardware atti a gestirle e dal software di controllo dell'intero sistema.
+\\\\
+Lo scopo di questa tesi, frutto del lavoro congiunto tra UNIBO e ARCES, seguito della tesi di laurea di Federico Montori, è quello di fornire un contributo significativo in questa direzione.
 
 \section{Internet of Energy}
 
-\subsection{Artemis}
+Internet of Energy è un progetto del framework ARTEMIS che da tre anni si concentra sullo sviluppo di tecnologie atte a realizzare e supportare l'adozione su larga scala della EM in Europa. Riunisce 40 partner di 10 paesi europei con l'obiettivo di mobilitare le migliori capacità industriali e di ricerca nei settori di produzione e stoccaggio dell'energia, sistemi embedded e produzione di veicoli elettrici. Il budget totale del progetto IoE è di 45 milioni di Euro, di cui la metà finanziata da 40 industrie partner.
+
+Gli elementi fondamentali del progetto sono:
+
+\begin{itemize}
+	\item La cosiddetta \emph{smart-grid} ovvero, in sintesi, la connessione delle reti energetiche ad Internet per consentire il controllo intelligente della produzione di energia da fonti rinnovabili, il suo stoccaggio e la sua distribuzione.
+	\item La progettazione di veicoli elettrici che, mediante apposite tecnologie e dispositivi hardware e software, aumentino il rendimento dei motori elettrici minimizzando al contempo il consumo dell'energia immagazzinata nelle batterie.
+	\item L'utilizzo di Internet per l'interconnessione tra la smart-grid, i veicoli elettrici e gli utenti al fine di ottimizzare le operazioni di ricarica delle batterie compatibilmente con i vincoli imposti dal traffico cittadino e dal rapporto tra consumo e disponibilità globali di energia. In questo ambito si inserisce il progetto all'origine di questa tesi.
+	\item La definizione di standard volti ad assicurare l'interoperabilità tra gli attori in gioco.
+\end{itemize}
+
+\section{Contributo al progetto IoE}
+
+L'Università di Bologna, congiuntamente ad ARCES, si propone di sviluppare una piattaforma software con l'obbiettivo di fornire una prima valutazione della compatibilità delle specifiche del progetto IoE con la realtà dello scenario cittadino Bolognese.
+
+Innanzitutto è stato sviluppato un architettura software rivolta a fornire i servizi per l'interazione tra gli utenti e la smart-grid incentrati sull'utilizzo di smartphone. La connessione tra l'utente e la smart-grid è assicurata dal City Service (CS) che si fa carico le richieste di prenotazione di ricariche, che arrivano dagli smartphone, fornendo la lista delle colonnine disponibili che meglio si adattano alle esigenze dell'utente. I dati sono rappresentati mediante un grafo semantico e la loro definizione avviene tramite ontologia. Questo permette ai vari attori in gioco, di natura estremamente eterogenea, di comunicare e processare i dati in modo completamente trasparente. Attraverso l'ontologia vengono definite tutte le informazioni inerenti la smart-grid. La persistenza e la condivisione delle informazioni è assicurata da un repository semantico, il Semantic Information Broker (SIB), parte del progetto Smart-M3. 
+
+In secondo luogo è stata creata un'applicazione mobile che permette all'utente di monitorare i parametri della batteria del veicolo e di prenotare slot di tempo presso gli EVSE grazie all'interazione con il CS mediante un SIB dedicato. Il servizio di prenotazione da la possibilità all'utente di trovare l'opzione di ricarica più consona alle sue esigenze.
+
+Infine è stata creata una piattaforma di simulazione integrata che permette di valutare su larga scala
+l'impatto dell'introduzione della mobilità elettrica veicolare nel contesto urbano bolognese. Diversamente ad altri tool gia presenti il nostro framework permette di studiare il comportamento degli EV, con relativo modello di carica e scarica della batteria, insieme all'interazione di essi con la samrt-grid. 
+
+%\subsection{Artemis}
 
 %partner importanti enel crf fiat ambito energia...%http://www.artemis-ioe.eu/
 
-\subsection{Far progredire il mondo dell'energia}
+%\subsection{Far progredire il mondo dell'energia}
 
 %livelli: mobilità, ricarica, batterie, standard, colonnine, 
 
-\subsection{Mobilità/software}
+%\subsection{Mobilità/software}
 
 %colonnina
 %business
 %
 
-\section{Lavori Correlati}
+%\section{Lavori Correlati}
 
 
 

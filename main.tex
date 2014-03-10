@@ -89,13 +89,25 @@
 	\input{simulator.tex}
 	
 	\clear
+	
+	\input{conclusioni.tex}
 	  
 	\appendix%tutti i capitoli da qui in avanti sono considerati appendici
 	  
 	\input{appendix.tex}
+
+	\clear
+
+	\listoffigures%			produce l'indice delle figure
+	\addcontentsline{toc}{part}{\small{Elenco delle figure}}%inserisco la voce ``Elenco delle figure'' che fa riferimento a questa parte nell'indice (come nuova parte)
 	
 	\clear
 	
+	\lstlistoflistings%		produce l'indice dei codici
+	\addcontentsline{toc}{part}{\small{Elenco dei codici}}%inserisco la voce ``Elenco dei codici'' che fa riferimento a questa parte nell'indice (come nuova parte)
+	
+	\clear
+		
 	\chapter*{\refname}
 	\printbibliography[heading=cartaceo,nottype=online]
 	\printbibliography[heading=web,type=online]

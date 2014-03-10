@@ -100,14 +100,95 @@ A questo punto non rimane che compilare il progetto. La compilazione può avveni
 	\item \textbf{gcc-release}: Compila non includendo le informazioni di debug e applicando le ottimizzazioni previste dal compilatore \code{gcc} con il flag \code{-O2}. Ovviamente questa configurazione è più performante della precedente e andrebbe usata quando, una volta ritenuto stabile il codice, si vogliono eseguire simulazioni batch.
 \end{itemize}
 
-Il cambio di modalità di compilazione si può effettuare tramite: \code{Tasto DX su veins-2.1 -> Build Configurations -> Set Active -> gcc-debug/gcc-release}.
+Il cambio di modalità di compilazione si può effettuare tramite:\\ \code{Tasto DX su veins-2.1 -> Build Configurations -> Set Active -> gcc-debug/gcc-release}.
 
-I file che fanno parte del simulatore si trovano sotto la directory \code{simulator/veins-2.1/examples/veins}. 
+I file che fanno parte del simulatore si trovano sotto la directory:\\ \code{simulator/veins-2.1/examples/veins}. 
 
 \chapter{Vista al Centro Ricerche Fiat}\label{app:crf}
 
+In data martedì 1 gennaio io e Alfredo D'Elia siamo andati a Torino al Centro Ricerche Fiat (CRF). Essendo Fiat un partner IoE ha dato la disponibilità a fornire un loro veicolo elettrico al fine di fare prove di interfacciamento con la tecnologia Blue\&{}Me.
+
+L'importanza di questo evento, al di la di dimostrare la possibilità di interfacciare l'applicazione mobile con un veicolo reale senza apportare particolari modifiche, è determinata dal fatto che raccogliendo i dati forniti dalla centralina del veicolo è possibile verificare l'esattezza del modello di consumo del veicolo implementato nel simulatore. Oltre ai dati forniti dalla centralina ci è stato fornita una costante che indica il consumo medio, espresso in Watt, impiegato da un veicolo per ogni tonnellata per ogni km indipendentemente dal tipo di percorso effettuato. Il dato è confidenziale e quindi non verrà pubblicato in questa tesi. Basti sapere che tale numero si avvicina di molto sia ai dati ottenuti dal Daily che da quelli ottenuti dal simulatore. Non mi sono occupato personalmente della validazione del modello della batteria.
+
+\section{Ottenimento dei dati}
+
+Per ottenere i dati Fiat ci ha fornito delle librerie appositamente create per interfacciarsi con il prototipo di Daily fornito. Non so se l'interfaccia Blue\&{}Me sia stata implementata solo sul prototipo da noi usato oppure se sia uno standard interno di Fiat, rimane il fatto che i parametri restituiti dalla centralina sono in costante evoluzione. Infatti, due mesi prima alla data in cui sono andato al CRF, c'è stato un altro incontro. Analizzando i dati raccolti in quell'occasione si possono notare delle differenze significative rispetto a quelli raccolti in mia presenza. Ad esempio era presente un parametro che indicava la distanza percorsa assente nel set di dati raccolto la prima volta.
+
+La libreria di Fiat fornisce i dati con metodologia push: quando un dato cambia la centralina lo invia attraverso l'interfaccia Bluetooth. I dati sono stati scritti su file, aperto in modalità \emph{append}, a mano a mano che venivano inviati all'applicazione per poterli studiare con calma in seguito. Sul file sono stati salvati il timestamp in cui è stato ricevuto il dato, il nome della variabile e il valore della variabile.
+
+Particolarmente soddisfacente è stato vedere l'interfaccia dell'applicazione mobile visualizzare correttamente i dati inviati dal veicolo. Malgrado siano stati necessari non pochi ritocchi al fine di rendere il tutto funzionante. 
+
 \chapter{UniboGeoTools}\label{app:unibo-geo-tools}
 
-Libreria java sviluppata per motivi strani
+Questa libreria è stata sviluppata da me  parallelamente al progetto di laurea. I sorgenti sono disponibili all'indirizzo \url{https://code.google.com/p/unibo-geotools/}. È interamente scritta in Java e non dipende da nessun'altra libreria, scelta fatta per facilitarne la portabilità.
 
-\chapter{OntologyLoader}\label{app:ontology-loader}
+La libreria fornisce funzioni utili al calcolo del percorso tra due punti, al reperimento dell'altitudine di uno o più punti, distanza tra due coordinate geografiche (con diversi algoritmi in base alla precisione richiesta dal calcolo), compressione di punti attraverso l'algoritmo polylines ecc\dots
+
+Il principio di base della libreria è fornire delle interfacce (Java) per le sue funzionalità per le quali vengono fornite delle implementazioni di default, nulla impedisce di dare delle implementazioni diverse.
+
+Tutte le classi sono dotate delle relative classi di test necessarie ad assicurarsi l'integrità della libreria in seguito alle modifiche.
+
+Non fornirò informazioni particolarmente approfondite a riguardo in quanto non è oggetto della tesi. Rimango comunque disponibile a rispondere ad eventuali domande all'indirizzo: simone.rondelli2@studio.unibo.it
+
+\section{Profilo Altimetrico}
+
+L'API fornisce diverse funzione per reperire l'altitudine di uno o più punti a partire dalle loro coordinate geografiche. Nel List. \ref{lst:elevation-api} viene mostrata l'interfaccia della libreria. Vengono fornite due implementazioni di questa interfaccia:
+
+\begin{itemize}
+	\item \code{SrtmElevationAPI}: i dati del profilo altimetrico vengono prelevati da un file SRTM (Shuttle Radar Topography Mission). I file SRTM sono stati raccolti dalla NASA attraverso scansioni satellitari che hanno portato ad ottenere i dati di elevazione di quasi tutto il globo terrestre. I file contengono i dati risultanti da queste scansioni e sapendo l'algoritmo di codifica risulta semplice ricavarne il valore di altitudine del punto desiderato. Ovviamente è necessario possedere i file SRTM, a tal proposito la libreria fornisce una funzione per scaricare i file direttamente da internet.
+	\item \code{GoogleElevationAPI}: i dati del profilo altimetrico vengono prelevati da un web-service REST fornito da Google. Questo approccio ha i limiti imposti da Google per quanto riguarda la dimensione massima della richiesta e il numero massimo di volte che può essere iterata. Questi limiti possono essere alzati pagando.
+\end{itemize} 
+
+\begin{java}[caption={Interfaccia di Elevation API},label={lst:elevation-api}]
+package it.unibo.elevation;
+
+/**
+ * Defines the base method of Elevation API
+ * @author Simone Rondelli - simone.rondelli2@studio.unibo.it
+ */
+public interface ElevationAPI {
+
+        public double getElevation(double lat, double lon) throws Exception;
+
+        public double getElevation(GeoPoint p) throws Exception;
+
+        public void setElevation(GeoPoint point) throws Exception;
+        
+        public List<GeoPoint> getElevations(List<GeoPoint> points) throws Exception;
+
+        public void setElevations(List<GeoPoint> points) throws Exception;
+
+        public List<GeoPoint> getElevations(String polyline) throws Exception;
+
+}
+\end{java}
+
+\section{Percorso tra due punti}
+
+Grazie a alle funzionalità di questa API possiamo ricavare il percorso stradale tra due punti. Vengono inoltre fornite le informazioni descrittive del percorso (es: ``gira a destra'', ``vai avanti 500 metri'' ecc\dots). L'interfaccia di questa libreria viene mostrata nel List.\ref{lst:direction-api}. Da notare l'utilizzo dei waypoints i quali indicano le deviazioni rispetto al percorso impostato. Le funzioni restituiscono una lista in quanto possono esistere molteplici percorsi che uniscono due punti.
+
+Attualmente esiste una sola implementazione di questa API:
+
+\begin{itemize}
+	\item \code{GoogleDirectionApi}: Le informazioni sul percorso vengono prelevate tramite web-service REST forniti da Google. Come nel caso delle \code{GoogleElevationAPI} bisogna prestare attenzione ai limiti imposti da Google per quanto riguarda il numero e la dimensione delle richieste.
+\end{itemize}
+
+\begin{java}[caption={Interfaccia di Direction API},label={lst:direction-api}]
+package it.unibo.direction;
+
+/**
+ * Defines the base method of Direction API
+ * @author Simone Rondelli - simone.rondelli2@studio.unibo.it
+ */
+public interface DirectionAPI {
+
+        public List<Route> getDirectionsBetween(String from, String to) throws Exception;
+
+        public List<Route> getDirectionsBetween(GeoPoint from, GeoPoint to) throws Exception;
+
+        public List<Route> getDirectionsBetween(String from, String to, List<String> waypoints) throws Exception;
+
+        public List<Route> getDirectionsBetween(GeoPoint from, GeoPoint to, List<GeoPoint> waypoints) throws Exception;
+
+}
+\end{java}

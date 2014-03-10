@@ -176,6 +176,13 @@ La sezione descrive la lista delle tipologie di dati usate nel progetto. Sono tu
 	\item \code{ioe:TimeIntervalData}: Rappresenta un intervallo che originariamente era compreso tra due date nella forma gg/mm/aaaa mentre attualmente si misura in Millisecondi (ms).
 \end{description}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.0\textwidth]{assets/ontology-pro.jpg}
+	\caption{Rappresentazione grafica delle classi dell'ontologia}
+	\label{fig:ioe-ontology}
+\end{figure}
+
 \subsection{Modifiche apportate all'ontologia}
 
 La versione dell'ontologia su cui ho iniziato a lavorare era la 1.5.4 alla quale sono seguiti 10 successivi rilasci fino all'attuale release 1.6.2. Le modifiche più importanti hanno riguardato il supporto di un nuovo protocollo di prenotazione delle ricariche oltre a operazioni varie operazioni di refactoring e correzione di incongruenze.
@@ -241,7 +248,7 @@ Al di la della mancanza del concetto di utente, l'assenza di range nei campi \co
 
 \subsubsection{Il nuovo Protocollo di prenotazione}\label{subsubsec:chargerequest}
 
-In seguito ai problemi messi in luce nel paragrafo precedente (\ref{subsubsec:old-proto}) si è deciso di sviluppare un nuovo protocollo di prenotazione che prendesse in considerazione i nuovi requisiti funzionali.
+In seguito ai problemi messi in luce nel paragrafo precedente (\ref{subsubsec:old-proto}) si è deciso di sviluppare un nuovo protocollo di prenotazione che prendesse in considerazione i nuovi requisiti funzionali (Fig. \ref{fig:res-sec}).
 
 La classe è \code{ioe:ChargeRequest} è stata quindi ridefinita con le seguenti proprietà:
 
@@ -270,6 +277,12 @@ Di seguito verranno esposte le proprietà della classe \code{ioe:ChargeOption}. 
 	\item \code{ioe:hasGcpPosition}: posizione del GCP. Anche questa proprietà è stata aggiunta per semplificare le query SPARQL.
 \end{itemize}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=1.0\textwidth]{assets/reservation-seq-diagram.png}
+	\caption{Sequence diagram che schematizza il protocollo di richiesta}
+	\label{fig:res-sec}
+\end{figure}
 
 \subsubsection{Rimozione informazioni Hardcoded}
 
@@ -281,9 +294,9 @@ Grazie a questo approccio è diventato relativamente semplice impostare uno scen
 
 \section{I Semantic Information Broker}
 
-I SIB sono alla base dell'infrastruttura semantica che caratterizza il progetto. I componenti del sistema (dal servizio cittadino, allo smartphone, all'EVSE ecc..) comunicano e rendono permanenti le informazioni grazie ad essi. L'architettura rimane sostanzialmente invariata da quella presentata da Federico Montori (\cite{montori2012}) nel suo progetto di tesi. Verrà comunque esposta al fine di comprendere il resto della trattazione e verranno evidenziate le variazioni apportate alla soluzione iniziale.
+I SIB sono alla base dell'infrastruttura semantica che caratterizza il progetto. I componenti del sistema (dal servizio cittadino, allo smartphone, all'EVSE ecc\dots) comunicano e rendono permanenti le informazioni grazie ad essi. L'architettura rimane sostanzialmente invariata da quella presentata da Federico Montori (\cite{montori2012}) nel suo progetto di tesi. Verrà comunque esposta al fine di comprendere il resto della trattazione e verranno evidenziate le variazioni apportate alla soluzione iniziale.
 
-L'architettura proposta prevede 2 SIB: il \emph{City SIB} e il \emph{Dash SIB}.
+L'architettura proposta prevede 2 SIB: il \emph{City SIB} e il \emph{Dash SIB} e una sua schematizzazione è rappresentata in Fig. \ref{fig:proj-sib-arch}.
 
 \subsection{City SIB}\label{subsec:city-sib}
 
@@ -300,6 +313,13 @@ Il \emph{Dash SIB} è  un SIB che dovrebbe essere integrato a bordo di ogni veic
 Inizialmente si pensava che questo SIB sarebbe stato eliminato in un contesto reale in quanto i dati in esso contenuti sarebbero stati letti direttamente dal veicolo. Si è invece deciso di mantenerlo con la funzione di interfaccia comune per l'interrogazione dei dati. Ovvero le applicazioni che utilizzano i dati del veicolo, come ad esempio l'applicazione mobile, dovrebbero essere indifferenti alla sorgente dei dati (es: Veicolo Reale, Veicolo Simulato). Compito del programmatore è implementare un adattatore che scrive i dati in provenienti dalle varie fonti sul \emph{Dash SIB}. Come vedremo più avanti (Cap. \ref{chap:mobile-app} e \ref{chap:sim}) grazie a questa tecnica si può controllare dallo smartphone un veicolo presente nel simulatore tenendone monitorati tutti i parametri. I veicoli del simulatore scrivono tutti sullo stesso \emph{Dash SIB} in quanto sarebbe computazionalmente proibitivo e del tutto inutile fare altrimenti.
 
 Poiché attualmente non esistono veicoli dotati di un SIB, in fase di test su veicolo reale (App. \ref{app:crf}) è stato necessario dotarsi di un computer a bordo che contenesse il \emph{Dash SIB} dal quale l'applicazione mobile prelevava i dati.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.0\textwidth]{assets/software-architecture.jpg}
+	\caption{Architettura proposta per il progetto}
+	\label{fig:proj-sib-arch}
+\end{figure}
 
 \section{La libreria IoE}\label{subsec:ioe-lib}
 

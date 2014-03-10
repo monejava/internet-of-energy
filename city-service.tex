@@ -105,7 +105,7 @@ Come visto nella sezione ~\ref{sec:protocol} il servizio cittadino deve gestire 
 
 \subsubsection{Inizializzazione}\label{subsubsec:city-init}
 
-Il CS all'avvio compie innumerevoli compiti. Contrariamente a quanto avveniva in precedenza, dove i GCP erano codificati nell'ontologia e l'ontologia stessa veniva caricata da un programma esterno, ho scelto di delegare le inizializzazioni al CS col fine di semplificarne lo sviluppo. Infatti in precedenza ad ogni riavvio del servizio era necessario ``killare'' manualmente il SIB e riavviarlo per ottenere una situazione di partenza pulita. Il caricamento dell'ontologia avviene tramite una libreria da me sviluppata, \emph{OntologyLoader}, (App. ~\ref{app:ontology-loader}) che a sua volta si appoggia alle librerie Apache Jena (\cite{jena2011}). In ambito di produzione, ovviamente, il servizio cittadino non eliminerebbe i dati e nemmeno ricaricherebbe quelli già presenti.
+Il CS all'avvio compie innumerevoli compiti. Contrariamente a quanto avveniva in precedenza, dove i GCP erano codificati nell'ontologia e l'ontologia stessa veniva caricata da un programma esterno, ho scelto di delegare le inizializzazioni al CS col fine di semplificarne lo sviluppo. Infatti in precedenza ad ogni riavvio del servizio era necessario ``killare'' manualmente il SIB e riavviarlo per ottenere una situazione di partenza pulita. Il caricamento dell'ontologia avviene tramite una libreria da me sviluppata, \emph{OntologyLoader}, che a sua volta si appoggia alle librerie Apache Jena (\cite{jena2011}). In ambito di produzione, ovviamente, il servizio cittadino non eliminerebbe i dati e nemmeno ricaricherebbe quelli già presenti.
 
 Di seguito una lista dettagliata delle operazioni eseguite dal CS in fase di inizializzazione:
 

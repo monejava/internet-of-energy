@@ -4,18 +4,25 @@ La piattaforma di simulazione è uno strumento di fondamentale importanza al fin
 
 \section{Architettura}
 
-Per simulare gli innumerevoli aspetti legati all'Electrical Mobility sono stati usati diversi simulatori/tecnologie in simbiosi. In questa sezione verranno analizzate sommariamente per introdurre il resto della trattazione.
+Per simulare gli innumerevoli aspetti legati all'Electrical Mobility sono stati usati diversi simulatori/tecnologie in simbiosi. In questa sezione verranno analizzate sommariamente per introdurre il resto della trattazione. Esisteva già una versione del simulatore, ma era a puro titolo dimostrativo e di demo. 
 
 \subsection{SUMO}\label{sebsec:sumo}
 
-SUMO (Simulator of Urban Mobility) è un simulatore Open Source e multi-piattaforma di traffico urbano progettato per simulare reti stradali di grandi dimensioni. Sviluppato in C++ è supportato principalmente dall'Institute of Transportation Systems at the German Aerospace Center. La simulazione è di tipo microscopico ovvero ogni veicolo è modellato in modo esplicito, ha un proprio itinerario e si muove individualmente attraverso la rete. Ogni aspetto relativo alla simulazione viene configurato attraverso file XML di descrizione della rete stradale, dei parametri e percorsi di ogni singolo veicolo ed eventualmente di altri aspetti legati alla simulazione come i flussi di traffico e la descrizione degli edifici. 
+SUMO (Simulator of Urban Mobility) è un simulatore Open Source e multi-piattaforma di traffico urbano progettato per simulare reti stradali di grandi dimensioni (\cite{behrisch2011sumo}). Sviluppato in C++ è supportato principalmente dall'Institute of Transportation Systems at the German Aerospace Center. La simulazione è di tipo microscopico ovvero ogni veicolo è modellato in modo esplicito, ha un proprio itinerario e si muove individualmente attraverso la rete. Ogni aspetto relativo alla simulazione viene configurato attraverso file XML di descrizione della rete stradale, dei parametri e percorsi di ogni singolo veicolo ed eventualmente di altri aspetti legati alla simulazione come i flussi di traffico e la descrizione degli edifici. 
 
 SUMO permette di avviare la simulazione in due modalità:
 
 \begin{itemize}
-	\item \textbf{Visuale}: rende disponibile un riscontro visuale dell'andamento della simulazione tramite un interfaccia che mostra la mappa della rete/città con vista dall'alto. Vengono mostrati tutti i veicoli ed è possibile accedere a tutti i parametri della simulazione. Vengono mostrati inoltre i semafori agli incroci, la segnaletica delle strade e, nel caso siano stati caricati, gli edifici della città. Tutto questo ovviamente impatta notevolmente sulle performance ma, al di la del gradevole ed efficace effetto visivo, è utile per monitorare come evolve la simulazione. L'abbiamo usato ad esempio per assicurarsi che i veicoli si fermassero alle colonnine, oppure per valutare la quantità di traffico generata in seguito all'inserimento di un determinato numero di veicoli. È stato molto utile è anche in fase di Demo per mostrare il funzionamento del simulatore.
+	\item \textbf{Visuale}: rende disponibile un riscontro visuale dell'andamento della simulazione tramite un interfaccia che mostra la mappa della rete/città con vista dall'alto (Fig. \ref{fig:sumo}). Vengono mostrati tutti i veicoli ed è possibile accedere a tutti i parametri della simulazione. Vengono mostrati inoltre i semafori agli incroci, la segnaletica delle strade e, nel caso siano stati caricati, gli edifici della città. Tutto questo ovviamente impatta notevolmente sulle performance ma, al di la del gradevole ed efficace effetto visivo, è utile per monitorare come evolve la simulazione. L'abbiamo usato ad esempio per assicurarsi che i veicoli si fermassero alle colonnine, oppure per valutare la quantità di traffico generata in seguito all'inserimento di un determinato numero di veicoli. È stato molto utile è anche in fase di Demo per mostrare il funzionamento del simulatore.
 	\item \textbf{Testuale}: vengono stampati nel terminale i messaggi di Warning ed Error e opzionalmente qualche messaggio integrativo di debug per indicare gli step di avanzamento della simulazione. Una volta constatato, tramite la modalità visuale, che la simulazione si comporta come previsto si passa a questa modalità che offre performance maggiori. È quindi particolarmente indicata per le simulazioni di lunga durata.
 \end{itemize}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1.0\textwidth]{assets/sumo.jpg}
+	\caption{Simulazione di bologna in SUMO}
+	\label{fig:sumo}
+\end{figure}
 
 \subsubsection{Tools}\label{sumo-tools}
 
@@ -29,11 +36,11 @@ I file XML che descrivono le simulazioni possono diventare molto complessi qualo
 
 \subsubsection{TRaCI}
 
-TraCI (Traffic Controller Interface) è un modulo, reso disponibile da SUMO, che permette di interagire con la simulazione in tempo reale tramite un protocollo Client/Server basato su TCP/IP. All'avvio della simulazione SUMO si mette in ascolto su una porta in attesa di messaggi. Qualunque linguaggio che supporti il protocollo TCP/IP può dunque modificare lo stato della simulazione oppure ricevere notifiche sul cambiamento di variabili alle quali ci si può sottoscrivere. È proprio TraCI che farà da ponte tra SUMO e l'altro simulatore usato all'interno della nostra piattaforma.
+TraCI (Traffic Controller Interface) è un modulo, reso disponibile da SUMO, che permette di interagire con la simulazione in tempo reale tramite un protocollo Client/Server basato su TCP/IP (\cite{wegener2008traci}). All'avvio della simulazione SUMO si mette in ascolto su una porta in attesa di messaggi. Qualunque linguaggio che supporti il protocollo TCP/IP può dunque modificare lo stato della simulazione oppure ricevere notifiche sul cambiamento di variabili alle quali ci si può sottoscrivere. È proprio TraCI che farà da ponte tra SUMO e l'altro simulatore usato all'interno della nostra piattaforma.
 
 \subsection{OMNeT++}
 
-OMNeT++ è un ambiente OpenSource di simulazione a eventi discreti. È principalmente usato per la simulazione di reti di comunicazione ma, grazie alla sua architettura modulare ed estremamente flessibile, è possibile utilizzarlo negli ambiti più disparati come la simulazione di sistemi informatici complessi, architetture hardware o, come nel nostro caso, per supporto alla simulazione veicolare.
+OMNeT++ è un ambiente OpenSource di simulazione a eventi discreti (\cite{varga2001omnet++}). È principalmente usato per la simulazione di reti di comunicazione ma, grazie alla sua architettura modulare ed estremamente flessibile, è possibile utilizzarlo negli ambiti più disparati come la simulazione di sistemi informatici complessi, architetture hardware o, come nel nostro caso, per supporto alla simulazione veicolare.
 
 Le simulazioni vengono modellate tramite l'impiego di componenti riusabili chiamati \emph{moduli} combinabili tra di loro come blocchi LEGO.
 
@@ -51,9 +58,16 @@ In OMNeT++ si possono registrare due tipi di dato: i vettori e gli scalari. Nel 
 
 \subsection{Veins}\label{subsec:veins}
 
-Veins è un framework OpenSource per la simulazione di reti veicolari IVC (Inter-Vehicular Communication). Utilizza OMNeT++ e SUMO in simbiosi. Si appoggia su MiXiM, un framework per OMNeT++ che implementa modelli per reti wireless fisse e mobili (reti di sensori wireless, reti ad hoc, reti veicolari ecc\dots). La comunicazione con SUMO avviene tramite TRaCI. Ogni volta che nella simulazione in SUMO viene aggiunto un veicolo, Veins crea dinamicamente un corrispondente modulo OMNeT++ che permette di controllarlo sotto ogni aspetto (percorso, colore, velocità, accelerazione, parcheggio ecc..).
+Veins è un framework OpenSource per la simulazione di reti veicolari IVC (Inter-Vehicular Communication) (\cite{sommer2011bidirectionally}). Utilizza OMNeT++ e SUMO in simbiosi (Fig. \ref{fig:veins-arch}). Si appoggia su MiXiM(\cite{kopke2008simulating}), un framework per OMNeT++ che implementa modelli per reti wireless fisse e mobili (reti di sensori wireless, reti ad hoc, reti veicolari ecc\dots)(\cite{di2011dynamic}). La comunicazione con SUMO avviene tramite TRaCI. Ogni volta che nella simulazione in SUMO viene aggiunto un veicolo, Veins crea dinamicamente un corrispondente modulo OMNeT++ che permette di controllarlo sotto ogni aspetto (percorso, colore, velocità, accelerazione, parcheggio ecc\dots).
 
 Il simulatore consiste in un modulo di Veins opportunamente modificato per disporre di un ambiente contenente solo i componenti indispensabili allo scopo. Le performance sono infatti determinanti per ottenere risultati in tempi utili. Infatti sono stati rimossi da Veins i moduli necessari alla comunicazione wireless (nic80211 e ARP) e il modulo per la gestione degli ostacoli (obstacles) che era utilizzato per la gestione dello shadowing delle reti wireless.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.0\textwidth]{assets/veins-arch.png}
+	\caption{Architettura Veins}
+	\label{fig:veins-arch}
+\end{figure}
 
 \subsubsection{Il funzionamento di Veins}\label{subsubsec:veins-func}
 
@@ -66,8 +80,6 @@ Veins è il ponte tra OMNeT++ e SUMO e la comunicazione tra i due avviene tramit
                 \caption{Panoramica dei due simulatori abbinati. Macchina a stati di SUMO e i moduli di Veins.}
                 \label{fig:veins-state-machine}
         \end{subfigure}%
-        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-          %(or a blank line to force the subfigure onto a new line)
         \begin{subfigure}[H]{0.5\textwidth}
                 \includegraphics[width=\textwidth]{assets/veins-sequence-diagram.jpg}
                 \caption{ Diagramma di sequenza dei messaggi scambiati tra SUMO e Veins. L'esecuzione dei comandi è ritardata fino al successivo passo temporale in SUMO.}
@@ -79,6 +91,7 @@ Veins è il ponte tra OMNeT++ e SUMO e la comunicazione tra i due avviene tramit
 
 \section{Modellazione della Simulazione}
 
+Esisteva già una versione del simulatore ma essendo sviluppato da più persone (me compreso) in tempi brevi, con deadline corrispondenti a demo internazionali il codice era diventato irrimediabilmente farraginoso e pieno di memory leak. Basti pensare che la prima versione allocava RAM esponenzialmente e già dopo 2000 secondi si poteva arrivare ad un occupazione della memoria RAM di 4GB. Dopo varie modifiche apportate al fine di ottimizzarlo e rifattorizzarlo (il tool Valgrind si è rivelato molto utile allo scopo) ho deciso di riscriverlo da zero.
 L'intera simulazione viene incapsulata all'interno di una Network. Il Network è lo scenario da simulare al cui interno si definiscono i moduli che compongono la simulazione. Come mostrato in Fig \ref{fig:module-scenario} sono sostanzialmente quattro i moduli che compongono la nostra simulazione:
 
 \begin{itemize}
@@ -181,12 +194,18 @@ Definisce il comportamento del veicolo mediante implementazione della logica rel
 	\item \textbf{writeCarStatusOnSib}: se \emph{true} indica di scrivere le informazioni di stato del veicoli sul \emph{Dash SIB} consentendo il monitoraggio dello stato dei veicoli dall'applicazione mobile. Essendo la scrittura sul SIB un operazione abbastanza onerosa è meglio tenere disattivata l'opzione salvo non ci si trovi in fase di demo.
 \end{itemize}
 
-
 \subsubsection{Inizializzazione}
 
-In fase di inizializzazione il primo provvedimento è quello di chiedere al modulo \code{CityService} quale sarà la natura del veicolo: elettrica o a combustibile fossile. Nel caso in cui sia elettrica si procede alla valorizzazione tutti i parametri e, se è abilitata la prenotazione, si scrivono le informazioni del veicolo sul \emph{Dash SIB}. Si invia quindi un comando a SUMO che colora il veicolo di verde, attributo visivo molto utile sia in fase di debug che in fase di demo.
+In fase di inizializzazione il primo provvedimento è quello di chiedere al modulo \code{CityService} quale sarà la natura del veicolo: elettrica o a combustibile fossile. Nel caso in cui sia elettrica si procede alla valorizzazione tutti i parametri e, se è abilitata la prenotazione, si scrivono le informazioni del veicolo sul \emph{Dash SIB}. Si invia quindi un comando a SUMO che colora il veicolo di verde, attributo visivo molto utile sia in fase di debug che in fase di demo (Fig. \ref{fig:sumo-res}).
 
-Qualora il veicolo non sia elettrico vengono eliminati i relativi moduli da OMNeT++ ferma restando la permanenza del veicolo in SUMO. Questa funzionalità non era prevista da Veins che è stato necessario modificare opportunamente per poterla introdurla. Poichè un modulo di Veins non può eliminare se stesso, l'eliminazione avviene indirettamente tramite l'invio di un messaggio al \code{CityService} con la richiesta di eliminazione.
+Qualora il veicolo non sia elettrico si provvede a colorarlo di rosso e vengono eliminati i relativi moduli da OMNeT++ ferma restando la permanenza del veicolo in SUMO. Questa funzionalità non era prevista da Veins che è stato necessario modificare opportunamente per poterla introdurla. Poichè un modulo di Veins non può eliminare se stesso, l'eliminazione avviene indirettamente tramite l'invio di un messaggio al \code{CityService} con la richiesta di eliminazione.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.0\textwidth]{assets/recharge.jpg}
+	\caption{Veicolo elettrico: verde, Veicolo in carica: giallo, Veicolo a combustibile fossile: rosso}
+	\label{fig:sumo-res}
+\end{figure}
 
 Un problema di SUMO, quantomeno nell'ambito dei nostri obbiettivi, è rappresentato dal fatto che i veicoli giunti a destinazione vengono eliminati dalla simulazione. Questo influisce negativamente sulla simulazione in quanto ci interessa simulare un periodo di vita dei veicoli abbastanza lungo da poterne studiare diversi cicli di carica e scarica. Ho risolto cosi il problema: ottenuto tramite TraCI gli ID di tutte le strade componenti il percorso del veicolo, considero l'ultima al fine di intercettarne l'arrivo del veicolo e quindi dirottarlo verso un'altra destinazione (ultima strada del percorso) scelta casualmente. Le altre destinazioni si selezionano da una lista globale popolata con gli ID elle strade di destinazione, prelevate da ogni veicoli stessi, più lunghe di 50 metri. Il controllo sulla lunghezza è necessario in quanto più lunga è la strada più probabile è che un messaggio venga schedulato nell'intervallo di tempo in cui il veicolo la percorre.
 
@@ -246,7 +265,7 @@ Di seguito l'elenco dei diversi stati del veicolo:
 		\item{Senza Prenotazione}: si controlla la disponibilità di EVSE liberi e in caso affermativo inizia la ricarica con passaggio allo stato \code{CHARGING}. In assenza di EVSE disponibili si interroga il modulo \code{DriverBehaviour} che stabilisce se  attendere la fine della ricarica del veicolo che occupa correntemente l'EVSE selezionato con passaggio allo stato \code{WAITING_EVSE}. In caso contrario si sceglie casualmente un GCP tra i tre più vicini che non siano già stati visitati e ci si dirige verso di esso con passaggio allo stato \code{GO_TO_RECHARGE}. 
 	\end{itemize}
 	\item \code{WAITING_EVSE}: rappresenta l'attesa presso un EVSE. Non viene schedulato nessun messaggio poiché è compito del veicolo attualmente in carica ``risvegliare'' il veicolo in attesa. Lo stato successivo al ``risveglio'' è \code{CHARGING}
-	\item \code{CHARGING}: Rappresenta lo stato in cui il veicolo si sta caricando. Si rimane in questo stato finché la carica non è completa oppure, nel caso di prenotazione attiva, fino al raggiungimento dell'ora di fine ricarica. Se raggiunto il termine dell'intervallo di ricarica il veicolo non ha raggiunto la ricarica completa può permanere presso l'EVSE nel caso in cui il veicolo con la prenotazione successiva sia in ritardo.
+	\item \code{CHARGING}: Rappresenta lo stato in cui il veicolo si sta caricando. Si rimane in questo stato finché la carica non è completa oppure, nel caso di prenotazione attiva, fino al raggiungimento dell'ora di fine ricarica. Se raggiunto il termine dell'intervallo di ricarica il veicolo non ha raggiunto la ricarica completa può permanere presso l'EVSE nel caso in cui il veicolo con la prenotazione successiva sia in ritardo. Il veicolo in questo stato viene colorato di giallo per distinguerlo dai veicoli parcheggiati (Fig. \ref{fig:sumo-res}).
 \end{description}
 	
 \begin{figure}[H]
@@ -258,9 +277,13 @@ Di seguito l'elenco dei diversi stati del veicolo:
 
 Al termine del ciclo di vita del modulo si provvede all'eliminazione dei dati relativi al veicolo dal SIB.
 
+\subsubsection{Sincronizzazione tra tempo simulato e tempo reale}
+
+Per permettere una corretta gestione delle prenotazioni è stato necessario sincronizzare il tempo reale con quello simulato. Per ottenere questo risultato viene ottenuto il tempo reale all'inizio della simulazione e ad esso viene sommato il tempo di simulazione. Il tempo simulato rapportato a quello reale si ottine con la funzione \code{getRelativeRealTime()} contenuta nel modulo \code{CarLogic}. Questa funzionalità non influisce con il CS dal momento che lavora solo con lavora solo con le date che arrivano all'interno delle richieste senza far riferimento al tempo reale.
+
 \subsection{Battery}\label{sec:battery}
 
-Il modulo fornisce il modello di consumo energetico del veicolo. Non è esatto parlare di modello della batteria dal momento che le equazioni usate sono relative al lavoro e non strettamente legate all'elettrotecnica poiché troppo complesse da simulare. Il modello implementato rimane abbastanza fedele alla realtà in virtù del fatto che è stato validato con dati sperimentali raccolti durante la visita al CRF.
+Il modulo fornisce il modello di consumo energetico del veicolo. Non è esatto parlare di modello della batteria dal momento che le equazioni usate sono relative al lavoro e non strettamente legate all'elettrotecnica poiché troppo complesse da simulare (Fig. \ref{fig:car-consumption}). Il modello implementato rimane abbastanza fedele alla realtà in virtù del fatto che è stato validato con dati sperimentali raccolti durante la visita al CRF.
 
 Determinante al fine di modellare e validare il consumo è stato il lavoro di Alfredo D'Elia prima e Marco di Nicola (\cite{dinicola2014}) dopo. Il modello attualmente tiene conto della pendenza della strada grazie alla quale si può calcolare l'energia richiesta in salita e quella guadagnata in discesa. A questo si aggiunge la ricarica dovuta alla frenata rigenerativa.
 
@@ -357,6 +380,13 @@ Ne consegue che il consumo energetico totale, espresso in kWh è dato da:
 \noindent
 che viene sottratto alla quantità di carica in kWh precedentemente calcolata che viene ritrasformata in percentuale.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{assets/car-consumption.jpg}
+	\caption{Schematizzazione del modello di consumo del veicolo}
+	\label{fig:car-consumption}
+\end{figure}
+
 \subsubsection{Frenata Rigenerativa}
 
 Il freno rigenerativo è un particolare tipo di freno che recupera energia utile estraendola da una quota di quella che normalmente si dissipa in aria sotto forma di calore durante il rallentamento del veicolo (diminuzione di energia cinetica). Nel nostro sistema la frenata è determinata da accelerazione negativa. In questo caso $L_m$, che contribuirebbe all'energia consumata dal veicolo, non viene considerato e al suo posto viene considerata l'energia cinetica prodotta nella decelerazione del veicolo in Joule (J):
@@ -403,101 +433,90 @@ I parametri di questo modulo sono rappresentati da coefficienti statistici che d
 In assenza di prenotazione l'utente che deve effettuare la ricarica presso un EVSE occupato interroga questo modulo richiedendo se deve fermarsi ad attendere oppure no tramite la funzione \code{waitingForEVSE()}. Questa funzione genera un valore random compreso tra \code{maxWaitingTime} e \code{minWaitingTime} che se maggiore del tempo di attesa presso la colonnina induce l'utente ad attendere il suo turno.
 
 
-\section{Implementazione}
-
-Esisteva già una versione del simulatore ma era a puro titolo dimostrativo e di demo e soffriva del fatto che era stato sviluppato da diverse persone (me compreso) in tempi molto brevi e con deadline che corrispondendo a demo internazionali si era costretti a rispettare. Questo ha portato ad avere un codice farraginoso e pieno di memory leak. Basti pensare che la prima versione del simulatore allocava RAM esponenzialmente e già dopo 2000 secondi si poteva arrivare ad avere un occupazione di 4GB.
-
-La prima cosa che ho fatto, quando ho capito che la situazione stava diventando ingestibile è stato profilare e rifattorizzare il codice. La profilazione è avvenuta tramite il tool Valgrind grazie al quale sono riuscito ad ottenere un cosumo di memoria lineare, infatti, dove prima venivano occupati 4GB, sono riuscito a raggiungere il traguardo dei 100MB. La rifattorizzazione del codice invece è stata più complessa in quanto diverse mani hanno messo mano con diversi stili di programmazione. 
-
-\subsection{Logging}
-
-\subsection{SibController}
-
-\subsection{GcpController}
-
-\subsubsection{GCP e EVSE}
-
-\subsection{Utility}
-
-\section{L'ambiente di simulazione}
-
-In questa sezione verranno descritti in dettaglio i componenti necessari a creare un ambiente di simulazione funzionante.
-
-La logica del simulatore è implementata attraverso moduli di OMNeT++. Grazie ad essi sono implementati, i modelli di consumo dei veicoli elettrici, i comportamenti degli degli autisti e la rete di distribuzione elettrica cittadina. L'unico aspetto non implementato è la guida dei veicoli in quanto è gestita da SUMO.
-
-I file di configurazione di SUMO sono generati da script che in base ai parametri specificati possono variare l'intensità del traffico.
-
-
-\subsection{Generazione file di Configurazione}
-
-Dopo aver scaricato compilato ed installato tutti i componenti è necessario generare i file di configurazione riguardanti lo scenario che si vuole simulare. 
-
-\subsection{Download Scenario}
-
-A questo punto è necessario scegliere quale scenario si vuole simulare. Lo scenario di Bologna è già disponibile nella cartella \code{simulator/veins-2.1/examples/veins/bologna} siccome è quello di nostro interesse.
-
-Nel caso in cui si sia interessati ad uno scenario diverso da quello di Bologna il modo più semplice per ottenere la mappa desiderata è andare all'indirizzo \url{http://www.openstreetmap.org/export} e scaricarsi l'area interessata. La dimensione delle mappe scaricabili è limitata onde evitare la saturazione della banda del server. Per sopperire a questa mancanza SUMO mette a disposizione un tool situato in \code{<SUMO_HOME>/tools/import/osm/osmGet.py} che permette di scaricare mappe di dimensione arbitraria. Per l'utilizzo di questo tool rimando alla documentazione dello script oppure alla pagine ufficiale:
-
-\url{http://sumo-sim.org/userdoc/Networks/Import/OpenStreetMapDownload.html}.
-
-\subsubsection{Profilo Altimetrico}\label{profilo-altimetrico}
-
-Da notare che le mappe di Open Street Map non contengono le informazioni relative al profilo altimetrico. È quindi necessario "arricchire" la mappa scaricata con tali informazioni. Il programma utilizzato a questo scopo è Osmosis, presente nella cartella \code{osmosis} del progetto. In particolare ho usato \code{osmosis-srtm-plugin_1.1.0} che permette, attraverso l'interrogazione di file SRTM (scaricabili da \url{http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/}, di inserire i dati del profilo altimetrico nelle mappe di Open Street Map. 
-
-Di seguito viene mostrato l'utilizzo del Osmosis e del relativo plugin considerando \code{\$SRTM_HOME} la cartelle che contiene i file SRTM e \code{\$CITY_NAME} il nome della città. Quindi avendo, ad esempio, \code{bologna.osm}, ovvero la mappa della città di Bologna senza dati riguardanti il profilo altimetrico, in output avremo \code{bologna_srtm.osm}, ovvero la stessa mappa con i dati estratti dai file SRTM.
-
-\begin{bash}
-osmosis -plugin org.srtmplugin.osm.osmosis.SrtmPlugin_loader --read-xml "\$CITY_NAME".osm --write-srtm locDir="\$SRTM_HOME" locOnly=true repExisting=false --write-xml "\$CITY_NAME"_srtm.osm
-\end{bash}
-
+%\section{Implementazione}
 %
+%
+%
+%La prima cosa che ho fatto, quando ho capito che la situazione stava diventando ingestibile è stato profilare e rifattorizzare il codice. La profilazione è avvenuta tramite il tool Valgrind grazie al quale sono riuscito ad ottenere un cosumo di memoria lineare, infatti, dove prima venivano occupati 4GB, sono riuscito a raggiungere il traguardo dei 100MB. La rifattorizzazione del codice invece è stata più complessa in quanto diverse mani hanno messo mano con diversi stili di programmazione. 
+%
+%\subsection{Logging}
+%
+%\subsection{SibController}
+%
+%\subsection{GcpController}
+%
+%\subsubsection{GCP e EVSE}
+%
+%\subsection{Utility}
 
-Da tenere in considerazione il fatto che il comando mostrato è incluso nello script di generazione automatica da me creato al fine di velocizzare la configurazione dello scenario.
-
-\subsection{Generazione XML di SUMO}
-
-SUMO necessita di file di configurazione in XML che descrivono la rete stradale, i poligoni dei palazzi e i percorsi di ogni singolo veicolo. Siccome ognuno di questi file, per essere generato, richiede un apposito comando il quale a sua volta richiede vari parametri, ho creato uno script che data la mappa di una città in formato Open Street Map esegue tutte le operazioni necessarie.
-
-Verranno comunque analizzati tutti i comandi singolarmente in modo d aavere una panoramica sulle scelte implementative.
-
-\subsubsection{La rete Stradale (.net.xml)}
-
-Il file della rete stradale viene generato attraverso il tool \code{netconvert} direttamente dalla mappa di Open Stree Map. Oltre al file \code{.osm} è necessario anche un file di supporto che istruisca SUMO sui vincoli e i limiti di velocità delle strade importate. Noi ne utilizziamo uno creato ad hoc per il traffico tedesco. 
-
-Qui sotto ne riporto un frammento a puro titolo esemplificativo, il file intero si trova in \code{simulator/veins-2.1/examples/veins/bologna/osm-urban-de.typ.xml}
-
-\begin{xml}
-<types xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <type id="highway.motorway" priority="13" numLanes="2" speed="41.667"
-                oneway="true" disallow="bicycle pedestrian"/>
-  <type id="highway.motorway_link" priority="8" numLanes="1" speed="13.889"/>
-  <type id="highway.trunk" priority="12" numLanes="2" speed="13.889"/>
-  <type id="highway.trunk_link" priority="8" numLanes="1" speed="13.889"/>
-  <type id="highway.primary" priority="11" numLanes="2" speed="13.889"/>
-  <type id="highway.primary_link" priority="8" numLanes="1" speed="13.889"/>
-  <type id="highway.secondary" priority="10" numLanes="2" speed="13.889"/>
-  ....
-</types> 
-\end{xml}
-
-Di seguito passiamo ad un analisi dettagliata di tutti i parametri passati a \code{netconvert}:
-
-\begin{itemize}
-	\item \textbf{-{}-type-files}: Specifica il file che contiene i vincoli e i limiti, quello citato sopra.
-	\item \textbf{-{}-ramps.guess}: Prova a capire dove sono le rampe e ad eseguirne l'importazione
-	\item \textbf{-{}-remove-edges.by-vclass}: Siccome Open Street Map include un infinità informazioni del tutto inutili al nostro fine (ferrovie, piste ciclabili, aree pedonali ecc..) con questo parametro si indicano le classi da non importare (\code{bicycle,pedestrian...})
-	\item \textbf{-{}-geometry.remove}:
-	\item \textbf{-{}-remove-edges.isolated}:
-	\item \textbf{-{}-tls.join}:
-	\item \textbf{-{}-osm-files}:
-	\item \textbf{-{}-output.street-names}:
-	\item \textbf{-{}-output.original-names}:
-	\item \textbf{-{}-output-file}:
-\end{itemize}
-
-Siccome Open Street Map include molte informazioni che sono del tutto inutili al nostro fine (ferrovie, piste ciclabili, aree pedonali ecc..) bisogna istruire \code{netconvert} affinché le escluda dall'importazione. 
-
+%\section{L'ambiente di simulazione}
+%
+%In questa sezione verranno descritti in dettaglio i componenti necessari a creare un ambiente di simulazione funzionante.
+%
+%La logica del simulatore è implementata attraverso moduli di OMNeT++. Grazie ad essi sono implementati, i modelli di consumo dei veicoli elettrici, i comportamenti degli degli autisti e la rete di distribuzione elettrica cittadina. L'unico aspetto non implementato è la guida dei veicoli in quanto è gestita da SUMO.
+%
+%I file di configurazione di SUMO sono generati da script che in base ai parametri specificati possono variare l'intensità del traffico.
+%
+%
+%\subsection{Generazione file di Configurazione}
+%
+%Dopo aver scaricato compilato ed installato tutti i componenti è necessario generare i file di configurazione riguardanti lo scenario che si vuole simulare. 
+%
+%\subsection{Download Scenario}
+%
+%A questo punto è necessario scegliere quale scenario si vuole simulare. Lo scenario di Bologna è già disponibile nella cartella: \code{simulator/veins-2.1/ examples/veins/bologna} siccome è quello di nostro interesse.
+%
+%Nel caso in cui si sia interessati ad uno scenario diverso da quello di Bologna il modo più semplice per ottenere la mappa desiderata è andare all'indirizzo \url{http://www.openstreetmap.org/export} e scaricarsi l'area interessata. La dimensione delle mappe scaricabili è limitata onde evitare la saturazione della banda del server. Per sopperire a questa mancanza SUMO mette a disposizione un tool situato in \code{<SUMO_HOME>/tools/import/osm/osmGet.py} che permette di scaricare mappe di dimensione arbitraria. Per l'utilizzo di questo tool rimando alla documentazione dello script oppure alla pagine ufficiale:
+%\noindent
+%\url{http://sumo-sim.org/userdoc/Networks/Import/OpenStreetMapDownload.html}.
+%
+%\subsubsection{Profilo Altimetrico}\label{profilo-altimetrico}
+%
+%Da notare che le mappe di Open Street Map non contengono le informazioni relative al profilo altimetrico. È quindi necessario "arricchire" la mappa scaricata con tali informazioni. Il programma utilizzato a questo scopo è Osmosis, presente nella cartella \code{osmosis} del progetto. In particolare ho usato \code{osmosis-srtm-plugin_1.1.0} che permette, attraverso l'interrogazione di file SRTM (scaricabili da \url{http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/}, di inserire i dati del profilo altimetrico nelle mappe di Open Street Map. 
+%
+%Di seguito viene mostrato l'utilizzo del Osmosis e del relativo plugin considerando \code{\$SRTM_HOME} la cartelle che contiene i file SRTM e \code{\$CITY_NAME} il nome della città. Quindi avendo, ad esempio, \code{bologna.osm}, ovvero la mappa della città di Bologna senza dati riguardanti il profilo altimetrico, in output avremo \code{bologna_srtm.osm}, ovvero la stessa mappa con i dati estratti dai file SRTM.
+%
 %\begin{bash}
-%netconvert --type-files osm-urban-de.typ.xml --ramps.guess --remove-edges.by-vclass hov,taxi,bus,delivery,transport,lightrail,cityrail,rail_slow, rail_fast,motorcycle,bicycle,pedestrian --geometry.remove --remove-edges.isolated true --tls.join --osm-files "$MAP_FILE" --output.street-names --output.original-names --output-file "$CITY_NAME".net.xml
+%osmosis -plugin org.srtmplugin.osm.osmosis.SrtmPlugin_loader --read-xml "\$CITY_NAME".osm --write-srtm locDir="\$SRTM_HOME" locOnly=true repExisting=false --write-xml "\$CITY_NAME"_srtm.osm
 %\end{bash}
+%
+%%
+%
+%Da tenere in considerazione il fatto che il comando mostrato è incluso nello script di generazione automatica da me creato al fine di velocizzare la configurazione dello scenario.
+%
+%\subsection{Generazione XML di SUMO}
+%
+%SUMO necessita di file di configurazione in XML che descrivono la rete stradale, i poligoni dei palazzi e i percorsi di ogni singolo veicolo. Siccome ognuno di questi file, per essere generato, richiede un apposito comando il quale a sua volta richiede vari parametri, ho creato uno script che data la mappa di una città in formato Open Street Map esegue tutte le operazioni necessarie.
+%
+%Lo script prende in ingresso 4 parametri:
+
+
+
+%Verranno comunque analizzati tutti i comandi singolarmente in modo d avere una panoramica sulle scelte implementative.
+
+%\subsubsection{La rete Stradale (.net.xml)}
+%
+%Il file della rete stradale viene generato attraverso il tool \code{netconvert} direttamente dalla mappa di Open Stree Map. Oltre al file \code{.osm} è necessario anche un file di supporto che istruisca SUMO sui vincoli e i limiti di velocità delle strade importate. Noi ne utilizziamo uno creato ad hoc per il traffico tedesco. 
+%
+%Qui sotto ne riporto un frammento a puro titolo esemplificativo, il file intero si trova in \code{simulator/veins-2.1/examples/veins/bologna/osm-urban-de.typ.xml}
+%
+%\begin{xml}
+%<types xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+%  <type id="highway.motorway" priority="13" numLanes="2" speed="41.667"
+%                oneway="true" disallow="bicycle pedestrian"/>
+%  <type id="highway.motorway_link" priority="8" numLanes="1" speed="13.889"/>
+%  <type id="highway.trunk" priority="12" numLanes="2" speed="13.889"/>
+%  <type id="highway.trunk_link" priority="8" numLanes="1" speed="13.889"/>
+%  <type id="highway.primary" priority="11" numLanes="2" speed="13.889"/>
+%  <type id="highway.primary_link" priority="8" numLanes="1" speed="13.889"/>
+%  <type id="highway.secondary" priority="10" numLanes="2" speed="13.889"/>
+%  ....
+%</types> 
+%\end{xml}
+%
+%Siccome Open Street Map include molte informazioni che sono del tutto inutili al nostro fine (ferrovie, piste ciclabili, aree pedonali ecc..) bisogna istruire \code{netconvert} affinché le escluda dall'importazione. 
+%
+%
+%\subsubsection{I file dei  rete Stradale (.net.xml)}
+
 

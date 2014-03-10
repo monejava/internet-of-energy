@@ -1,18 +1,18 @@
-\chapter{Servizio Cittadino}
+\section{Servizio Cittadino}
 
 Il servizio cittadino (\emph{City Service} o CS) è il cuore dell'architettura software e supporta le interazioni tra gli EV e la Smart Grid. Lo scambio di informazioni avviene tramite il \emph{City SIB} con la struttura dei messaggi definita all'interno dell'Ontologia. 
 
-\section{Architettura}
+\subsection{Architettura}
 
 Il CS era già stato implementato da Federico Montori nel progetto precedente. Ho deciso di riscriverlo puntando ad una maggiore modularità e riusabilità. Ho quindi creato libreria di cui ho già trattato in Sez. \ref{subsec:ioe-lib} condivisa tra il servizio cittadino e l'applicazione mobile. La libreria fornisce i servizi di base per l'accesso al SIB con un approccio \emph{Object Oriented} ai dati in essa contenuti. Questa scelta progettuale si rifà ai principi di Ingegneria del Software \emph{High Cohesion} e \emph{Low Coupling} \cite{larcab2005}
 
-\section{La comunicazione con il City Service}\label{sec:protocol}
+\subsection{La comunicazione con il City Service}\label{sec:protocol}
 
 In questa sezione si analizzano in dettaglio le modalità di comunicazione da e verso il servizio cittadino. Per ogni operazione esiste un protocollo basato su scambio di messaggi la cui struttura è definita mediante classi dell'ontologia. Attualmente le uniche operazioni supportate sono la richiesta di prenotazione e la richiesta di ritiro di prenotazione.
 
 Lo scambio dei messaggi è implementato tramite il meccanismo delle Subscription messo a disposizione dal SIB. Questo comporta che i messaggi si scrivano sul SIB cittadino che manda una notifica al KP sottoscritto a quella particolare modifica. Ne consegue un protocollo di comunicazione asincrono.
 
-\subsection{Protocollo di richiesta di prenotazione}
+\subsubsection{Protocollo di richiesta di prenotazione}
 
 Descriverò i passaggi necessari al completamento del protocollo di richiesta di prenotazione con particolare attenzione ai messaggi vengono scambiati. Il fine della prenotazione è la certezza di trovare l'EVSE libero quando andremo a caricarci. Come già detto in precedenza, i tempi di ricarica per i veicoli elettrici possono essere molto lunghi. È quindi necessario dare all'utente la certezza che potrà ricaricare il suo veicolo senza il rischio di terminare la carica della batteria.
 
@@ -25,7 +25,7 @@ Descriverò i passaggi necessari al completamento del protocollo di richiesta di
 	\item \textbf{Creazione Prenotazione}: Il CS, ricevuto l'acknowledgment dall'utente, ``blocca'' l'EVSE nella finestra di tempo richiesta creando un istanza della classe \code{ioe:Reservation}. Inoltre cancella dal SIB tutte le triple necessarie allo svolgimento del protocollo che, una volta terminato, diventano inutili.
 \end{enumerate}
 
-\section{Il Protocollo di rimozione di una prenotazione}
+\subsection{Il Protocollo di rimozione di una prenotazione}
 
 Una volta completata la procedura di prenotazione l'EVSE diventa inagibile nella finestra di tempo richiesta dall'utente. Per ritirare la prenotazione l'utente deve inviare una richiesta al CS. Attualmente il servizio cittadino rimuove semplicemente dal SIB i dati relativi alla prenotazione rendendo nuovamente disponibile la ricarica. In futuro il servizio potrà stabilire, in base a regole dettate dai gestori della rete elettrica, se accettare o meno la richiesta ed eventualmente accreditare una penale all'utente.
 
@@ -37,7 +37,7 @@ Come nel caso precedente il protocollo si basa su cambio di messaggi.
 	\item \textbf{Notifica avvenuta cancellazione}: attualmente l'utente per accertarsi dell'avvenuta cancellazione deve sottoscriversi ai cambiamenti relativi all'URI della prenotazione che sta cancellando.
 \end{enumerate}
 
-\section{Implementazione}\label{sec:impl}
+\subsection{Implementazione}\label{sec:impl}
 
 In questa sezione discuteremo i dettagli implementativi del \emph{City Service}, dalle tecnologie usate alle scelte architetturali. Principalmente il servizio cittadino deve essere altamente performante in quanto, una vota a regime, deve essere in grado di soddisfare le richieste di centinaia se non migliaia di utenti. Contemporaneamente bisogna controllare che l'elevato parallelismo di thread gestiti dal CS non intacchi l'integrità dei dati residenti sul SIB cittadino per evitare ad esempio che due persone che prenotano nello stesso momento e nello stesso EVSE riescano entrambe a completare la procedura di prenotazione. 
 
@@ -45,7 +45,7 @@ Il servizio è scritto interamente in Java. Questo lo rende multi piattaforma, f
 
 Per rendere il servizio più performante possibile si sono adottate tecniche di programmazione quali: pool di oggetti, pool di thread, e caching delle risorse.
 
-\subsection{Pool Di Oggetti}
+\subsubsection{Pool Di Oggetti}
 
 Per effettuare le connessioni al SIB cittadino è necessario istanziare oggetti di tipo \code{KpConnector}. Inoltre per effettuare il parsing delle risposte alle sottoscrizioni sono necessari oggetti di tipo \code{SSAP_XMLTools} forniti dalla libreria JavaKPI. Come anticipato nella Sez. \ref{sec:impl} il CS deve supportare connessioni multiple simultanee, ognuna delle quali dialogante con il SIB. Dal momento che ne la libreria JavaKPI ne wrapper da me creato sono thread-safe, è necessario istanziare un oggetto \code{KpConnector} per ogni connessione insieme a uno di tipo \code{SSAP_XMLTools} per \emph{parsare} i risultati delle sottoscrizioni.
 
@@ -80,7 +80,7 @@ Evidenzio la semplicità di creazione di un pool per un determinato tipo di dato
 	\item \code{public void returnObject(T object)}: restituisce un oggetto al pool.
 \end{itemize}
 
-\subsection{Pool Di Thread}
+\subsubsection{Pool Di Thread}
 
 Analizzeremo ora più in dettaglio i pool di thread e le problematiche che questi risolvere.
 L'uso di thread può creare problemi in termini di performance in quanto la creazione e distruzione di questo oggetti è abbastanza onerosa. Risulta inoltre critico il controllo del numero dei thread creati ai fini della scalabilità (\cite{vetti2008}).
@@ -99,11 +99,11 @@ pool.execute(new Runnable() {
 });
 \end{java}
 
-\subsection{Il funzionamento del City Service}
+\subsubsection{Il funzionamento del City Service}
  
 Come visto nella sezione ~\ref{sec:protocol} il servizio cittadino deve gestire un gran numero di messaggi ad ogni tipologia dei quali corrisponde una sottoscrizione al SIB cittadino. Inoltre per poter rispondere alle richieste degli utenti il CS deve disporre delle informazioni relative a tutti gli EVSE.
 
-\subsubsection{Inizializzazione}\label{subsubsec:city-init}
+\paragraph{Inizializzazione}\label{subsubsec:city-init}
 
 Il CS all'avvio compie innumerevoli compiti. Contrariamente a quanto avveniva in precedenza, dove i GCP erano codificati nell'ontologia e l'ontologia stessa veniva caricata da un programma esterno, ho scelto di delegare le inizializzazioni al CS col fine di semplificarne lo sviluppo. Infatti in precedenza ad ogni riavvio del servizio era necessario ``killare'' manualmente il SIB e riavviarlo per ottenere una situazione di partenza pulita. Il caricamento dell'ontologia avviene tramite una libreria da me sviluppata, \emph{OntologyLoader}, che a sua volta si appoggia alle librerie Apache Jena (\cite{jena2011}). In ambito di produzione, ovviamente, il servizio cittadino non eliminerebbe i dati e nemmeno ricaricherebbe quelli già presenti.
 
@@ -123,7 +123,7 @@ Di seguito una lista dettagliata delle operazioni eseguite dal CS in fase di ini
 	\end{enumerate}
 \end{itemize}
 
-\subsubsection{Gestione delle richieste}
+\paragraph{Gestione delle richieste}
 
 Quando il CS effettua una sottoscrizione nel SIB, oltre a definire l'oggetto della sottoscrizione, deve definire un \emph{handler} che verrà eseguito all'occorrenza del cambiamento di interesse. Come visto nella sezione ~\ref{sec:protocol} vengono effettuate 4 sottoscrizioni per ognuna delle quali si definisce lo stesso \emph{hanlder} che lancia un thread istanza della classe \code{RequestDispatcher}. Questo si occupa semplicemente di gestire la richiesta e di eseguire un altro thread, anch'esso contenuto in un pool, che la soddisfi.
 
@@ -144,12 +144,12 @@ All'interno della sessione vengono salvate le seguenti informazioni:
 \noindent
 La classe \code{SessionManager} possiede un timer che a tempo prefissato lancia un thread di controllo delle sessioni attive. Una sessione attiva da un tempo eccessivo indica che probabilmente c'è stato un problema: vengono quindi rimossi dal SIB tutti i dati relativi alla sessione, compresa la prenotazione.
 
-\paragraph{Prenotazioni}
+\subparagraph{Prenotazioni}
 
 La gestione delle prenotazioni, una volta che sono state create e confermate dall'utente, è delegata alla classe \code{ReservationManager}. Al suo interno vengono salvate in una cache le istanze di \code{Reservation} create. All'arrivo di una nuova richiesta di prenotazione la verifica della disponibilità viene fatta su questa cache anziché sul SIB per ridurre gli accessi al database e il successivo parsing delle risposte.
 Poiché l'uso di questa classe è altamente concorrente, in quanto possono accedervi molti thread contemporaneamente, viene utilizzata una mappa thread-safe resa disponibile da java \code{ConcurrentHashMap}. Inoltre le operazioni di verifica di disponibilità delle prenotazioni sono atomiche a livello di EVSE grazie a un lock per ognuna di esse. 
 
-\paragraph{Thread}\label{par:thread}
+\subparagraph{Thread}\label{par:thread}
 
 Cinque classi diverse implementano l'interfaccia \code{Runnable}. Ognuna delle quali ha il compito di gestire un preciso aspetto dei protocolli di richiesta. Ovviamente c'è un pool di esecuzione per ognuna di esse.
 
@@ -190,7 +190,7 @@ xmlToolsPool.returnObject(xmlTools);
 \end{java}	
 
 
-\section{Testing}
+\subsection{Testing}
 
 Un aspetto fondamentale nello sviluppo del \emph{City Service} è stato l'integrazione con test di unità che ne hanno assicurato la continuità di funzionamento durante le fasi di modifica e sviluppo.
 
@@ -198,7 +198,7 @@ Il framework utilizzato per eseguire il testing è \code{junit4}, un ottima libr
 
 I test sono stati determinanti non solo per assicurare la stabilità del codice ma anche per testare le performance del sistema, soprattutto del SIB. 
 
-\subsection{Test Protocolli}
+\subsubsection{Test Protocolli}
 
 Per testare i protocolli ho implementato un thread che svolgesse tutte lo operazioni necessarie per completare una richiesta di prenotazione e il suo ritiro. L'incapsulamento della logica del protocollo di richiesta all'interno di un thread permette di fatto l'esecuzione multipla delle sue istanze simulando quindi l'interazione di molteplici utenti. La classe delegata a svolgere questo compito è \code{ChargeProtocolTest} nel packacge \code{it.unibo.ioe.cityservice .chargeprotocol} situato nella cartella di test. All'interno di questa classe si trova una inner-class, \code{ReservationProtocol}, che implementa \code{Runnable} rendendo quindi possibile la sua esecuzione all'interno di un thread separato. 
 
@@ -238,7 +238,7 @@ assertNotNull(response);
 assertEquals(request.getUri(), response.getChargeRequestUri());
 \end{java}
 
-\subsection{Valutazione Performance}
+\subsubsection{Valutazione Performance}
 
 L'esecuzione di molteplici istanze del protocollo di richiesta è stato determinante per testare le performance del sistema. Ha permesso infatti di capire quante richieste contemporanee potessero essere servite e quali fossero i colli di bottiglia. Ho infatti rilevato che, raggiunto un certo numero di connessioni simultanee, il SIB allungava i tempi di risposta fino a far scattare il \code{socket-timeout} della libreria JavaKPI in quanto, come indicato nella Sez. ~\ref{subsec:sib}, il SIB comunica con l'esterno tramite protocollo TCP/IP. Questo ha portato a trovare un bug che affliggeva il SIB stesso il quale, una volta interrotta brutalmente la connessione con il socket di JavaKPI, dava seri problemi di memory-leak come si può ben vedere in Fig. ~\ref{fig:sib-memory-leak}. Ho preso l'immagine dal mio computer e l'ho inviata agli sviluppatori di Smart-M3-B per evidenziare il problema. Si nota chiaramente che nel momento che precedeva \emph{l'uccisione} del SIB erano allocati circa 8GB di Ram e 3Gb di Swap. Il problema è stato risolto e la versione attuale (0.901) ne è esente.
 

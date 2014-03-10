@@ -298,7 +298,7 @@ Il modulo \code{Battery} ha anche la funzione di eliminare il veicolo dalla simu
 Elenco nel seguito i parametri che caratterizzano il modulo batteria. I valori di default sono relativi al Fiat Daily fornito dal CRF in quanto disponendo dei dati sperimentali abbaiamo potuto validare al meglio per confronto quelli generati dalle simulazione.
 
 \begin{itemize}
-	\item \textbf{manufacturer}: costruttore della batteria impostato di default a ``Simens'' in quanto partner del progetto IoE;
+	\item \textbf{manufacturer}: costruttore della batteria impostato di default a ``Siemens'' in quanto partner del progetto IoE;
 	\item \textbf{engineEfficense}: efficienza della gestione energetica del motore. Varia tra 0 e 1.
 	\item \textbf{socPerc}: carica iniziale del veicolo (State Of Charge). Varia da 0 a 1, dove 1 indica una quantità di carica pari alla capacità della batteria;
     \item \textbf{capacity}: capacità della batteria misurata in Kilowattora (kWh);
@@ -431,6 +431,64 @@ I parametri di questo modulo sono rappresentati da coefficienti statistici che d
 \subsubsection{Attesa presso l'EVSE}
 
 In assenza di prenotazione l'utente che deve effettuare la ricarica presso un EVSE occupato interroga questo modulo richiedendo se deve fermarsi ad attendere oppure no tramite la funzione \code{waitingForEVSE()}. Questa funzione genera un valore random compreso tra \code{maxWaitingTime} e \code{minWaitingTime} che se maggiore del tempo di attesa presso la colonnina induce l'utente ad attendere il suo turno.
+
+
+\section{Risultati Simulazioni}
+
+In questa sezione verranno esposti i risultati di alcune simulazioni.
+
+\subsection{Consumo del veicolo}
+
+I grafici sottostanti mostrano come al variare di peso del veicolo e pendenza della strada il consumo varia sensibilmente. 
+
+Nel primo grafico (Fig. \ref{fig:consumo}) si può vedere in ordinata il consumo del veicolo per ogni km espresso in kWh. Il percorso ha una pendenza di $0^{\circ}$.  Si noti che al variare del peso il consumo aumenta sensibilmente passando da un minimo di 0.08 kWh con un veicolo di 1000 kg a un massimo di 0.32 kWh nel caso di 4000 kg.
+
+Nel secondo grafico (Fig. \ref{fig:consumo-pendenza}) si può vedere in ordinata il consumo del veicolo per ogni km espresso in kWh. Il percorso ha una pendenza di $23^{\circ}$.  Si noti che il consumo è quasi 10 volte maggiore rispetto al grafico precedente. Si passa da un minimo di 0.8 kWh (10 volte il consumo rispetto a pendenza $0^{\circ}$) con un veicolo di 1000 kg a un massimo di 2.5 kWh (circa 7.5 volte rispetto a pendenza $0^{\circ}$) nel caso di 4000 kg.
+
+\begin{figure}
+        \centering
+		\begin{subfigure}[H]{0.45\textwidth}
+                \includegraphics[width=\textwidth]{assets/mdn-consumo.jpg}
+                \caption{Consumo del veicolo al variare del peso. Pendenza $0^{\circ}$}
+                \label{fig:consumo}
+        \end{subfigure}
+        \qquad
+        \begin{subfigure}[H]{0.45\textwidth}
+                \includegraphics[width=\textwidth]{assets/mdn-consumo-pendenza.jpg}
+                \caption{Consumo del veicolo al variare del peso. Pendenza $23^{\circ}$}
+                \label{fig:consumo-pendenza}
+        \end{subfigure}%
+        \caption{Modello di consumo del veicolo elettrico}
+\end{figure}
+
+\subsection{Occupazione delle colonnine}
+
+I grafici esposti in questa sezione mostrano l'occupazione delle colonnine al variare del numero di veicoli sia con la prenotazione attiva che con la prenotazione non attiva. Guardando il grafico \ref{fig:occupazione} può sembrare che senza prenotazione l'occupazione delle colonnine sia maggiore rispetto alla modalità con prenotazione. Questo è vero ma solo in parte in quanto il grafico va rapportato a quello di fianco \ref{fig:vapo} che indica il numero di tentativi di ricarica falliti. La maggior occupazione inoltre è dovuta all'assenza di traffico intenso che avrebbe richiesto un tempo di computazione eccessivo per le nostre disponibilità. Infatti, in mancanza di traffico, i veicoli senza prenotazione iniziano a girare tra le colonnine finché non ne trovano una libera determinando che le colonnine siano visitate con elevata frequenza. Questo non accade con la prenotazione poiché i veicoli si parcheggiano in attesa dell'ora di ricarica che può essere considerato un notevole vantaggio per l'utente che impiega il suo tempo come meglio crede piuttosto che facendo il \emph{polling} tra le colonnine.
+
+
+In Fig. \ref{fig:states} viene mostrato il rapporto fra il tempo perso per andare a ricaricarsi e il tempo in cui si guida normalmente. È chiaramente vantaggioso nel caso delle prenotazioni. Il che indica che gli utenti possono essere più rilassati.
+
+\begin{figure}
+        \centering
+		\begin{subfigure}[T]{0.45\textwidth}
+                \includegraphics[width=\textwidth]{assets/anxiety30-occupation.eps}
+                \caption{Occupazione delle colonnine}
+                \label{fig:occupazione}
+        \end{subfigure}
+        ~
+		\begin{subfigure}[T]{0.45\textwidth}
+                \includegraphics[width=\textwidth]{assets/anxiety30-vapo.eps}
+                \caption{Richieste non soddisfatte}
+                \label{fig:vapo}
+        \end{subfigure}%
+        ~
+        \begin{subfigure}[H]{0.45\textwidth}
+                \includegraphics[width=\textwidth]{assets/anxiety30-states.eps}
+                \caption{Rapporto tra tempo }
+                \label{fig:states}
+        \end{subfigure}%
+        \caption{}
+\end{figure}
 
 
 %\section{Implementazione}

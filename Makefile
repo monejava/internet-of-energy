@@ -14,7 +14,7 @@ rename:
 	mv $(MAIN).pdf $(DIST).pdf
 	
 clean:
-	rm -Rf *.log *.out *.dvi *.aux *.toc *.synctex.gz *.blg *.bcf *.run.xml *.bbl *-blx.bib build/
+	rm -Rf *.log *.out *.dvi *.aux *.toc *.synctex.gz *.blg *.bcf *.run.xml *.bbl *-blx.bib *.lol *.lof build/
 	
 clean-all: clean
 	rm -f $(MAIN).pdf $(DIST).pdf

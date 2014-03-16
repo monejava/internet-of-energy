@@ -167,8 +167,8 @@
 	
 	\begin{conblock}{Mobilit\`{a} elettrica veicolare - CONTRO}
 		\begin{itemize}
-			\con {\large Tempi di ricarica Lunghi}
-			\con {\large Durata Batterie limitata}
+			\con {\large Tempi di ricarica lunghi}
+			\con {\large Autonomia limitata}
 			\con {\large Posizione Colonnine}
 		\end{itemize}
 	\end{conblock}
@@ -179,8 +179,12 @@
 	\frametitle{Internet of Energy}
 	\begin{problock}{Internet of Energy}
 		\begin{itemize}
-			\item {\large Infrastrutture}
-			\item {\large Servizi}
+			\vspace*{0.3em}
+			\item {\large Produzione da fonti rinnovabili, distribuzione e stoccaggio dell'Energia}
+			\vspace*{0.3em}
+			\item {\large Batterie preformanti e Veicoli ``intelligenti''}
+			\vspace*{0.3em}			
+			\item {\large Servizi di supporto alla ricarica}
 		\end{itemize}	
 	\end{problock}
 	 
@@ -218,68 +222,20 @@
 	\end{problock}
 	
 	\begin{center}
-		\includegraphics<1>[width=.3\textwidth]{assets/mobile-app-charge-request.png}
+		\includegraphics<1>[width=.304\textwidth]{assets/mobile-app-charge-request.png}
+		\hspace{2em}
 		\includegraphics<1>[width=.3\textwidth]{assets/mobile-app-charge-options.png}
 		\includegraphics<2>[width=.3\textwidth]{assets/mobile-app-map.png}
-		\hspace*{2em}
 		\includegraphics<2>[width=.5\textwidth]{assets/mobile-app-alti-graph.png}
 		\includegraphics<3>[width=.3\textwidth]{assets/mobile-app-battery-var.png}
-		\hspace*{2em}
 		\includegraphics<3>[width=.3\textwidth]{assets/mobile-app-notify.png}
 		\includegraphics<4>[width=.45\textwidth]{assets/daily.png}
-%		\includegraphics<1>[height=0.5\textheight,keepaspectratio]{assets/daily.png}
-
-%		\begin{tikzpicture}%[framed,background rectangle/.style={ultra thick,draw=white, top color=white, rounded corners}]
-%			\visible<1> {
-%				\node[inner sep=0pt] (daily) at (2,0)
-%	  				 {\includegraphics[width=.45\textwidth]{assets/daily.png}};
-%			}
-%			\visible<2> {
-%				\node[inner sep=0pt] (request) at (0,0)
-%	  				 {\includegraphics[width=.3\textwidth]{assets/mobile-app-charge-request.png}};
-%				\node[inner sep=0pt] (response) at (5,0)
-%	   				 {\includegraphics[width=.3\textwidth]{assets/mobile-app-charge-options.png}};
-%				\draw[->,thick] (request) -- (response) ;		
-%			}
-%			
-%			\visible<3> {
-%				\node[inner sep=0pt] (map) at (0,0)
-%	  				 {\includegraphics[width=.3\textwidth]{assets/mobile-app-map.png}};
-%				\node[inner sep=0pt] (graph) at (5,0)
-%	   				 {\includegraphics[width=.5\textwidth]{assets/mobile-app-alti-graph.png}};	
-%			}
-%			
-%			\visible<4> {
-%				\node[inner sep=0pt] (request) at (0,0)
-%	  				 {\includegraphics[width=.43\textwidth]{assets/mobile-app-altimetry-summary.png}};
-%				\node[inner sep=0pt] (response) at (5,0)
-%	   				 {\includegraphics[width=.4\textwidth]{assets/mobile-app-energy.png}};	
-%			}
-%		\end{tikzpicture}
 	\end{center}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Simulatore}
-	\begin{problock}{Architettura}
-		\begin{itemize}[<+->]
-			\item {\large SUMO}
-			\item {\large OMNeT++}
-			\item {\large Veins}
-		\end{itemize}	
-	\end{problock}
-	
-	\begin{center}
-		\includegraphics<1>[height=0.5\textheight,keepaspectratio]{assets/sumo.jpg}
-		\includegraphics<2>[height=0.5\textheight,keepaspectratio]{assets/sumo-2.jpg}
-		\includegraphics<3>[height=0.5\textheight,keepaspectratio]{assets/veins-arch.png}
-	\end{center}
-	
-\end{frame}
-
-\begin{frame}
-	\frametitle{Simulatore}
-	\begin{problock}{Dati Studiabili}
+	\begin{problock}{Funzionalità}
 		\begin{itemize}[<+->]
 			\item {\large Occupazione Colonnine}
 			\item {\large Comportamento veicoli}
@@ -298,5 +254,107 @@
 	\end{center}
 		
 \end{frame}
+
+\begin{frame}
+	\frametitle{Simulatore}
+	\begin{problock}{Architettura}
+		\begin{itemize}[<+->]
+			\item {\large SUMO}
+			\item {\large OMNeT++}
+			\item {\large Veins}
+		\end{itemize}
+	\end{problock}
+	
+	\begin{center}
+		\includegraphics<1-2>[width=0.5\textwidth,keepaspectratio]{assets/sumo.jpg}
+		\hspace{1em}
+		\includegraphics<1-2>[width=0.4\textwidth,keepaspectratio]{assets/sumo-2.jpg}
+		\includegraphics<3->[height=0.5\textheight,keepaspectratio]{assets/veins-arch.png}
+	\end{center}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Dettagli implementativi}
+	
+	\begin{problock}{Libreria IoE}
+		\begin{itemize}
+			\item {\large Rappresentazione a Oggetti delle classi dell'ontologia}
+			\item {\large Semplificate operazioni CRUD}
+			\item {\large Condivisa tra Servizio Cittadino e Applicazione Mobile}
+		\end{itemize}
+	\end{problock}
+	
+	\pause		
+		
+	\begin{problock}{Servizio Cittadino}
+		\begin{itemize}
+			\item {\large Pool di Thread}
+			\item {\large Pool di Oggetti}
+			\item {\large Cache}
+		\end{itemize}
+	\end{problock}
+	
+	\pause
+	
+	\begin{problock}{Libreria UniboGeoTool}
+		\begin{itemize}[<+->]
+			\item {\large Dati altimetrici (Google - SRTM)}
+			\item {\large Percorso in strada (Google)}
+		\end{itemize}
+	\end{problock}
+\end{frame}
+	
+
+
+\begin{frame}
+	\frametitle{Pubblicazioni}
+	
+	\begin{itemize}
+		\item {\large An interoperable architecture for mobile smart services over the Internet of Energy (pubblicato)\\ \vspace{0.5em} Luciano Bononi; Marco Di Felice; Alfredo D'Elia; Randolf Mock; Federico Montori; Francesco Morandi; Luca Roffia; Simone Rondelli; , Tullio S. Cinotti; Fabio Vergari}
+		\item {\large An Integrated Simulation Framework to Model Electric Vehicles Operations and Services (sottoposto)\\ \vspace{0.5em} Luciano Bononi; Marco Di Felice; Alfredo D'Elia; Randolf Mock; Simone Rondelli; , Tullio S. Cinotti; Fabio Vergari}
+	\end{itemize}
+\end{frame}
+
+%\begin{frame}
+%	\frametitle{Architettura Simulatore}
+%	\begin{problock}{SUMO}
+%		\begin{itemize}
+%			\item {\large Simulatore Traffico Urbano}
+%			\item {\large Modellazione dello scenario stradale di Bologna}
+%		\end{itemize}	
+%	\end{problock}
+%	
+%	\begin{center}
+%		\includegraphics[height=0.5\textheight,keepaspectratio]{assets/sumo.jpg}
+%	\end{center}
+%\end{frame}
+%
+%\begin{frame}
+%	\begin{problock}{OMNeT++}
+%		\begin{itemize}
+%			\item {\large Simulatore a eventi discreti}
+%			\item {\large Logica di funzionamento dei veicoli}
+%			\item {\large Comportamento degli utenti}
+%			\item {\large Modello di carica e scarica della batteria}
+%		\end{itemize}	
+%	\end{problock}
+%	
+%	\begin{center}
+%		\includegraphics[height=0.5\textheight,keepaspectratio]{assets/sumo-2.jpg}
+%	\end{center}
+%\end{frame}
+%
+%\begin{frame}
+%	\begin{problock}{Veins}
+%		\begin{itemize}
+%			\item {\large Modulo di OMNeT++}
+%			\item {\large Comunicazione tra OMNeT++ e SUMO}
+%		\end{itemize}	
+%	\end{problock}
+%	
+%	\begin{center}
+%		\includegraphics[height=0.5\textheight,keepaspectratio]{assets/veins-arch.png}
+%	\end{center}
+%\end{frame}
 
 \end{document}

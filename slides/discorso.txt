@@ -1,31 +1,143 @@
 I problemi derivanti dall'inquinamento e dalla dipendenza dai combustibili fossili
-hanno reso di fondametale importanza il graduale ricorso alla Mobilità Elettrica Veicolare.
+hanno reso di fondametale importanza il graduale ricorso alla Mobilità Veicolare Elettrica.
 
-Perchè graduale?
-Perchè l'utilizzo dei veicoli elettrici e subordinato alla soluzione di diverse problemi ovvero:
--Elevati tempi di ricarica, dell'ordine anche di ore
--Durata della batteria ridotta
--Reperibilità delle colonnine di ricarica
+I veicoli elettrici presentano però alcune inconvenienti:
+- Inanzitutto tempi di ricarica molto lunghi, circa un ordine grandezza maggiori rispetto a quelli richiesti dei veicoli a combustibile fossile,
+- al quale si aggiunge una limitata autonomia delle batteria
+- e infine la difficoltà di riperimento delle colonnine di ricarica
 
 Risulta quindi necessario per l'utente programmare le ricariche.
 
-Il progetto Internet of Energy si pone un'obiettivo a largo raggio che va da 
--Produzione dell'energia da finti rinnovabili, distribuzione e stoccaggio.
--Servizi di supporto alla mobilità elettrica veicolare.
+Il progetto Europeo di ricerca Internet of Energy che coinvolge 40 partner da 10 nazioni si prefigge come obbiettivo:
 
-Uno di questi servizi, motivato dai cospiqui tempi di permanenza dei veicoli presso le stazioni di 
-ricarica, è un efficace sistema di prenotazione delle ricariche.
+- la produzione dell'energia da fonti rinnovabili, la sua distribuzione e il suo stoccaggio.
+- la prgettazione di batterie più performanti e di veicoli intelligenti in grado di ottimizzare il rendimento dei motori elettrici.
+- e infine la creazione di servizi di supporto alla mobilità elettrica veicolare.
 
-Il dipartimento di Informatica dell'Università di Bologna in collaborazione con ARCES ha proposto 
-un infrastruttura che fornisce un servizio di prenotazione basato su tecnologie semantiche.
+Uno degli obiettivi di questa tesi è appunto l'implentazione di un efficace sistema di prenotazione delle ricariche, 
+reso indispensabile dai lunghi tempi di permanenza dei veicoli presso le colonnine di ricarica. 
+La tesi si basa sul precedente lavoro di Federico Montori, del dipartimento di Informatica dell'Università di Bologna,
+che in collaborazione con ARCES ha proposto un infrastruttura, software basata su tecnologie semantiche.
 
-La definizione dei dati del sistema avviene tramite Ontologia: questa consente in generale
-di relazionare i dati di un certo dominio applicativo tramite la semantica, ovvero il 
-significato da essi assunto all'interno del contesto in cui si trovano.
+La definizione dei dati del sistema avviene tramite Ontologia che, in termini estremamente sintetici,
+specifica la struttura semantica di un dominio applicativo, ovvero il significato che i dati assumono 
+all'interno del contesto in cui si trovano. La rappresentazione è tale per cui può essere interpretata
+dalle macchine allo scopo di rendere la semantica del dominio accessibile agli agenti software che condividono 
+la stessa all'ontologia, consentendo di fatto l'interoperabilità.
+.
 
 Il Servizio Cittadino di gestione delle prenotazioni è basato su un database semantico,
 il Semantic Information Broker, che gestisce la persistenza e lo scambio dei dati tra 
 gli utenti e le colonnine di ricarica.
+
+Ho inoltre sviluppato una applicazione mobile che, interagendo con il servizio cittadino,
+permette di effettuare richieste di prenotazione specificando la zona la fascia oraria e la
+quantità di energia da acquistare.
+
+Il servizio cittadino risponde con la lista delle colonnine conformi alla richiesta.
+
+Un altra importante funzionalità che ho implentato, basata sullo studio del profilo
+altimetrico, è la stima del consumo energetico necessario a raggiungere una certa destinazione
+(che può essere ad esempio la colonnina di ricarica).
+
+Inoltre è possibile monitorare i parametri della batteria e di avvisare l'utente quando il
+livello di carica scende sotto una certa soglia. 
+
+Essendo Fiat uno dei partner del progetto IoE ho potuto testare l'applicazione su un 
+prototipo di Iveco Daily elettrico presso il Centro Ricerche Fiat a Torino. 
+
+Il terzo apporto fornito a questo progetto è stato lo sviluppo di un simulatore di mobilità
+elettrica veicolare.
+
+Il simulatore risulta fondamentale per i distributori di energia o le amministrazioni pubbliche
+per studiare l'impatto dell'introduzione dei veicoli elettrici in un contesto urbano reale.
+
+Potremmo ad esempio valutare l'occupazione delle colonnine in relazione con il numero di veicoli,
+oppure qual è il punto più sensato dove inserire una nuova colonnina o dve aumentare la
+potenza delle stesse.
+
+Possimo vedere nel grafico come l'occupazione delle colonnine sia direttamente proporzionale al numero di veicoli
+fino a raggiungere una situazione di saturazione a circa 200 veicoli.
+
+Nel grafico è rapresentata l'occupazione sia senza prenotazione (linea verde) che con prenotazione:
+
+-tempi di prenotazione elastici, ovvero l'utente è disposto a variare i parametri della prenotazione se non 
+trova ozioni di ricarica (linea rossa)
+
+-tempi di prenotazione fissi, ovvero l'utente prova sempre a ricaricare al massimo la batteria (linea blu),
+questa soluzione porta inevitabilmente ad avere dei buchi nell'occupazione delle colonnine che aumentano
+proporzionalmente con il numero dei veicoli.
+
+Guardando soltanto questo grafico si potrebbe pensare che il sistema con prenotazione sia svantaggioso, come vedremo
+nei prossimi grafici non è cosi:
+
+Questo grafico mostra il rapporto tra il tempo impiegato dai veicoli a cercare una colonnina di ricarica e il tempo
+impiegato a svolgere le normali mansioni dell'autista. È evidente come i  veicoli senza prenotazioni impieghino la
+maggior parte del loro tempo alla ricerca di una colonnina di ricarica mentre gli utenti con prenotazioni possono
+essere più rilassati e impiegare il loro tempo com emeglio credono.
+
+Questo graico mostra il numero di tentativi di ricarica falliti, che nel sistema simulato equivalgono ai veicoli
+che non riuscendo ad effettuare una ricarica rimangono con la batteria completamente scarica,.
+È evidente come senza prenotazione il numero di veicoli che rimane "a piedi" sia sensibilmente maggiore
+rispetto alla modalità con prenotazione.
+
+Infine questo grafico che mostra il consumo di energia di un veicolo al variare del peso e della pendenza.
+Il grafico a destra mostra il consumo in un percorso in pianura mentre quello a sinistra mostra il consumo in un percorso 
+con una pendenza costante del 23°.
+Si può notare come il consumo cresca linearmente con il peso del veicolo e come aumenti di circa sette volte nel percorso in salita.
+Questi dati sono stati validati con quelli raccolti al Centro Ricerche Fiat dal Daily. Ovvero inserendo nella simulazione
+un veicolo con parametri analoghi a quelli del Daily otteniamo un consumo molto simile.
+
+
+Il simulatore consta di tre parti fondamentali:
+
+-SUMO: un simulatore di traffico urbano, che ha consentito di modellare lo scenario bolognese.
+
+-OMNeT++ un simulatore a eventi discreti attraverso il quale ho implementato la logica di funzionamento
+dei veicoli, i modelli di carica e scarica della batteria e il comportamento degli utenti.
+
+Infine Veins, un modulo di OMNeT++ permette la comunicazione con SUMO tramite socket TCP/IP.
+
+Proverò adesso ad approfondire qualche dettaglio implementativo rilveante:
+
+Per semplificare lo sviluppo ho creato una libreria che permette di avere una rappresentazione a oggetti 
+delle classi dell'ontologia. Ogni classe dell'ontologia è mappata da un equivalente classe "Entity" Java,
+analogamente a quanto accade con gli ORM.
+
+Per ogni classe Java ho quindi creato i controller che permettono di eseguire le operazioni di lettura,
+scrittura, cancellazione e creazione delle entità nascondendo i dettagli di connessione al Semantic
+Information Broker all'utilizzatore.
+
+La libreria è infatti usata sia dall'applicazione mobile che dal servizio cittadino. È stata inoltre 
+utilizzata in un progetto parallelo al mio.
+
+Per quanto riguardo il servizo cittadino ho usato la tecnica dei Pool di Thread e dei Pool di Oggetti
+al fine di minimizzare le latenze necessarie alla loro creazione. La sincronizzazione tra i vari thread
+è assicurata tramite il meccanismo dei lock.
+Inoltre ho implementato un meccanismo di caching dei dati che riduce al minimo le letture dal Semantic 
+Information Brocker.
+
+Parallelamente a quasto progetto ho sviluppato la libreria UniboGeoTools che permette di calcolare il percorso
+tra due punti e il profilo altimetrico oltre a molte altre funzionalità. Questa libreria è stata usata
+sia dall'appliczione mobile, per stimare in modo preciso i consumi del veicolo, che dal servizio cittadino
+per calcolare le distanze delle colonnine.
+
+Il percorso tra due punti, su strada, è ottenuto tramite interrogazione dei WebServices messi a disposizione
+da Google.
+
+Mentre il profilo altimetrico è ottenuto in due diversi modo. Uno sempre tramite i Web Service di google
+e un'altro, molto più efficiente e privo di limitazioni, tramite lettura di appositi file chiamati SRTM 
+messi a disposizione dal governo americano risultato di una scansione tramite satellite della superfice terrestre.
+
+Concludo dicendo che questo progetto ha portato a scrivere due articoli, il primo che è già stato pubblicato 
+su una rivista e il secondo che è stato sottoposto a un Jurnal.
+
+
+Spacca bella ciao.
+
+
+
+
 
 
 

@@ -24,7 +24,6 @@ specifica la struttura semantica di un dominio applicativo, ovvero il significat
 all'interno del contesto in cui si trovano. La rappresentazione è tale per cui può essere interpretata
 dalle macchine allo scopo di rendere la semantica del dominio accessibile agli agenti software che condividono 
 la stessa all'ontologia, consentendo di fatto l'interoperabilità.
-.
 
 Il Servizio Cittadino di gestione delle prenotazioni è basato su un database semantico,
 il Semantic Information Broker, che gestisce la persistenza e lo scambio dei dati tra 

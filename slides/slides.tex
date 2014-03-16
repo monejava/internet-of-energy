@@ -196,13 +196,13 @@
 	\begin{problock}{Componenti}
 		\begin{itemize}
 			\item {\large Ontologia}
-			\item {\large Semantic Informationn Broker}
+			\item {\large Semantic Information Broker}
 			\item {\large Servizio Cittadino}
 		\end{itemize}	
 	\end{problock}
 	
 	\begin{center}
-		\includegraphics[height=0.65\textheight,keepaspectratio]{assets/architecture-without.png}
+		\includegraphics[height=0.63\textheight,keepaspectratio]{assets/architecture-without.png}
 	\end{center}
 \end{frame}
 
@@ -210,43 +210,52 @@
 	\frametitle{Applicazione Mobile}
 	\begin{problock}{Funzionalità}
 		\begin{itemize}[<+->]
-			\item {\large Interfaccia con Veicolo Reale}
 			\item {\large Prenotazione Ricariche}
-			\item {\large Profilo Altimetrico}
-			\item {\large Consumo Energetico}
+			\item {\large Profilo Altimetrico \& Consumo Energetico}
+			\item {\large Monitoraggio batteria}
+			\item {\large Interfaccia con Veicolo Reale}
 		\end{itemize}	
 	\end{problock}
 	
 	\begin{center}
+		\includegraphics<1>[width=.3\textwidth]{assets/mobile-app-charge-request.png}
+		\includegraphics<1>[width=.3\textwidth]{assets/mobile-app-charge-options.png}
+		\includegraphics<2>[width=.3\textwidth]{assets/mobile-app-map.png}
+		\hspace*{2em}
+		\includegraphics<2>[width=.5\textwidth]{assets/mobile-app-alti-graph.png}
+		\includegraphics<3>[width=.3\textwidth]{assets/mobile-app-battery-var.png}
+		\hspace*{2em}
+		\includegraphics<3>[width=.3\textwidth]{assets/mobile-app-notify.png}
+		\includegraphics<4>[width=.45\textwidth]{assets/daily.png}
 %		\includegraphics<1>[height=0.5\textheight,keepaspectratio]{assets/daily.png}
 
-		\begin{tikzpicture}%[framed,background rectangle/.style={ultra thick,draw=white, top color=white, rounded corners}]
-			\visible<1> {
-				\node[inner sep=0pt] (daily) at (2,0)
-	  				 {\includegraphics[width=.45\textwidth]{assets/daily.png}};
-			}
-			\visible<2> {
-				\node[inner sep=0pt] (request) at (0,0)
-	  				 {\includegraphics[width=.3\textwidth]{assets/mobile-app-charge-request.png}};
-				\node[inner sep=0pt] (response) at (5,0)
-	   				 {\includegraphics[width=.3\textwidth]{assets/mobile-app-charge-options.png}};
-				\draw[->,thick] (request) -- (response) ;		
-			}
-			
-			\visible<3> {
-				\node[inner sep=0pt] (map) at (0,0)
-	  				 {\includegraphics[width=.3\textwidth]{assets/mobile-app-map.png}};
-				\node[inner sep=0pt] (graph) at (5,0)
-	   				 {\includegraphics[width=.5\textwidth]{assets/mobile-app-alti-graph.png}};	
-			}
-			
-			\visible<4> {
-				\node[inner sep=0pt] (request) at (0,0)
-	  				 {\includegraphics[width=.43\textwidth]{assets/mobile-app-altimetry-summary.png}};
-				\node[inner sep=0pt] (response) at (5,0)
-	   				 {\includegraphics[width=.4\textwidth]{assets/mobile-app-energy.png}};	
-			}
-		\end{tikzpicture}
+%		\begin{tikzpicture}%[framed,background rectangle/.style={ultra thick,draw=white, top color=white, rounded corners}]
+%			\visible<1> {
+%				\node[inner sep=0pt] (daily) at (2,0)
+%	  				 {\includegraphics[width=.45\textwidth]{assets/daily.png}};
+%			}
+%			\visible<2> {
+%				\node[inner sep=0pt] (request) at (0,0)
+%	  				 {\includegraphics[width=.3\textwidth]{assets/mobile-app-charge-request.png}};
+%				\node[inner sep=0pt] (response) at (5,0)
+%	   				 {\includegraphics[width=.3\textwidth]{assets/mobile-app-charge-options.png}};
+%				\draw[->,thick] (request) -- (response) ;		
+%			}
+%			
+%			\visible<3> {
+%				\node[inner sep=0pt] (map) at (0,0)
+%	  				 {\includegraphics[width=.3\textwidth]{assets/mobile-app-map.png}};
+%				\node[inner sep=0pt] (graph) at (5,0)
+%	   				 {\includegraphics[width=.5\textwidth]{assets/mobile-app-alti-graph.png}};	
+%			}
+%			
+%			\visible<4> {
+%				\node[inner sep=0pt] (request) at (0,0)
+%	  				 {\includegraphics[width=.43\textwidth]{assets/mobile-app-altimetry-summary.png}};
+%				\node[inner sep=0pt] (response) at (5,0)
+%	   				 {\includegraphics[width=.4\textwidth]{assets/mobile-app-energy.png}};	
+%			}
+%		\end{tikzpicture}
 	\end{center}
 \end{frame}
 

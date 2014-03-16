@@ -3,5 +3,37 @@ hanno reso di fondametale importanza il graduale ricorso alla Mobilità Elettric
 
 Perchè graduale?
 Perchè l'utilizzo dei veicoli elettrici e subordinato alla soluzione di diverse problemi ovvero:
--Elevati tempi di ricarica a fronte di durata della batteria ridotta
+-Elevati tempi di ricarica, dell'ordine anche di ore
+-Durata della batteria ridotta
 -Reperibilità delle colonnine di ricarica
+
+Risulta quindi necessario per l'utente programmare le ricariche.
+
+Il progetto Internet of Energy si pone un'obiettivo a largo raggio che va da 
+-Produzione dell'energia da finti rinnovabili, distribuzione e stoccaggio.
+-Servizi di supporto alla mobilità elettrica veicolare.
+
+Uno di questi servizi, motivato dai cospiqui tempi di permanenza dei veicoli presso le stazioni di 
+ricarica, è un efficace sistema di prenotazione delle ricariche.
+
+Il dipartimento di Informatica dell'Università di Bologna in collaborazione con ARCES ha proposto 
+un infrastruttura che fornisce un servizio di prenotazione basato su tecnologie semantiche.
+
+La definizione dei dati del sistema avviene tramite Ontologia: questa consente in generale
+di relazionare i dati di un certo dominio applicativo tramite la semantica, ovvero il 
+significato da essi assunto all'interno del contesto in cui si trovano.
+
+Il Servizio Cittadino di gestione delle prenotazioni è basato su un database semantico,
+il Semantic Information Broker, che gestisce la persistenza e lo scambio dei dati tra 
+gli utenti e le colonnine di ricarica.
+
+
+
+
+
+
+
+
+
+
+

@@ -137,11 +137,29 @@ Mentre il profilo altimetrico è ottenuto in due diversi modo. Uno sempre tramit
 e un'altro, molto più efficiente e privo di limitazioni, tramite lettura di appositi file chiamati SRTM 
 messi a disposizione dal governo americano risultato di una scansione tramite satellite della superfice terrestre.
 
-Concludo dicendo che questo progetto ha portato a scrivere due articoli, il primo che è già stato pubblicato 
-su una rivista e il secondo che è stato sottoposto a un Jurnal.
+Concludo dicendo che questo progetto ha portato a scrivere due articoli, il primo che è già stato presetato 
+a una conferenza internazionale mentre il secondo che è stato sottoposto a una rivista internazionale.
 
 
 Spacca bella ciao.
+
+
+
+-----------------
+
+
+Servono dei servizi di supporto.... Al posto di servizi ricarica
+
+No parlare di federico montori Arces e Unibo.
+
+Occupazione simile ma slide successiva..
+
+Conclusioni & Sviluppi futuri
+
+Validazione del servizio su un infrastruttura reale.
+
+
+
 
 
 

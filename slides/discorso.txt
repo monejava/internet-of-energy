@@ -19,11 +19,16 @@ reso indispensabile dai lunghi tempi di permanenza dei veicoli presso le colonni
 La tesi si basa sul precedente lavoro di Federico Montori, del dipartimento di Informatica dell'Università di Bologna,
 che in collaborazione con ARCES ha proposto un infrastruttura, software basata su tecnologie semantiche.
 
+Il quore di questa architettura è il Servizio Cittadino ovvero l'entità che gestisce le richieste di prenotazione.
+
 La definizione dei dati del sistema avviene tramite Ontologia che, in termini estremamente sintetici,
 specifica la struttura semantica di un dominio applicativo, ovvero il significato che i dati assumono 
-all'interno del contesto in cui si trovano. La rappresentazione è tale per cui può essere interpretata
-dalle macchine allo scopo di rendere la semantica del dominio accessibile agli agenti software che condividono 
-la stessa all'ontologia, consentendo di fatto l'interoperabilità.
+all'interno del contesto in cui si trovano. 
+
+L'ontologia è rappresentata in formato machine-readable ovvero garantisce l'iterperabilità tra le
+macchine che la condividono.
+
+
 
 Il Servizio Cittadino di gestione delle prenotazioni è basato su un database semantico,
 il Semantic Information Broker, che gestisce la persistenza e lo scambio dei dati tra 
@@ -54,6 +59,10 @@ per studiare l'impatto dell'introduzione dei veicoli elettrici in un contesto ur
 Potremmo ad esempio valutare l'occupazione delle colonnine in relazione con il numero di veicoli,
 oppure qual è il punto più sensato dove inserire una nuova colonnina o dve aumentare la
 potenza delle stesse.
+
+I grafici che vedremo di seguito provengono dalle simulazioni svolte con il simulatore.
+
+[tempo di osservazione, ascissa, colore, ordinata, massimo, risultato]
 
 Possimo vedere nel grafico come l'occupazione delle colonnine sia direttamente proporzionale al numero di veicoli
 fino a raggiungere una situazione di saturazione a circa 200 veicoli.

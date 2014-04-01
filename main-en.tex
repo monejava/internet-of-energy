@@ -1,0 +1,76 @@
+\documentclass[12pt,a4paper,openright,twoside]{report}
+
+\usepackage[english]{babel} %a capo italiano
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}%libreria per accettare i caratteri si può usare anche \usepackage[T1]{fontenc}
+\usepackage{fancyhdr}%libreria per impostare il documento
+\usepackage{indentfirst}%libreria per avere l'indentazione
+\usepackage{newlfont}
+\usepackage[utf8]{inputenc} %fornisce i caratteri accentati
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{enumitem} % ref enumerate
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+\usepackage{underscore}
+\usepackage[babel]{csquotes}
+\usepackage[backend=biber,
+		    maxbibnames=99,
+		    style=numeric,
+    		sortlocale=en_EN,
+   			natbib=true,
+  		  	url=false, 
+    		doi=true,
+    		eprint=false]{biblatex} %biblio
+\usepackage[export]{adjustbox} %ridimensionamento immagini
+\usepackage{textcomp} %simbolo grado celsius
+\usepackage{amsmath}
+
+\defbibheading{cartaceo}{\subsection*{Paper source}}
+\defbibheading{web}{\subsection*{Web source}}
+
+%%% Impostazioni pagine %%%
+\usepackage{fancyhdr}
+%\pagestyle{fancy}\addtolength{\headwidth}{20pt}
+\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\chaptername}\ \thechapter.\ #1}{}}
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection \ #1}{}}
+\rhead[\fancyplain{}{\bfseries\leftmark}]{\fancyplain{}{\bfseries\thepage}}
+\cfoot{}
+
+%\newcommand{\clear}{\clearpage{\pagestyle{empty}\cleardoublepage}}
+
+\setlength{\headheight}{15pt}
+
+
+\addbibresource{biblio.bib}
+
+\oddsidemargin=30pt \evensidemargin=20pt%impostano i margini
+
+%comandi per l'impostazione della pagina, 
+\pagestyle{fancy}\addtolength{\headwidth}{20pt}
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection \ #1}{}}
+\rhead[\fancyplain{}{\bfseries\leftmark}]{\fancyplain{}{\bfseries\thepage}}
+\cfoot{}
+
+% comando per impostare l'interlinea
+\linespread{1.2}
+
+%\textwidth=450pt\oddsidemargin=0pt
+\begin{document}
+	 % comando per evitare che il contenuto di una pagina venga ``stiracchiato'' se non c'è abbastanza
+	 % testo lo spazio in bianco viene lasciato in fondo alla pagina e non qua e la
+	\raggedbottom 
+		
+	\input{abstract-en.tex}
+		
+	\chapter*{\refname}
+	\printbibliography[heading=cartaceo,nottype=online]
+	\printbibliography[heading=web,type=online]
+
+  
+\end{document}

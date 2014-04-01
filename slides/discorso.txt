@@ -144,6 +144,12 @@ a una conferenza internazionale mentre il secondo che è stato sottoposto a una 
 Spacca bella ciao.
 
 
+.............................................
+
+modalita di ricarica
+
+rosso -> modalità flessibile, ovvero l'utente accetta la ricarica solo se il tempo disponibile non permette la ricarica completa
+
 
 -----------------
 

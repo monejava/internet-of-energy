@@ -5,6 +5,9 @@ Tesi di Laurea triennale di Simone Rondelli
 
 Un framework di analisi e di servizi innovativi per la mobilità veicolare elettrica
 
+A Framework for Analysis and innovative services for Electrical Mobility
+
+
 Relatore: Luciano Bononi
 Correlatore: Tullio Salomon Cinotti, Luca Bedogni, Marco Di Felice
 
